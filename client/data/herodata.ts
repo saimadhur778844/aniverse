@@ -1,13 +1,16 @@
-const heroData = [
+import { HeroBanner } from "@/types/hero";
+
+const heroData: HeroBanner[] = [
   {
     id: 1,
-    title: "One Piece",
-    subtitle: "Embark on the Grand Line",
+    anime: "One Piece",
+    heading: "ENTER THE ANIVERSE",
     description:
-      "Premium figures, collectibles, swords and exclusive merchandise.",
-    image:
-      "https://images.unsplash.com/photo-1511512578047-dfb367046420?w=1600",
-    button: "Explore One Piece",
+      "Discover premium anime figures, collectibles and exclusive merchandise.",
+    button: "Explore Collection",
+    image: "/images/hero/onepiece.png",
+    color: "#E63946",
+    category: "Shonen",
   },
 ];
 
