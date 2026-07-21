@@ -8,6 +8,9 @@ import {
   deleteProduct,
 } from "../controllers/productController.js";
 
+import protect from "../middleware/protect.js";
+import admin from "../middleware/admin.js";
+
 const router = express.Router();
 
 router.get("/", getProducts);

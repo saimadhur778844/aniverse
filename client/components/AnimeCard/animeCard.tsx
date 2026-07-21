@@ -1,7 +1,7 @@
 import Image from "next/image";
 import { Anime } from "@/types/anime";
 import styles from "./animeCard.module.css";
-import Button from "@/components/Button";
+import button from "@/components/Button";
 
 interface AnimeCardProps {
   anime: Anime;

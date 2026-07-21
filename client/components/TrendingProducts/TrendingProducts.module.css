@@ -1,0 +1,23 @@
+.section {
+  padding: 80px 5%;
+}
+
+.header {
+  text-align: center;
+  margin-bottom: 50px;
+}
+
+.header h2 {
+  font-size: 2.5rem;
+  margin-bottom: 12px;
+}
+
+.header p {
+  color: gray;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 30px;
+}
