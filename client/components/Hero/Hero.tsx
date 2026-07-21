@@ -3,6 +3,7 @@
 import Image from "next/image";
 import heroData from "@/data/herodata";
 import styles from "./Hero.module.css";
+import Button from "@/components/Button";
 
 export default function Hero() {
   const hero = heroData[0];

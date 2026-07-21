@@ -1,11 +1,13 @@
 import Hero from "@/components/Hero";
 import Navbar from "@/components/Navbar";
+import FeaturedCollection from "@/components/FeaturedCollection";
 
 export default function Home() {
   return (
     <>
       <Navbar />
       <Hero />
+      <FeaturedCollection />
 
       <main
         style={{
