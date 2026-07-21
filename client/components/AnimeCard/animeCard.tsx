@@ -1,7 +1,7 @@
 import Image from "next/image";
 import { Anime } from "@/types/anime";
 import styles from "./animeCard.module.css";
-import button from "@/components/Button";
+import Button from "@/components/Button";
 
 interface AnimeCardProps {
   anime: Anime;
@@ -25,9 +25,7 @@ export default function AnimeCard({ anime }: AnimeCardProps) {
 
         <p>{anime.description}</p>
 
-        <button variant="secondary">
-            Explore →
-        </button>
+        <Button variant="secondary">Explore →</Button>
       </div>
     </article>
   );
