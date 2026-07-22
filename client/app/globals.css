@@ -46,3 +46,29 @@ img {
 section {
   padding: 80px 8%;
 }
+
+/* ---------- ADMIN INPUT FIXES ---------- */
+
+input,
+textarea,
+select {
+  color: #111827;
+  background: #ffffff;
+  border: 1px solid #d1d5db;
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: #9ca3af;
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+  outline: none;
+  border-color: #2563eb;
+}
+
+label {
+  color: #111827;
+}

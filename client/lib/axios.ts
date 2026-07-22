@@ -5,6 +5,7 @@ const api = axios.create({
   headers: {
     "Content-Type": "application/json",
   },
+  timeout: 10000,
 });
 
 api.interceptors.request.use((config) => {
@@ -18,5 +19,20 @@ api.interceptors.request.use((config) => {
 
   return config;
 });
+
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response?.status === 401) {
+      console.warn("Unauthorized");
+
+      // Later:
+      // localStorage.removeItem("token");
+      // router.push("/login");
+    }
+
+    return Promise.reject(error);
+  }
+);
 
 export default api;

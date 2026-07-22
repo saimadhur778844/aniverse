@@ -1,7 +1,13 @@
 const errorHandler = (err, req, res, next) => {
   console.error(err);
 
-  const statusCode = res.statusCode !== 200 ? res.statusCode : 500;
+  let statusCode = res.statusCode !== 200 ? res.statusCode : 500;
+
+  if (err.name === "CastError" || err.name === "ValidationError") {
+    statusCode = 400;
+  } else if (err.code === 11000) {
+    statusCode = 409;
+  }
 
   res.status(statusCode).json({
     success: false,

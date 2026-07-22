@@ -1,5 +1,7 @@
+import mongoose from "mongoose";
 import Product from "../models/Product.js";
 import asyncHandler from "../utils/asyncHandler.js";
+import slugify from "slugify";
 
 // @desc    Get all products
 // @route   GET /api/products
@@ -87,7 +89,13 @@ export const getProduct = asyncHandler(async (req, res) => {
 // @desc    Create product
 // @route   POST /api/products
 export const createProduct = asyncHandler(async (req, res) => {
-  const product = await Product.create(req.body);
+  const product = await Product.create({
+    ...req.body,
+    slug: slugify(req.body.name, {
+      lower: true,
+      strict: true,
+    }),
+  });
 
   res.status(201).json({
     success: true,
@@ -98,6 +106,23 @@ export const createProduct = asyncHandler(async (req, res) => {
 // @desc    Update product
 // @route   PUT /api/products/:id
 export const updateProduct = asyncHandler(async (req, res) => {
+  if (!mongoose.isValidObjectId(req.params.id)) {
+    res.status(400);
+    throw new Error("Invalid product id");
+  }
+
+  if (!req.body || Object.keys(req.body).length === 0) {
+    res.status(400);
+    throw new Error("Product update data is required");
+  }
+
+    if (req.body.name) {
+  req.body.slug = slugify(req.body.name, {
+    lower: true,
+    strict: true,
+  });
+  }
+  
   const product = await Product.findByIdAndUpdate(
     req.params.id,
     req.body,

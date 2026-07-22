@@ -4,14 +4,10 @@ import cloudinary from "../config/cloudinary.js";
 
 const storage = new CloudinaryStorage({
   cloudinary,
-  params: {
+  params: async (req, file) => ({
     folder: "aniverse/products",
     allowed_formats: ["jpg", "jpeg", "png", "webp"],
-  },
+  }),
 });
 
-const upload = multer({
-  storage,
-});
-
-export default upload;
+export default multer({ storage });

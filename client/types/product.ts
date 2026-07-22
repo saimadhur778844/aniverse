@@ -1,11 +1,19 @@
 export interface Product {
-  id: number;
+  _id: string;
+  id?: number;
   name: string;
   anime: string;
-  category: string;
-  price: number;
+  description: string;
   image: string;
-  rating: number;
-  inStock: boolean;
+  price: number;
+  stock: number;
   featured: boolean;
+  rating?: number;
+  inStock?: boolean;
+  category:
+    | string
+    | {
+        _id: string;
+        name: string;
+      };
 }
