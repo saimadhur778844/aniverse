@@ -1,0 +1,50 @@
+.button {
+  border: none;
+  border-radius: 12px;
+  padding: 0.85rem 1.5rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.fullWidth {
+  width: 100%;
+}
+
+.primary {
+  background: #2563eb;
+  color: white;
+}
+
+.primary:hover {
+  background: #1d4ed8;
+}
+
+.secondary {
+  background: #374151;
+  color: white;
+}
+
+.secondary:hover {
+  background: #4b5563;
+}
+
+.outline {
+  background: transparent;
+  color: white;
+  border: 1px solid #4b5563;
+}
+
+.outline:hover {
+  border-color: #2563eb;
+}
+
+.danger {
+  background: #dc2626;
+  color: white;
+}
+
+.danger:hover {
+  background: #b91c1c;
+}
