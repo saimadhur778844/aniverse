@@ -1,0 +1,50 @@
+.toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+}
+
+.left {
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.right {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.select {
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--border-color, #ddd);
+  border-radius: 8px;
+  background: white;
+  font-size: 0.95rem;
+  cursor: pointer;
+}
+
+.select:focus {
+  outline: none;
+  border-color: #6366f1;
+}
+
+@media (max-width: 768px) {
+  .toolbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .right {
+    width: 100%;
+    flex-direction: column;
+  }
+
+  .select {
+    width: 100%;
+  }
+}

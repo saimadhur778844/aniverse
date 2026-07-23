@@ -2,20 +2,15 @@ import Hero from "@/components/store/Hero";
 import Section from "@/components/store/Section";
 import SectionHeader from "@/components/store/SectionHeader";
 import FeaturedSection from "@/components/store/FeaturedSection";
+import CategorySection from "@/components/store/CategorySection";
+import ProductToolbar from "@/components/store/ProductToolbar";
 
 export default function Home() {
   return (
     <>
       <Hero />
-      <FeaturedSection />
-      <Section>
-        <SectionHeader
-          title="Featured Products"
-          subtitle="Discover our most popular anime collectibles."
-        />
 
-        {/* Featured products will go here */}
-      </Section>
+      <FeaturedSection />
 
       <Section>
         <SectionHeader

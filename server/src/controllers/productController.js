@@ -2,6 +2,7 @@ import mongoose from "mongoose";
 import Product from "../models/Product.js";
 import asyncHandler from "../utils/asyncHandler.js";
 import slugify from "slugify";
+import Category from "../models/Category.js";
 
 // @desc    Get all products
 // @route   GET /api/products
@@ -17,6 +18,7 @@ export const getProducts = asyncHandler(async (req, res) => {
 
   const filter = {};
 
+  // Search
   if (search) {
     filter.$or = [
       { name: { $regex: search, $options: "i" } },
@@ -24,14 +26,35 @@ export const getProducts = asyncHandler(async (req, res) => {
     ];
   }
 
+  // Category Filter
   if (category) {
-    filter.category = category;
+    if (mongoose.Types.ObjectId.isValid(category)) {
+      filter.category = category;
+    } else {
+      const categoryDoc = await Category.findOne({
+        slug: category,
+      });
+
+      if (categoryDoc) {
+        filter.category = categoryDoc._id;
+      } else {
+        return res.status(200).json({
+          success: true,
+          total: 0,
+          page: Number(page),
+          totalPages: 0,
+          products: [],
+        });
+      }
+    }
   }
 
+  // Featured Filter
   if (featured === "true") {
     filter.featured = true;
   }
 
+  // Sorting
   let sortOption = {};
 
   switch (sort) {
@@ -122,7 +145,7 @@ export const updateProduct = asyncHandler(async (req, res) => {
     strict: true,
   });
   }
-  
+
   const product = await Product.findByIdAndUpdate(
     req.params.id,
     req.body,

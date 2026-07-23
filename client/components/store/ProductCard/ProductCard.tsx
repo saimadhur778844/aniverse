@@ -15,9 +15,9 @@ interface ProductCardProps {
 
 export default function ProductCard({ product }: ProductCardProps) {
   const categoryName =
-    typeof product.category === "string"
-      ? product.category
-      : product.category.name;
+  typeof product.category === "string"
+    ? product.category
+    : product.category?.name ?? "Uncategorized";
 
   const rating = product.rating ?? 0;
 

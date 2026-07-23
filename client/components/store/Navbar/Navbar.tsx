@@ -71,6 +71,15 @@ export default function Navbar() {
                   placeholder="Search anime, figures, katanas..."
                   className={styles.searchInput}
                   autoFocus
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      const value = e.currentTarget.value.trim();
+
+                      if (value) {
+                        window.location.href = `/products?search=${encodeURIComponent(value)}`;
+                      }
+                    }
+                  }}
                 />
 
                 <button

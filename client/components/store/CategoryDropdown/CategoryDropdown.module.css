@@ -1,0 +1,20 @@
+.select {
+  min-width: 200px;
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--border-color, #ddd);
+  border-radius: 8px;
+  background: white;
+  font-size: 0.95rem;
+  cursor: pointer;
+}
+
+.select:focus {
+  outline: none;
+  border-color: #6366f1;
+}
+
+@media (max-width: 768px) {
+  .select {
+    width: 100%;
+  }
+}

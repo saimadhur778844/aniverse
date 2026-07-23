@@ -1,0 +1,26 @@
+.link {
+  display: block;
+}
+
+.card {
+  height: 100%;
+}
+
+.imageContainer {
+  position: relative;
+  min-height: 12rem;
+}
+
+.image {
+  object-fit: cover;
+}
+
+.placeholder {
+  display: grid;
+  min-height: 12rem;
+  place-items: center;
+}
+
+.content {
+  padding: 1rem;
+}

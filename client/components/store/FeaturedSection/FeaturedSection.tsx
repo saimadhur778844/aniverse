@@ -21,13 +21,12 @@ export default function FeaturedSection() {
       try {
         setLoading(true);
 
-        const featuredProducts =
-          await productService.getProducts({
+    const response = await productService.getProducts({
             featured: true,
             limit: 8,
-          });
+        });
 
-        setProducts(featuredProducts);
+        setProducts(response.products);
       } catch (err) {
         console.error(err);
         setError("Failed to load featured products.");

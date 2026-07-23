@@ -4,12 +4,16 @@ export const navigation = [
     href: "/",
   },
   {
-    label: "Products",
+    label: "Shop",
     href: "/products",
   },
   {
     label: "Categories",
     href: "/products",
+  },
+  {
+    label: "About",
+    href: "/about",
   },
   {
     label: "Contact",

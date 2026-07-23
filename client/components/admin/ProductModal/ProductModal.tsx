@@ -2,28 +2,9 @@
 
 import { useEffect, useState } from "react";
 import { getCategories } from "@/services/categoryService";
-// import { createProduct } from "@/services/productService";
-import {
-  createProduct,
-  updateProduct,
-} from "@/services/productService";
+import { productService } from "@/services/productService";
 import { uploadImage } from "@/services/uploadService";
 import { Product } from "@/types/product";
-
-// interface Product {
-//   _id: string;
-//   name: string;
-//   anime: string;
-//   category:
-//   typeof product.category === "string"
-//     ? product.category
-//     : product.category._id,
-//   description: string;
-//   image: string;
-//   price: number;
-//   stock: number;
-//   featured: boolean;
-// }
 
 interface ProductModalProps {
   open: boolean;
@@ -56,49 +37,50 @@ export default function ProductModal({
   const [image, setImage] = useState<File | null>(null);
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(false);
+
   const isEditMode = !!product;
 
   useEffect(() => {
-  const fetchCategories = async () => {
-    try {
-      const data = await getCategories();
-      setCategories(data.categories || data);
-    } catch (error) {
-      console.error(error);
+    const fetchCategories = async () => {
+      try {
+        const data = await getCategories();
+        setCategories(data.categories || data);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+
+    if (open) {
+      fetchCategories();
+
+      if (product) {
+        setForm({
+          name: product.name,
+          anime: product.anime,
+          category:
+            typeof product.category === "string"
+              ? product.category
+              : product.category._id,
+          description: product.description,
+          price: product.price.toString(),
+          stock: product.stock.toString(),
+          featured: product.featured,
+        });
+      } else {
+        setForm({
+          name: "",
+          anime: "",
+          category: "",
+          description: "",
+          price: "",
+          stock: "",
+          featured: false,
+        });
+
+        setImage(null);
+      }
     }
-  };
-
-  if (open) {
-    fetchCategories();
-
-    if (product) {
-      setForm({
-        name: product.name,
-        anime: product.anime,
-        category:
-          typeof product.category === "string"
-            ? product.category
-            : product.category._id,
-        description: product.description,
-        price: product.price.toString(),
-        stock: product.stock.toString(),
-        featured: product.featured,
-      });
-    } else {
-      setForm({
-        name: "",
-        anime: "",
-        category: "",
-        description: "",
-        price: "",
-        stock: "",
-        featured: false,
-      });
-
-      setImage(null);
-    }
-  }
-}, [open, product]);
+  }, [open, product]);
 
   const handleChange = (
     e: React.ChangeEvent<
@@ -116,81 +98,84 @@ export default function ProductModal({
     }));
   };
 
-const handleSave = async () => {
-  try {
-    setLoading(true);
+  const handleSave = async () => {
+    try {
+      setLoading(true);
 
-    let imageUrl = product?.image ?? "";
+      let imageUrl = product?.image ?? "";
 
-    if (image) {
-      const uploadResponse = await uploadImage(image);
-      imageUrl = uploadResponse.imageUrl;
-    }
-
-    const payload = {
-      name: form.name,
-      anime: form.anime,
-      category: form.category,
-      description: form.description,
-      image: imageUrl,
-      price: Number(form.price),
-      stock: Number(form.stock),
-      featured: form.featured,
-    };
-
-    if (isEditMode && product) {
-      await updateProduct(product._id, payload);
-      alert("Product updated successfully!");
-    } else {
-      if (!image) {
-        alert("Please select an image.");
-        return;
+      if (image) {
+        const uploadResponse = await uploadImage(image);
+        imageUrl = uploadResponse.imageUrl;
       }
 
-      await createProduct(payload);
-      alert("Product created successfully!");
+      const payload = {
+        name: form.name,
+        anime: form.anime,
+        category: form.category,
+        description: form.description,
+        image: imageUrl,
+        price: Number(form.price),
+        stock: Number(form.stock),
+        featured: form.featured,
+      };
+
+      if (isEditMode && product) {
+        await productService.updateProduct(
+          product._id,
+          payload
+        );
+
+        alert("Product updated successfully!");
+      } else {
+        if (!image) {
+          alert("Please select an image.");
+          return;
+        }
+
+        await productService.createProduct(payload);
+
+        alert("Product created successfully!");
+      }
+
+      onSuccess();
+
+      setForm({
+        name: "",
+        anime: "",
+        category: "",
+        description: "",
+        price: "",
+        stock: "",
+        featured: false,
+      });
+
+      setImage(null);
+
+      onClose();
+    } catch (error: any) {
+      console.error(error);
+
+      if (error.response) {
+        alert(error.response.data.message);
+      } else {
+        alert(error.message);
+      }
+    } finally {
+      setLoading(false);
     }
-
-    onSuccess();
-
-    setForm({
-    name: "",
-    anime: "",
-    category: "",
-    description: "",
-    price: "",
-    stock: "",
-    featured: false,
-    });
-
-    setImage(null);
-
-    onClose();
-  } catch (error: any) {
-    console.error(error);
-
-    if (error.response) {
-      alert(error.response.data.message);
-    } else {
-      alert(error.message);
-    }
-  } finally {
-    setLoading(false);
-  }
-};
+  };
 
   if (!open) return null;
 
   return (
     <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
       <div className="bg-white rounded-xl shadow-xl p-6 w-full max-w-2xl">
-
         <h2 className="text-2xl font-bold mb-6">
           {isEditMode ? "Edit Product" : "Add Product"}
         </h2>
 
         <div className="grid grid-cols-2 gap-4">
-
           <input
             type="text"
             name="name"
@@ -226,7 +211,6 @@ const handleSave = async () => {
             onChange={handleChange}
             className="border rounded-lg p-3"
           />
-
         </div>
 
         <textarea
@@ -270,41 +254,42 @@ const handleSave = async () => {
         <div className="mt-4">
           <label className="block mb-2 font-medium">
             {isEditMode
-            ? "Replace Product Image (Optional)"
-            : "Product Image"}
+              ? "Replace Product Image (Optional)"
+              : "Product Image"}
           </label>
 
           <input
             type="file"
             accept="image/*"
-            onChange={(e) => setImage(e.target.files?.[0] || null)}
+            onChange={(e) =>
+              setImage(e.target.files?.[0] || null)
+            }
             className="w-full"
           />
         </div>
 
         {image ? (
-  <img
-    src={URL.createObjectURL(image)}
-    alt="Preview"
-    className="mt-3 h-32 w-32 object-cover rounded-lg border"
-  />
-) : (
-  isEditMode &&
-  product?.image && (
-    <img
-      src={product.image}
-      alt={product.name}
-      className="mt-3 h-32 w-32 object-cover rounded-lg border"
-    />
-  )
-)}
+          <img
+            src={URL.createObjectURL(image)}
+            alt="Preview"
+            className="mt-3 h-32 w-32 object-cover rounded-lg border"
+          />
+        ) : (
+          isEditMode &&
+          product?.image && (
+            <img
+              src={product.image}
+              alt={product.name}
+              className="mt-3 h-32 w-32 object-cover rounded-lg border"
+            />
+          )
+        )}
 
         <div className="flex justify-end gap-3 mt-8">
-
           <button
             onClick={() => {
-            setImage(null);
-            onClose();
+              setImage(null);
+              onClose();
             }}
             disabled={loading}
             className="px-5 py-2 border rounded-lg hover:bg-gray-100"
@@ -313,25 +298,23 @@ const handleSave = async () => {
           </button>
 
           <button
-  onClick={handleSave}
-  disabled={
-    loading ||
-    !form.name ||
-    !form.price ||
-    !form.category ||
-    (!isEditMode && !image)
-  }
-  className="bg-blue-600 text-white px-5 py-2 rounded-lg hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
->
-  {loading
-    ? "Saving..."
-    : isEditMode
-    ? "Update Product"
-    : "Save Product"}
-</button>
-
+            onClick={handleSave}
+            disabled={
+              loading ||
+              !form.name ||
+              !form.price ||
+              !form.category ||
+              (!isEditMode && !image)
+            }
+            className="bg-blue-600 text-white px-5 py-2 rounded-lg hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
+          >
+            {loading
+              ? "Saving..."
+              : isEditMode
+              ? "Update Product"
+              : "Save Product"}
+          </button>
         </div>
-
       </div>
     </div>
   );

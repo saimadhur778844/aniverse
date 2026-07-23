@@ -1,7 +1,7 @@
 import api from "@/lib/axios";
 import { Product } from "@/types/product";
 
-interface GetProductsParams {
+export interface GetProductsParams {
   featured?: boolean;
   category?: string;
   search?: string;
@@ -10,38 +10,80 @@ interface GetProductsParams {
   limit?: number;
 }
 
-export const getProducts = async (
+export interface ProductResponse {
+  success: boolean;
+  total: number;
+  page: number;
+  totalPages: number;
+  products: Product[];
+}
+
+export interface ProductPayload {
+  name: string;
+  anime: string;
+  category: string;
+  description: string;
+  image: string;
+  price: number;
+  stock: number;
+  featured: boolean;
+}
+
+const getProducts = async (
   params?: GetProductsParams
-): Promise<Product[]> => {
-  const response = await api.get("/products", {
+): Promise<ProductResponse> => {
+  const { data } = await api.get("/products", {
     params,
   });
 
-  return response.data.products;
-};
-
-export const getProduct = async (slug: string) => {
-  const { data } = await api.get(`/products/${slug}`);
   return data;
 };
 
-export const createProduct = async (product: any) => {
+const getProduct = async (slug: string) => {
+  const response = await api.get(`/products/${slug}`);
+  return response.data;
+};
+
+// const getProduct = async (slug: string): Promise<Product> => {
+//   const { data } = await api.get(`/products/${slug}`);
+//   return data.product;
+// };
+
+const createProduct = async (
+  product: ProductPayload
+) => {
   const { data } = await api.post("/products", product);
   return data;
 };
 
-export const updateProduct = async (
+const updateProduct = async (
   id: string,
-  product: any
+  product: ProductPayload
 ) => {
-  const { data } = await api.put(`/products/${id}`, product);
+  const { data } = await api.put(
+    `/products/${id}`,
+    product
+  );  
+
   return data;
 };
 
-export const deleteProduct = async (id: string) => {
+const deleteProduct = async (id: string) => {
   const { data } = await api.delete(`/products/${id}`);
   return data;
 };
+
+/* ---------- Named Exports (Backward Compatible) ---------- */
+
+export {
+  getProducts,
+  getProduct,
+  createProduct,
+  updateProduct,
+  deleteProduct,
+};
+
+/* ---------- Service Object (Recommended) ---------- */
 
 export const productService = {
   getProducts,

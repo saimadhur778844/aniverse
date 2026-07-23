@@ -1,21 +1,27 @@
+import { Category } from "@/types/category";
+
+import CategoryCard from "../CategoryCard";
+
+import styles from "./CategoryGrid.module.css";
+
 interface CategoryGridProps {
-  categories?: string[];
+  categories: Category[];
 }
 
-const defaultCategories = ["Figures", "Katanas", "Clothing", "Accessories"];
-
 export default function CategoryGrid({
-  categories = defaultCategories,
+  categories,
 }: CategoryGridProps) {
+  if (categories.length === 0) {
+    return null;
+  }
+
   return (
-    <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
+    <div className={styles.grid}>
       {categories.map((category) => (
-        <div
-          key={category}
-          className="rounded-xl bg-white p-6 text-center font-semibold shadow"
-        >
-          {category}
-        </div>
+        <CategoryCard
+          key={category._id}
+          category={category}
+        />
       ))}
     </div>
   );
