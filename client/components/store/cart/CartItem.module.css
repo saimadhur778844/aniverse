@@ -1,0 +1,68 @@
+.item {
+  display: flex;
+  gap: 16px;
+  padding: 16px 0;
+
+  border-bottom: 1px solid rgba(255,255,255,.08);
+}
+
+.image {
+  border-radius: 10px;
+  object-fit: cover;
+}
+
+.info {
+  flex: 1;
+}
+
+.info h3 {
+  color: white;
+  font-size: 15px;
+  margin-bottom: 8px;
+}
+
+.price {
+  color: var(--primary);
+  font-weight: 700;
+  margin-bottom: 12px;
+}
+
+.controls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.controls button {
+  width: 32px;
+  height: 32px;
+
+  border: none;
+
+  border-radius: 8px;
+
+  background: #1d2330;
+  color: white;
+
+  cursor: pointer;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  transition: .2s;
+}
+
+.controls button:hover {
+  background: var(--primary);
+}
+
+.controls span {
+  min-width: 24px;
+  text-align: center;
+  color: white;
+}
+
+.delete {
+  margin-left: auto;
+}

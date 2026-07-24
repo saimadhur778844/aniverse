@@ -1,4 +1,1 @@
-export {
-  CartContext,
-  CartProvider,
-} from "./CartContext";
+export * from "./CartContext";

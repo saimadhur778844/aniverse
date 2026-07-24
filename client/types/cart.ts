@@ -1,30 +1,25 @@
-import { Product } from "./product";
-
-export interface CartItem {
-  product: Product;
-  quantity: number;
-}
-
 export interface CartContextType {
   items: CartItem[];
 
-  addToCart: (
+  addToCart(
     product: Product,
     quantity: number
-  ) => void;
+  ): void;
 
-  removeFromCart: (
+  removeFromCart(
     productId: string
-  ) => void;
+  ): void;
 
-  updateQuantity: (
+  updateQuantity(
     productId: string,
     quantity: number
-  ) => void;
+  ): void;
 
-  clearCart: () => void;
+  clearCart(): void;
 
   totalItems: number;
 
   subtotal: number;
+
+  isEmpty: boolean;
 }

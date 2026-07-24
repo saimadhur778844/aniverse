@@ -4,6 +4,8 @@ import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import clsx from "clsx";
+import useCart from "@/hooks/useCart";
+import { CartDrawer } from "@/components/store/cart";
 import {
   Search,
   Heart,
@@ -21,6 +23,8 @@ export default function Navbar() {
 
   const [mobileOpen, setMobileOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
+  const [cartOpen, setCartOpen] = useState(false);
+  const { totalItems } = useCart();
 
   return (
     <header className={styles.navbar}>
@@ -51,9 +55,17 @@ export default function Navbar() {
             <Heart size={22} />
           </button>
 
-          <button className={styles.iconButton}>
+          <button
+            className={styles.iconButton}
+            onClick={() => setCartOpen(true)}
+          >
             <ShoppingCart size={22} />
-            <span className={styles.badge}>0</span>
+
+            {totalItems > 0 && (
+              <span className={styles.badge}>
+                {totalItems > 99 ? "99+" : totalItems}
+              </span>
+            )}
           </button>
 
           {/* Expandable Search */}
@@ -130,6 +142,14 @@ export default function Navbar() {
           ))}
         </nav>
       )}
+      <CartDrawer
+      open={cartOpen}
+      onClose={() => setCartOpen(false)}
+    >
+      <p style={{ color: "white" }}>
+        Cart is empty
+      </p>
+    </CartDrawer>
     </header>
   );
 }

@@ -68,17 +68,19 @@
 }
 
 .iconButton {
-  background: transparent;
-  border: none;
-  color: white;
-  cursor: pointer;
+  position: relative;
 
   display: flex;
   align-items: center;
   justify-content: center;
 
-  transition: 0.25s;
-  position: relative;
+  background: transparent;
+  border: none;
+
+  color: white;
+  cursor: pointer;
+
+  transition: all 0.25s ease;
 }
 
 .iconButton:hover {
@@ -86,25 +88,38 @@
   transform: scale(1.08);
 }
 
+/* ------------------------------
+   Cart Badge
+------------------------------ */
+
 .badge {
   position: absolute;
-  top: -5px;
-  right: -5px;
 
-  width: 18px;
+  top: -6px;
+  right: -6px;
+
+  min-width: 18px;
   height: 18px;
 
-  border-radius: 50%;
-  background: crimson;
-
-  color: white;
-
-  font-size: 11px;
-  font-weight: bold;
+  padding: 0 5px;
 
   display: flex;
   align-items: center;
   justify-content: center;
+
+  border-radius: 999px;
+
+  background: #dc2626;
+  color: #ffffff;
+
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1;
+
+  box-shadow: 0 0 0 2px rgba(10, 10, 20, 0.9);
+
+  pointer-events: none;
+  user-select: none;
 }
 
 /* SEARCH */
@@ -172,7 +187,6 @@
   gap: 8px;
 
   border: none;
-
   border-radius: 999px;
 
   padding: 10px 18px;
