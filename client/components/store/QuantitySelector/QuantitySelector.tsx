@@ -13,20 +13,43 @@ export default function QuantitySelector({
   onChange,
   max,
 }: QuantitySelectorProps) {
+  const decrease = () => {
+    onChange(Math.max(1, quantity - 1));
+  };
+
+  const increase = () => {
+    onChange(Math.min(max, quantity + 1));
+  };
+
+  const isMin = quantity <= 1;
+  const isMax = quantity >= max;
+
   return (
-    <div className={styles.container}>
+    <div
+      className={styles.container}
+      aria-label="Quantity Selector"
+    >
       <button
-        onClick={() => onChange(Math.max(1, quantity - 1))}
-        disabled={quantity <= 1}
+        type="button"
+        onClick={decrease}
+        disabled={isMin}
+        aria-label="Decrease quantity"
       >
         −
       </button>
 
-      <span>{quantity}</span>
+      <span
+        className={styles.value}
+        aria-live="polite"
+      >
+        {quantity}
+      </span>
 
       <button
-        onClick={() => onChange(Math.min(max, quantity + 1))}
-        disabled={quantity >= max}
+        type="button"
+        onClick={increase}
+        disabled={isMax}
+        aria-label="Increase quantity"
       >
         +
       </button>

@@ -6,7 +6,7 @@ import Section from "../Section";
 import SectionHeader from "../SectionHeader";
 import CategoryGrid from "../CategoryGrid";
 
-import { categoryService } from "@/services/category.service";
+import { categoryService } from "@/services/categoryService";
 import { Category } from "@/types/category";
 
 import styles from "./CategorySection.module.css";

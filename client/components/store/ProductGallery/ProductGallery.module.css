@@ -6,43 +6,112 @@
 
 .mainImage {
   position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
   width: 100%;
   aspect-ratio: 1;
-  border-radius: 16px;
+
   overflow: hidden;
-  background: #f5f5f5;
+
+  border-radius: var(--radius-lg);
+  background: var(--color-surface-2);
+
+  cursor: zoom-in;
 }
 
 .image {
   object-fit: contain;
+
+  transition:
+    transform var(--transition-normal),
+    filter var(--transition-normal);
 }
 
-.thumbnails {
-  display: flex;
+.mainImage:hover .image {
+  transform: scale(1.08);
+  filter: brightness(1.03);
+}
+
+.imageSkeleton {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+
+  border-radius: inherit;
+}
+
+.thumbnailGrid {
+  display: grid;
+  grid-template-columns: repeat(5, 70px);
   gap: 0.75rem;
-  flex-wrap: wrap;
+
+  overflow-x: auto;
+  padding-bottom: 0.25rem;
 }
 
-.thumb {
+.thumbnailGrid::-webkit-scrollbar {
+  height: 6px;
+}
+
+.thumbnailGrid::-webkit-scrollbar-thumb {
+  background: var(--color-border);
+  border-radius: 999px;
+}
+
+.thumbnail {
   position: relative;
-  width: 80px;
-  height: 80px;
-  border: 2px solid transparent;
-  border-radius: 12px;
+
+  width: 70px;
+  aspect-ratio: 1;
+
   overflow: hidden;
-  background: white;
+
+  border: 2px solid transparent;
+  border-radius: var(--radius-md);
+
+  background: var(--color-surface-2);
+
   cursor: pointer;
-  transition: 0.2s;
+
+  transition:
+    transform var(--transition-fast),
+    border-color var(--transition-fast),
+    box-shadow var(--transition-fast);
 }
 
-.thumb:hover {
-  border-color: #666;
+.thumbnail:hover {
+  transform: translateY(-3px);
+  border-color: var(--color-primary-light);
 }
 
-.active {
-  border-color: #ff4d4f;
+.thumbnail:focus-visible {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgb(255 77 109 / 20%);
 }
 
-.thumbImage {
+.activeThumbnail {
+  border-color: var(--color-primary);
+  box-shadow: var(--shadow-sm);
+}
+
+.thumbnailImage {
   object-fit: cover;
+  transition: transform var(--transition-fast);
+}
+
+.thumbnail:hover .thumbnailImage {
+  transform: scale(1.05);
+}
+
+@media (max-width: 768px) {
+  .thumbnailGrid {
+    grid-template-columns: repeat(auto-fit, minmax(70px, 1fr));
+  }
+
+  .thumbnail {
+    width: 100%;
+  }
 }

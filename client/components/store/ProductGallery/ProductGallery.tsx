@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Image from "next/image";
+import clsx from "clsx";
 
 import { Product } from "@/types/product";
 
@@ -14,50 +15,58 @@ interface ProductGalleryProps {
 export default function ProductGallery({
   product,
 }: ProductGalleryProps) {
-  // Support both current single image and future multiple images
   const images =
-    product.images && product.images.length > 0
+    product.images?.length
       ? product.images
-      : product.image
-      ? [product.image]
-      : [];
+      : [product.image];
 
-  const [selectedImage, setSelectedImage] = useState(
-    images[0] ?? ""
-  );
+  const [selectedIndex, setSelectedIndex] = useState(0);
+  const [imageLoaded, setImageLoaded] = useState(false);
 
   return (
-    <div className={styles.gallery}>
+    <div className={clsx("card", "card-padding", styles.gallery)}>
       <div className={styles.mainImage}>
-        {selectedImage && (
-          <Image
-            src={selectedImage}
-            alt={product.name}
-            fill
-            sizes="(max-width: 768px) 100vw, 50vw"
-            className={styles.image}
-            priority
-          />
+        {!imageLoaded && (
+          <div className="skeleton" />
         )}
+
+        <Image
+          key={images[selectedIndex]}
+          src={images[selectedIndex]}
+          alt={product.name}
+          fill
+          priority
+          sizes="(max-width:768px) 100vw, 50vw"
+          className={clsx(
+            styles.image,
+            imageLoaded && "animate-fade-in"
+          )}
+          onLoad={() => setImageLoaded(true)}
+        />
       </div>
 
       {images.length > 1 && (
-        <div className={styles.thumbnails}>
-          {images.map((image) => (
+        <div className={styles.thumbnailGrid}>
+          {images.map((image, index) => (
             <button
               key={image}
               type="button"
-              onClick={() => setSelectedImage(image)}
-              className={`${styles.thumb} ${
-                selectedImage === image ? styles.active : ""
-              }`}
+              onClick={() => {
+                setImageLoaded(false);
+                setSelectedIndex(index);
+              }}
+              className={clsx(
+                styles.thumbnail,
+                index === selectedIndex &&
+                  styles.activeThumbnail
+              )}
             >
               <Image
                 src={image}
-                alt={product.name}
+                alt={`${product.name} ${index + 1}`}
                 fill
                 sizes="80px"
-                className={styles.thumbImage}
+                className={styles.thumbnailImage}
               />
             </button>
           ))}

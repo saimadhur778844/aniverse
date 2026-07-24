@@ -21,25 +21,46 @@ export default function ProductDetailsPage() {
   const [error, setError] = useState("");
 
   useEffect(() => {
+    let mounted = true;
+
     const loadProduct = async () => {
       try {
         setLoading(true);
+        setError("");
 
         const response = await productService.getProduct(
           params.slug as string
         );
 
-        setProduct(response.product);
+        if (mounted) {
+          setProduct(response.product);
+        }
       } catch (err) {
         console.error(err);
-        setError("Failed to load product.");
+
+        if (mounted) {
+          setError("Failed to load product.");
+        }
       } finally {
-        setLoading(false);
+        if (mounted) {
+          setLoading(false);
+        }
       }
     };
 
     loadProduct();
+
+    return () => {
+      mounted = false;
+    };
   }, [params.slug]);
+
+  const category =
+    !product
+      ? ""
+      : typeof product.category === "string"
+        ? product.category
+        : product.category?.name ?? "";
 
   if (loading) {
     return (
@@ -64,11 +85,6 @@ export default function ProductDetailsPage() {
       </Section>
     );
   }
-
-  const category =
-    typeof product.category === "string"
-      ? product.category
-      : product.category.name;
 
   return (
     <Section>

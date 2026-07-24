@@ -1,0 +1,103 @@
+@theme {
+  /* ==========================================================
+     COLORS
+  ========================================================== */
+
+  --color-background: #09090f;
+
+  --color-surface: #171726;
+  --color-surface-2: #202033;
+  --color-surface-3: #2b2b45;
+
+  --color-border: #343454;
+
+  /* Brand */
+
+  --color-primary: #ec4899;
+  --color-primary-hover: #db2777;
+  --color-primary-light: #f472b6;
+
+  --color-secondary: #8b5cf6;
+  --color-secondary-light: #a78bfa;
+
+  /* Semantic */
+
+  --color-success: #22c55e;
+  --color-warning: #f59e0b;
+  --color-danger: #ef4444;
+  --color-info: #3b82f6;
+
+  /* Text */
+
+  --color-text: #ffffff;
+  --color-muted: #9ca3af;
+  --color-text-inverse: #09090f;
+
+  /* ==========================================================
+     TYPOGRAPHY
+  ========================================================== */
+
+  --font-sans: Inter, sans-serif;
+
+  --text-xs: 0.75rem;
+  --text-sm: 0.875rem;
+  --text-base: 1rem;
+  --text-lg: 1.125rem;
+  --text-xl: 1.25rem;
+  --text-2xl: 1.5rem;
+  --text-3xl: 1.875rem;
+  --text-4xl: 2.25rem;
+
+  /* ==========================================================
+     RADIUS
+  ========================================================== */
+
+  --radius-sm: 12px;
+  --radius-md: 18px;
+  --radius-lg: 24px;
+  --radius-xl: 32px;
+
+  --radius-button: 14px;
+  --radius-pill: 9999px;
+
+  /* ==========================================================
+     SHADOWS
+  ========================================================== */
+
+  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.15);
+
+  --shadow-sm: 0 4px 10px rgba(0, 0, 0, 0.18);
+
+  --shadow-card: 0 12px 30px rgba(0, 0, 0, 0.25);
+
+  --shadow-dropdown: 0 16px 40px rgba(0, 0, 0, 0.28);
+
+  --shadow-modal: 0 24px 60px rgba(0, 0, 0, 0.35);
+
+  --shadow-glow: 0 0 35px rgba(236, 72, 153, 0.25);
+
+  /* ==========================================================
+     TRANSITIONS
+  ========================================================== */
+
+  --transition-fast: 150ms ease;
+
+  --transition-normal: 250ms ease;
+
+  --transition-slow: 350ms ease;
+
+  /* ==========================================================
+     Z INDEX
+  ========================================================== */
+
+  --z-dropdown: 100;
+  --z-sticky: 200;
+  --z-modal: 500;
+  --z-toast: 1000;
+
+  /* ==========================================================
+     LAYOUT
+  ========================================================== */
+
+  --container-width: 80rem;
+}

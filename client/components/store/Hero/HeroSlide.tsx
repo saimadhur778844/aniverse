@@ -1,36 +1,67 @@
 import Image from "next/image";
 import Link from "next/link";
-import styles from "./Hero.module.css";
+
 import { HeroSlide as HeroSlideType } from "@/data/heroData";
+
+import styles from "./Hero.module.css";
 
 interface HeroSlideProps {
   slide: HeroSlideType;
 }
 
-export default function HeroSlide({ slide }: HeroSlideProps) {
+export default function HeroSlide({
+  slide,
+}: HeroSlideProps) {
   return (
     <div className={styles.container}>
       <div className={styles.content}>
-        <span className={styles.anime}>{slide.anime}</span>
+        {slide.badge && (
+          <span className={styles.badge}>
+            {slide.badge}
+          </span>
+        )}
 
-        <h1 className={styles.title}>{slide.title}</h1>
+        <span
+          className={styles.anime}
+          aria-label={`Featured anime: ${slide.anime}`}
+        >
+          {slide.anime}
+        </span>
 
-        <h2 className={styles.subtitle}>{slide.subtitle}</h2>
+        <h1 className={styles.title}>
+          {slide.title}
+        </h1>
 
-        <p className={styles.description}>{slide.description}</p>
+        <h2 className={styles.subtitle}>
+          {slide.subtitle}
+        </h2>
 
-        <Link href={slide.href} className={styles.button}>
-          {slide.buttonText}
-        </Link>
+        <p className={styles.description}>
+          {slide.description}
+        </p>
+
+        <div className={styles.actions}>
+          <Link
+            href={slide.href}
+            className={styles.button}
+            aria-label={`${slide.buttonText} - ${slide.anime}`}
+          >
+            {slide.buttonText}
+          </Link>
+        </div>
       </div>
 
-      <div className={styles.imageWrapper}>
+      <div
+        className={styles.imageWrapper}
+        aria-hidden="true"
+      >
         <Image
           src={slide.image}
-          alt={slide.anime}
+          alt={`${slide.title} collectible`}
           fill
           priority
-          sizes="(max-width:768px)100vw,50vw"
+          quality={95}
+          sizes="(max-width: 768px) 100vw, 50vw"
           className={styles.image}
         />
       </div>

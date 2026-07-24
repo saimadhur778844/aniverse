@@ -1,0 +1,291 @@
+@import "tailwindcss";
+
+/* ==========================================================
+   ANIVERSE DESIGN SYSTEM
+   Next.js 16 + Tailwind CSS v4
+========================================================== */
+
+@theme {
+  /* ======================
+     COLORS
+  ====================== */
+
+  --color-background: #09090f;
+
+  --color-surface: #171726;
+  --color-surface-2: #202033;
+  --color-surface-3: #2b2b45;
+
+  --color-border: #343454;
+
+  --color-primary: #ec4899;
+  --color-primary-light: #f472b6;
+  --color-primary-hover: #db2777;
+
+  --color-secondary: #8b5cf6;
+  --color-secondary-light: #a78bfa;
+
+  --color-success: #22c55e;
+  --color-warning: #f59e0b;
+  --color-danger: #ef4444;
+
+  --color-text: #ffffff;
+  --color-muted: #9ca3af;
+
+  /* ======================
+     RADIUS
+  ====================== */
+
+  --radius-sm: 12px;
+  --radius-md: 18px;
+  --radius-lg: 24px;
+  --radius-xl: 32px;
+
+  /* ======================
+     SHADOWS
+  ====================== */
+
+  --shadow-card: 0 12px 30px rgba(0, 0, 0, 0.25);
+  --shadow-glow: 0 0 35px rgba(236, 72, 153, 0.25);
+
+  /* ======================
+     FONT
+  ====================== */
+
+  --font-sans: Inter, sans-serif;
+}
+
+/* ==========================================================
+   BASE
+========================================================== */
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--color-background);
+  color: var(--color-text);
+  font-family: var(--font-sans);
+  overflow-x: hidden;
+}
+
+img,
+svg {
+  display: block;
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+}
+
+/* ==========================================================
+   SELECTION
+========================================================== */
+
+::selection {
+  background: rgba(236, 72, 153, 0.35);
+  color: white;
+}
+
+/* ==========================================================
+   SCROLLBAR
+========================================================== */
+
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: #111118;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-border);
+  border-radius: 999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-primary);
+}
+
+/* ==========================================================
+   BACKGROUND GLOW
+========================================================== */
+
+.aniverse-bg {
+  position: relative;
+  overflow: hidden;
+}
+
+.aniverse-bg::before,
+.aniverse-bg::after {
+  content: "";
+  position: absolute;
+  border-radius: 999px;
+  filter: blur(120px);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.aniverse-bg::before {
+  width: 380px;
+  height: 380px;
+  top: -120px;
+  left: -120px;
+  background: rgba(236, 72, 153, 0.12);
+}
+
+.aniverse-bg::after {
+  width: 450px;
+  height: 450px;
+  right: -150px;
+  bottom: -150px;
+  background: rgba(139, 92, 246, 0.12);
+}
+
+/* ==========================================================
+   CUSTOM UTILITIES
+========================================================== */
+
+@utility glass {
+  background: rgba(23, 23, 38, 0.72);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+}
+
+@utility glow {
+  box-shadow: var(--shadow-glow);
+}
+
+@utility card-shadow {
+  box-shadow: var(--shadow-card);
+}
+
+@utility gradient-text {
+  background: linear-gradient(
+    90deg,
+    #f472b6,
+    #ec4899,
+    #a855f7
+  );
+
+  -webkit-background-clip: text;
+  color: transparent;
+}
+
+@utility hover-lift {
+  transition:
+    transform 300ms ease,
+    box-shadow 300ms ease,
+    border-color 300ms ease;
+}
+
+.hover-lift:hover {
+  transform: translateY(-6px);
+}
+
+@utility hover-scale {
+  transition: transform 300ms ease;
+}
+
+.hover-scale:hover {
+  transform: scale(1.03);
+}
+
+@utility card {
+  @apply rounded-3xl border border-border bg-surface;
+}
+
+@utility section-padding {
+  @apply px-6 py-14;
+}
+
+@utility container-page {
+  @apply mx-auto max-w-7xl;
+}
+
+/* ==========================================================
+   GRADIENT BORDER
+========================================================== */
+
+.gradient-border {
+  position: relative;
+}
+
+.gradient-border::before {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  padding: 1px;
+
+  background: linear-gradient(
+    135deg,
+    rgba(236, 72, 153, 0.4),
+    rgba(168, 85, 247, 0.4)
+  );
+
+  mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+
+  mask-composite: exclude;
+
+  pointer-events: none;
+}
+
+/* ==========================================================
+   ANIMATIONS
+========================================================== */
+
+.fade-in {
+  animation: fadeIn 0.45s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ==========================================================
+   FORMS
+========================================================== */
+
+input,
+textarea,
+button {
+  transition: all 0.25s ease;
+}
+
+input:focus,
+textarea:focus {
+  outline: none;
+}
+
+input:focus-visible,
+textarea:focus-visible,
+button:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+/* ==========================================================
+   LINKS
+========================================================== */
+
+a {
+  transition: color 0.2s ease;
+}
+
+a:hover {
+  color: var(--color-primary);
+}

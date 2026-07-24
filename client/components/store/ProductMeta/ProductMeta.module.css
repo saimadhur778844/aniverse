@@ -8,15 +8,49 @@
 
 .row {
   display: flex;
-  justify-content: space-between;
   align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
 
-  padding-bottom: .75rem;
+  padding-bottom: 0.85rem;
 
-  border-bottom: 1px solid #ececec;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.row:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
 }
 
 .label {
-  color: #6b7280;
+  flex-shrink: 0;
+
+  color: var(--color-muted);
+
+  font-size: 0.95rem;
   font-weight: 600;
+}
+
+.value {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+
+  text-align: right;
+
+  color: var(--color-text);
+
+  font-weight: 600;
+}
+
+@media (max-width: 640px) {
+  .row {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .value {
+    justify-content: flex-start;
+    text-align: left;
+  }
 }

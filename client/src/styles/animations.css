@@ -1,0 +1,204 @@
+/* ==========================================================
+   KEYFRAMES
+========================================================== */
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slide-up {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slide-down {
+  from {
+    opacity: 0;
+    transform: translateY(-24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slide-left {
+  from {
+    opacity: 0;
+    transform: translateX(24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slide-right {
+  from {
+    opacity: 0;
+    transform: translateX(-24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes scale-in {
+  from {
+    opacity: 0;
+    transform: scale(.96);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes pulse-soft {
+  0%,100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: .65;
+  }
+}
+
+@keyframes shimmer {
+  from {
+    transform: translateX(-100%);
+  }
+
+  to {
+    transform: translateX(100%);
+  }
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ==========================================================
+   ANIMATION UTILITIES
+========================================================== */
+
+@utility animate-fade-in {
+  animation: fade-in .4s ease both;
+}
+
+@utility animate-slide-up {
+  animation: slide-up .45s ease both;
+}
+
+@utility animate-slide-down {
+  animation: slide-down .45s ease both;
+}
+
+@utility animate-slide-left {
+  animation: slide-left .45s ease both;
+}
+
+@utility animate-slide-right {
+  animation: slide-right .45s ease both;
+}
+
+@utility animate-scale {
+  animation: scale-in .35s ease both;
+}
+
+@utility animate-pulse-soft {
+  animation: pulse-soft 2s infinite;
+}
+
+/* ==========================================================
+   SPINNER
+========================================================== */
+
+@utility spinner {
+  width: 2rem;
+  height: 2rem;
+
+  border: 3px solid rgba(255,255,255,.15);
+  border-top-color: var(--color-primary);
+
+  border-radius: 50%;
+
+  animation: spin .8s linear infinite;
+}
+
+/* ==========================================================
+   SKELETON
+========================================================== */
+
+@utility skeleton {
+  position: relative;
+  overflow: hidden;
+
+  background: var(--color-surface-2);
+
+  border-radius: var(--radius-md);
+}
+
+.skeleton::after {
+  content: "";
+
+  position: absolute;
+  inset: 0;
+
+  background:
+    linear-gradient(
+      90deg,
+      transparent,
+      rgba(255,255,255,.08),
+      transparent
+    );
+
+  animation: shimmer 1.5s infinite;
+}
+
+/* ==========================================================
+   HOVER EFFECTS
+========================================================== */
+
+@utility hover-lift {
+  transition:
+    transform var(--transition-normal),
+    box-shadow var(--transition-normal);
+}
+
+.hover-lift:hover {
+  transform: translateY(-6px);
+  box-shadow: var(--shadow-glow);
+}
+
+@utility hover-scale {
+  transition:
+    transform var(--transition-normal);
+}
+
+.hover-scale:hover {
+  transform: scale(1.03);
+}
+
+@utility hover-rotate {
+  transition:
+    transform var(--transition-normal);
+}
+
+.hover-rotate:hover {
+  transform: rotate(3deg);
+}

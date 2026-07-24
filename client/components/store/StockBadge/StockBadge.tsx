@@ -1,5 +1,7 @@
 "use client";
 
+import clsx from "clsx";
+
 import styles from "./StockBadge.module.css";
 
 interface StockBadgeProps {
@@ -9,15 +11,30 @@ interface StockBadgeProps {
 export default function StockBadge({
   stock,
 }: StockBadgeProps) {
-  const inStock = stock > 0;
+  const isOutOfStock = stock <= 0;
+  const isLowStock = stock > 0 && stock <= 5;
+
+  const label = isOutOfStock
+    ? "Out of Stock"
+    : isLowStock
+      ? `Only ${stock} left`
+      : "In Stock";
 
   return (
     <span
-      className={`${styles.badge} ${
-        inStock ? styles.inStock : styles.outOfStock
-      }`}
+      className={clsx(
+        styles.badge,
+        isOutOfStock
+          ? styles.outOfStock
+          : isLowStock
+            ? styles.lowStock
+            : styles.inStock
+      )}
+      aria-label={label}
     >
-      {inStock ? "● In Stock" : "● Out of Stock"}
+      <span className={styles.dot} />
+
+      {label}
     </span>
   );
 }

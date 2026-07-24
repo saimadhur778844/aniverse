@@ -1,21 +1,35 @@
 import Link from "next/link";
+import clsx from "clsx";
+
 import styles from "./SectionHeader.module.css";
 
 interface SectionHeaderProps {
   title: string;
   subtitle?: string;
   viewAllHref?: string;
+  viewAllLabel?: string;
+  centered?: boolean;
 }
 
 export default function SectionHeader({
   title,
   subtitle,
   viewAllHref,
+  viewAllLabel = "View All",
+  centered = false,
 }: SectionHeaderProps) {
   return (
-    <div className={styles.header}>
-      <div>
-        <h2 className={styles.title}>{title}</h2>
+    <header
+      className={clsx(
+        styles.header,
+        centered &&
+          styles.centered
+      )}
+    >
+      <div className={styles.content}>
+        <h2 className={styles.title}>
+          {title}
+        </h2>
 
         {subtitle && (
           <p className={styles.subtitle}>
@@ -28,10 +42,17 @@ export default function SectionHeader({
         <Link
           href={viewAllHref}
           className={styles.link}
+          aria-label={`${viewAllLabel}: ${title}`}
         >
-          View All →
+          {viewAllLabel}
+          <span
+            className={styles.arrow}
+            aria-hidden="true"
+          >
+            →
+          </span>
         </Link>
       )}
-    </div>
+    </header>
   );
 }

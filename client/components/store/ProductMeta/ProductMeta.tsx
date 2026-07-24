@@ -1,6 +1,9 @@
 "use client";
 
+import { useMemo } from "react";
+
 import { Product } from "@/types/product";
+
 import StockBadge from "../StockBadge";
 
 import styles from "./ProductMeta.module.css";
@@ -12,27 +15,37 @@ interface ProductMetaProps {
 export default function ProductMeta({
   product,
 }: ProductMetaProps) {
-  const category =
-    typeof product.category === "string"
+  const category = useMemo(() => {
+    return typeof product.category === "string"
       ? product.category
       : product.category.name;
+  }, [product.category]);
 
   return (
-    <div className={styles.meta}>
+    <dl className={styles.meta}>
       <div className={styles.row}>
-        <span className={styles.label}>Anime</span>
-        <span>{product.anime}</span>
+        <dt className={styles.label}>Anime</dt>
+        <dd className={styles.value}>
+          {product.anime}
+        </dd>
       </div>
 
       <div className={styles.row}>
-        <span className={styles.label}>Category</span>
-        <span>{category}</span>
+        <dt className={styles.label}>Category</dt>
+        <dd className={styles.value}>
+          {category}
+        </dd>
       </div>
 
       <div className={styles.row}>
-        <span className={styles.label}>Availability</span>
-        <StockBadge stock={product.stock} />
+        <dt className={styles.label}>
+          Availability
+        </dt>
+
+        <dd className={styles.value}>
+          <StockBadge stock={product.stock} />
+        </dd>
       </div>
-    </div>
+    </dl>
   );
 }

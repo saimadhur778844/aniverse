@@ -1,9 +1,8 @@
 import Hero from "@/components/store/Hero";
+import FeaturedSection from "@/components/store/FeaturedSection";
 import Section from "@/components/store/Section";
 import SectionHeader from "@/components/store/SectionHeader";
-import FeaturedSection from "@/components/store/FeaturedSection";
 import CategorySection from "@/components/store/CategorySection";
-import ProductToolbar from "@/components/store/ProductToolbar";
 
 export default function Home() {
   return (
@@ -18,7 +17,7 @@ export default function Home() {
           subtitle="Browse collectibles by category."
         />
 
-        {/* Categories will go here */}
+        <CategorySection />
       </Section>
 
       <Section>
@@ -27,7 +26,16 @@ export default function Home() {
           subtitle="Explore collections from your favorite anime."
         />
 
-        {/* Collections will go here */}
+        {/* TODO: AnimeCollections component */}
+      </Section>
+
+      <Section>
+        <SectionHeader
+          title="New Arrivals"
+          subtitle="Freshly added collectibles."
+        />
+
+        {/* TODO: NewArrivals component */}
       </Section>
     </>
   );

@@ -9,15 +9,18 @@ interface Props {
 
 export default function AddToCartButton({
   onClick,
-  disabled,
+  disabled = false,
 }: Props) {
   return (
     <button
+      type="button"
       className={styles.button}
       onClick={onClick}
       disabled={disabled}
+      aria-label="Add product to cart"
     >
-      Add to Cart
+      <span className={styles.icon}>🛒</span>
+      <span>Add to Cart</span>
     </button>
   );
 }

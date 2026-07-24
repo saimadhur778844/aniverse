@@ -1,19 +1,19 @@
 "use client";
 
-import { useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 
 import { Product } from "@/types/product";
 
+import Rating from "../Rating";
+import ProductMeta from "../ProductMeta";
 import QuantitySelector from "../QuantitySelector";
 import AddToCartButton from "../AddToCartButton";
 import WishlistButton from "../WishlistButton";
+import StockBadge from "../StockBadge";
+
+import useCart from "@/hooks/useCart";
 
 import styles from "./ProductInfo.module.css";
-import Rating from "../Rating";
-import StockBadge from "../StockBadge";
-import ProductMeta from "../ProductMeta";
-import RelatedProducts from "@/components/store/RelatedProducts";
-import useCart from "@/hooks/useCart";
 
 interface Props {
   product: Product;
@@ -23,26 +23,68 @@ export default function ProductInfo({
   product,
 }: Props) {
   const [quantity, setQuantity] = useState(1);
+
   const { addToCart } = useCart();
 
-//   const category =
-//     typeof product.category === "string"
-//       ? product.category
-//       : product.category.name;
+  const isOutOfStock = product.stock <= 0;
+
+  const discountPercentage = useMemo(() => {
+    if (
+      !product.originalPrice ||
+      product.originalPrice <= product.price
+    ) {
+      return null;
+    }
+
+    return Math.round(
+      ((product.originalPrice - product.price) /
+        product.originalPrice) *
+        100
+    );
+  }, [product.originalPrice, product.price]);
+
+  const handleAddToCart = useCallback(() => {
+    addToCart(product, quantity);
+  }, [addToCart, product, quantity]);
 
   return (
     <div className={styles.container}>
-      <p className={styles.anime}>{product.anime}</p>
+      <p className={styles.anime}>
+        {product.anime}
+      </p>
 
-      <h1>{product.name}</h1>
+      <h1 className={styles.title}>
+        {product.name}
+      </h1>
 
       {product.rating !== undefined && (
-        <Rating rating={product.rating} />
+        <Rating
+          rating={product.rating}
+          reviewCount={product.reviewCount}
+        />
+      )}
+
+      <div className={styles.priceSection}>
+        <h2 className={styles.price}>
+          ₹{product.price.toLocaleString()}
+        </h2>
+
+        {product.originalPrice && (
+          <span className={styles.originalPrice}>
+            ₹{product.originalPrice.toLocaleString()}
+          </span>
         )}
 
-      <h2 className={styles.price}>
-        ₹{product.price.toLocaleString()}
-      </h2>
+        {discountPercentage && (
+          <span className={styles.discount}>
+            {discountPercentage}% OFF
+          </span>
+        )}
+      </div>
+
+      <StockBadge
+        stock={product.stock}
+      />
 
       <ProductMeta product={product} />
 
@@ -58,21 +100,19 @@ export default function ProductInfo({
 
       <div className={styles.actions}>
         <AddToCartButton
-        onClick={() => addToCart(product, quantity)}
-        disabled={product.stock === 0}
+          onClick={handleAddToCart}
+          disabled={isOutOfStock}
         />
 
         <WishlistButton
           onClick={() =>
-            console.log("Wishlist", product)
+            console.log(
+              "Wishlist:",
+              product._id
+            )
           }
         />
       </div>
-      <div className={styles.related}>
-  <RelatedProducts currentProduct={product} />
-</div>
     </div>
-
-    
   );
 }

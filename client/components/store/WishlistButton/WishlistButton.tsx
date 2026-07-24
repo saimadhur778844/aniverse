@@ -11,10 +11,14 @@ export default function WishlistButton({
 }: Props) {
   return (
     <button
+      type="button"
       className={styles.button}
       onClick={onClick}
+      aria-label="Add product to wishlist"
     >
-      ♡ Wishlist
+      <span className={styles.icon}>♡</span>
+
+      <span>Wishlist</span>
     </button>
   );
 }

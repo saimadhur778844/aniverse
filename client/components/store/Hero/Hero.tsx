@@ -1,6 +1,12 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import {
+  useCallback,
+  useEffect,
+  useState,
+  CSSProperties,
+} from "react";
+
 import styles from "./Hero.module.css";
 import { heroData } from "@/data/heroData";
 
@@ -11,29 +17,93 @@ import HeroDots from "./HeroDots";
 const AUTO_SLIDE_INTERVAL = 5000;
 
 export default function Hero() {
-  const [currentSlide, setCurrentSlide] = useState(0);
+  const [currentSlide, setCurrentSlide] =
+    useState(0);
 
-  const nextSlide = () => {
-    setCurrentSlide((prev) => (prev + 1) % heroData.length);
-  };
+  const [paused, setPaused] =
+    useState(false);
 
-  const previousSlide = () => {
+  const nextSlide = useCallback(() => {
     setCurrentSlide(
-      (prev) => (prev - 1 + heroData.length) % heroData.length
+      (prev) => (prev + 1) % heroData.length
     );
-  };
+  }, []);
 
+  const previousSlide = useCallback(() => {
+    setCurrentSlide(
+      (prev) =>
+        (prev - 1 + heroData.length) %
+        heroData.length
+    );
+  }, []);
+
+  // Auto slide
   useEffect(() => {
-    const timer = setInterval(nextSlide, AUTO_SLIDE_INTERVAL);
+    if (paused) return;
+
+    const timer = window.setInterval(() => {
+      nextSlide();
+    }, AUTO_SLIDE_INTERVAL);
 
     return () => clearInterval(timer);
-  }, [currentSlide]);
+  }, [paused, nextSlide]);
+
+  // Keyboard navigation
+  useEffect(() => {
+    const handleKeyDown = (
+      event: KeyboardEvent
+    ) => {
+      if (event.key === "ArrowRight") {
+        nextSlide();
+      }
+
+      if (event.key === "ArrowLeft") {
+        previousSlide();
+      }
+    };
+
+    window.addEventListener(
+      "keydown",
+      handleKeyDown
+    );
+
+    return () => {
+      window.removeEventListener(
+        "keydown",
+        handleKeyDown
+      );
+    };
+  }, [nextSlide, previousSlide]);
+
+  const current =
+    heroData[currentSlide];
 
   return (
-    <section className={styles.hero}>
-      <div className={styles.overlay} />
+    <section
+      className={styles.hero}
+      role="region"
+      aria-label="Featured anime carousel"
+      aria-roledescription="carousel"
+      aria-live="polite"
+      onMouseEnter={() =>
+        setPaused(true)
+      }
+      onMouseLeave={() =>
+        setPaused(false)
+      }
+      style={
+        {
+          "--accent-color":
+            current.accentColor ??
+            "#3b82f6",
+        } as CSSProperties
+      }
+    >
+      <div
+        className={styles.overlay}
+      />
 
-      <HeroSlide slide={heroData[currentSlide]} />
+      <HeroSlide slide={current} />
 
       <HeroControls
         onPrevious={previousSlide}

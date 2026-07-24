@@ -1,10 +1,15 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import {
+  useCallback,
+  useEffect,
+  useState,
+} from "react";
 
 import Section from "../Section";
 import SectionHeader from "../SectionHeader";
 import ProductGrid from "../ProductGrid";
+import Button from "@/components/shared/Button";
 
 import { productService } from "@/services/productService";
 import { Product } from "@/types/product";
@@ -12,71 +17,109 @@ import { Product } from "@/types/product";
 import styles from "./FeaturedSection.module.css";
 
 export default function FeaturedSection() {
-  const [products, setProducts] = useState<Product[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
+  const [products, setProducts] =
+    useState<Product[]>([]);
 
-  useEffect(() => {
-    const loadFeaturedProducts = async () => {
+  const [loading, setLoading] =
+    useState(true);
+
+  const [error, setError] =
+    useState("");
+
+  const loadFeaturedProducts =
+    useCallback(async () => {
+      setLoading(true);
+      setError("");
+
       try {
-        setLoading(true);
-
-    const response = await productService.getProducts({
+        const response =
+          await productService.getProducts({
             featured: true,
             limit: 8,
-        });
+          });
 
         setProducts(response.products);
-      } catch (err) {
-        console.error(err);
-        setError("Failed to load featured products.");
+      } catch (error) {
+        console.error(error);
+
+        setError(
+          "Unable to load featured products."
+        );
       } finally {
         setLoading(false);
       }
+    }, []);
+
+  useEffect(() => {
+    let mounted = true;
+
+    const load = async () => {
+      if (!mounted) return;
+
+      await loadFeaturedProducts();
     };
 
-    loadFeaturedProducts();
-  }, []);
+    load();
 
-  if (loading) {
-    return (
-      <Section>
-        <SectionHeader
-          title="Featured Products"
-          subtitle="Discover our hand-picked anime collectibles."
-        />
-
-        <p>Loading products...</p>
-      </Section>
-    );
-  }
-
-  if (error) {
-    return (
-      <Section>
-        <SectionHeader
-          title="Featured Products"
-          subtitle="Discover our hand-picked anime collectibles."
-        />
-
-        <p>{error}</p>
-      </Section>
-    );
-  }
-
-  if (products.length === 0) {
-    return null;
-  }
+    return () => {
+      mounted = false;
+    };
+  }, [loadFeaturedProducts]);
 
   return (
-    <Section>
+    <Section className={styles.section}>
       <SectionHeader
         title="Featured Products"
         subtitle="Discover our hand-picked anime collectibles."
         viewAllHref="/products"
       />
 
-      <ProductGrid products={products} />
+      {loading && (
+        <div
+          className={styles.state}
+          aria-live="polite"
+        >
+          <div className="spinner" />
+          <p>
+            Loading featured
+            collectibles...
+          </p>
+        </div>
+      )}
+
+      {!loading && error && (
+        <div className={styles.state}>
+          <p>{error}</p>
+
+          <Button
+            variant="primary"
+            onClick={
+              loadFeaturedProducts
+            }
+          >
+            Try Again
+          </Button>
+        </div>
+      )}
+
+      {!loading &&
+        !error &&
+        products.length > 0 && (
+          <ProductGrid
+            products={products}
+          />
+        )}
+
+      {!loading &&
+        !error &&
+        products.length === 0 && (
+          <div className={styles.state}>
+            <p>
+              No featured products
+              available.
+            </p>
+          </div>
+        )}
     </Section>
   );
 }

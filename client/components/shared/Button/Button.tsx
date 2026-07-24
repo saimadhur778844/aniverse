@@ -1,4 +1,5 @@
 import { ButtonHTMLAttributes } from "react";
+import clsx from "clsx";
 import styles from "./Button.module.css";
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
@@ -10,17 +11,17 @@ export default function Button({
   children,
   variant = "primary",
   fullWidth = false,
-  className = "",
+  className,
   ...props
 }: ButtonProps) {
   return (
     <button
-      className={`
-        ${styles.button}
-        ${styles[variant]}
-        ${fullWidth ? styles.fullWidth : ""}
-        ${className}
-      `}
+      className={clsx(
+        styles.button,
+        styles[variant],
+        fullWidth && styles.fullWidth,
+        className
+      )}
       {...props}
     >
       {children}

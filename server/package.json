@@ -10,7 +10,9 @@
   "keywords": [],
   "type": "module",
   "dependencies": {
+    "@cashfreepayments/cashfree-js": "^1.0.7",
     "bcrypt": "^6.0.0",
+    "cashfree-pg": "^6.0.4",
     "cloudinary": "^1.41.3",
     "cors": "^2.8.6",
     "dotenv": "^17.4.2",
@@ -26,6 +28,8 @@
   },
   "allowScripts": {
     "cloudinary@1.41.3": true,
-    "dotenv@17.4.2": true
+    "dotenv@17.4.2": true,
+    "cashfree-pg@6.0.4": true,
+    "@cashfreepayments/cashfree-js@1.0.7": true
   }
 }

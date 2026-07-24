@@ -1,3 +1,174 @@
+"use client";
+
+import { useEffect, useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
+import { load } from "@cashfreepayments/cashfree-js";
+
+import { useCart } from "@/context/CartContext/CartContext";
+import { createOrder } from "@/services/orderService";
+import { createPaymentSession } from "@/services/paymentService";
+
+import CheckoutHeader from "@/components/checkout/CheckoutHeader";
+import CustomerInformation from "@/components/checkout/CustomerInformation";
+import ShippingAddress from "@/components/checkout/ShippingAddress";
+import PaymentMethod from "@/components/checkout/PaymentMethod";
+import OrderSummary from "@/components/checkout/OrderSummary";
+
+type CheckoutForm = {
+  fullName: string;
+  email: string;
+  phone: string;
+  address: string;
+  city: string;
+  state: string;
+  pincode: string;
+};
+
 export default function CheckoutPage() {
-  return <main className="mx-auto max-w-7xl px-6 py-12"><h1 className="text-3xl font-bold">Checkout</h1><p className="mt-4 text-gray-600">Checkout details will appear here.</p></main>;
+  const router = useRouter();
+
+  const { items, subtotal, clearCart, isEmpty } = useCart();
+
+  const [loading, setLoading] = useState(false);
+
+  const [form, setForm] = useState<CheckoutForm>({
+    fullName: "",
+    email: "",
+    phone: "",
+    address: "",
+    city: "",
+    state: "",
+    pincode: "",
+  });
+
+  useEffect(() => {
+    if (isEmpty) {
+      router.replace("/cart");
+    }
+  }, [isEmpty, router]);
+
+  const shipping = useMemo(() => {
+    if (subtotal >= 1999) return 0;
+    return 99;
+  }, [subtotal]);
+
+  const total = subtotal + shipping;
+
+  const onChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+    setForm((prev) => ({
+      ...prev,
+      [e.target.name]: e.target.value,
+    }));
+  };
+
+  const validate = () => {
+    if (
+      !form.fullName ||
+      !form.email ||
+      !form.phone ||
+      !form.address ||
+      !form.city ||
+      !form.state ||
+      !form.pincode
+    ) {
+      alert("Please fill all fields.");
+      return false;
+    }
+
+    return true;
+  };
+
+  const handleCheckout = async () => {
+    if (!validate()) return;
+
+    try {
+      setLoading(true);
+
+      const order = await createOrder({
+        items: items.map((item) => ({
+          product: item.product._id,
+          quantity: item.quantity,
+        })),
+        shippingAddress: {
+          fullName: form.fullName,
+          email: form.email,
+          phone: form.phone,
+          addressLine1: form.address,
+          city: form.city,
+          state: form.state,
+          pincode: form.pincode,
+        },
+      });
+
+      const payment = await createPaymentSession(order.order._id);
+
+      const cashfree = await load({
+        mode:
+          process.env.NEXT_PUBLIC_CASHFREE_ENV === "PRODUCTION"
+            ? "production"
+            : "sandbox",
+      });
+
+      if (!cashfree) {
+        throw new Error("Unable to initialize Cashfree.");
+      }
+
+      await cashfree.checkout({
+        paymentSessionId: payment.payment_session_id,
+        redirectTarget: "_self",
+      });
+
+      clearCart();
+
+      router.push(`/orders/${order.order._id}`);
+    } catch (error) {
+      console.error(error);
+      alert("Unable to process payment.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (isEmpty) return null;
+
+  return (
+    <main className="min-h-screen bg-[#09090f] px-6 py-14">
+      <div className="mx-auto max-w-7xl">
+
+        <CheckoutHeader />
+
+        <div className="mt-12 grid gap-10 lg:grid-cols-3">
+
+          <div className="space-y-8 lg:col-span-2">
+
+            <CustomerInformation
+              form={form}
+              onChange={onChange}
+            />
+
+            <ShippingAddress
+              form={form}
+              onChange={onChange}
+            />
+
+            <PaymentMethod />
+
+          </div>
+
+          <OrderSummary
+            items={items}
+            subtotal={subtotal}
+            shipping={shipping}
+            total={total}
+            loading={loading}
+            onCheckout={handleCheckout}
+          />
+
+        </div>
+
+      </div>
+    </main>
+  );
 }
