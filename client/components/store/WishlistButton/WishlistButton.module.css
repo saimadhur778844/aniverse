@@ -1,3 +1,21 @@
 .button {
+  width: 100%;
+  padding: 1rem;
+
+  background: #ffffff;
+  color: #ef4444;
+
+  border: 2px solid #ef4444;
+  border-radius: 10px;
+
+  font-size: 1rem;
+  font-weight: 600;
+
   cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.button:hover {
+  background: #ef4444;
+  color: #ffffff;
 }

@@ -1,3 +1,48 @@
 .gallery {
-  display: grid;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.mainImage {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1;
+  border-radius: 16px;
+  overflow: hidden;
+  background: #f5f5f5;
+}
+
+.image {
+  object-fit: contain;
+}
+
+.thumbnails {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.thumb {
+  position: relative;
+  width: 80px;
+  height: 80px;
+  border: 2px solid transparent;
+  border-radius: 12px;
+  overflow: hidden;
+  background: white;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.thumb:hover {
+  border-color: #666;
+}
+
+.active {
+  border-color: #ff4d4f;
+}
+
+.thumbImage {
+  object-fit: cover;
 }

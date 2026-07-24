@@ -1,19 +1,35 @@
+"use client";
+
+import styles from "./QuantitySelector.module.css";
+
 interface QuantitySelectorProps {
-  value: number;
-  onChange: (value: number) => void;
+  quantity: number;
+  onChange: (quantity: number) => void;
+  max: number;
 }
 
 export default function QuantitySelector({
-  value,
+  quantity,
   onChange,
+  max,
 }: QuantitySelectorProps) {
   return (
-    <input
-      type="number"
-      min={1}
-      value={value}
-      onChange={(event) => onChange(Math.max(1, Number(event.target.value)))}
-      aria-label="Quantity"
-    />
+    <div className={styles.container}>
+      <button
+        onClick={() => onChange(Math.max(1, quantity - 1))}
+        disabled={quantity <= 1}
+      >
+        −
+      </button>
+
+      <span>{quantity}</span>
+
+      <button
+        onClick={() => onChange(Math.min(max, quantity + 1))}
+        disabled={quantity >= max}
+      >
+        +
+      </button>
+    </div>
   );
 }

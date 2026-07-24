@@ -7,8 +7,11 @@ import { productService } from "@/services/productService";
 import { Product } from "@/types/product";
 
 import Section from "@/components/store/Section";
+import Breadcrumb from "@/components/store/Breadcrumb";
 import ProductGallery from "@/components/store/ProductGallery";
 import ProductInfo from "@/components/store/ProductInfo";
+
+import styles from "./page.module.css";
 
 export default function ProductDetailsPage() {
   const params = useParams();
@@ -38,23 +41,58 @@ export default function ProductDetailsPage() {
     loadProduct();
   }, [params.slug]);
 
-  if (loading) return <Section>Loading...</Section>;
+  if (loading) {
+    return (
+      <Section>
+        <p>Loading product...</p>
+      </Section>
+    );
+  }
 
-  if (error) return <Section>{error}</Section>;
+  if (error) {
+    return (
+      <Section>
+        <p>{error}</p>
+      </Section>
+    );
+  }
 
-  if (!product) return <Section>Product not found.</Section>;
+  if (!product) {
+    return (
+      <Section>
+        <p>Product not found.</p>
+      </Section>
+    );
+  }
+
+  const category =
+    typeof product.category === "string"
+      ? product.category
+      : product.category.name;
 
   return (
     <Section>
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "1fr 1fr",
-          gap: "3rem",
-        }}
-      >
-        <ProductGallery product={product} />
+      <Breadcrumb
+        items={[
+          {
+            label: "Home",
+            href: "/",
+          },
+          {
+            label: "Products",
+            href: "/products",
+          },
+          {
+            label: category,
+          },
+          {
+            label: product.name,
+          },
+        ]}
+      />
 
+      <div className={styles.layout}>
+        <ProductGallery product={product} />
         <ProductInfo product={product} />
       </div>
     </Section>

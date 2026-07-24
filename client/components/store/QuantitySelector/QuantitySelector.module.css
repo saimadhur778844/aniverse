@@ -1,3 +1,33 @@
-.selector {
-  width: 5rem;
+.container {
+  display: inline-flex;
+  align-items: center;
+  gap: 1rem;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 0.4rem;
+}
+
+.container button {
+  width: 36px;
+  height: 36px;
+  border: none;
+  background: #f5f5f5;
+  cursor: pointer;
+  border-radius: 6px;
+  font-size: 1.2rem;
+}
+
+.container button:hover:not(:disabled) {
+  background: #e5e5e5;
+}
+
+.container button:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.container span {
+  min-width: 24px;
+  text-align: center;
+  font-weight: 600;
 }

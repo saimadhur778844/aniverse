@@ -1,0 +1,23 @@
+.rating {
+  display: flex;
+  align-items: center;
+  gap: .5rem;
+}
+
+.stars {
+  display: flex;
+  gap: .15rem;
+}
+
+.active {
+  color: #f59e0b;
+}
+
+.inactive {
+  color: #d1d5db;
+}
+
+.value {
+  font-weight: 600;
+  color: #374151;
+}
