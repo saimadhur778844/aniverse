@@ -31,3 +31,8 @@ export const getProfile = async () => {
 
   return data;
 };
+
+export const logout = () => {
+  localStorage.removeItem("token");
+  localStorage.removeItem("user");
+};

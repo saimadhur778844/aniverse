@@ -23,12 +23,12 @@ api.interceptors.request.use((config) => {
 api.interceptors.response.use(
   (response) => response,
   (error) => {
-    if (error.response?.status === 401) {
-      console.warn("Unauthorized");
-
-      // Later:
-      // localStorage.removeItem("token");
-      // router.push("/login");
+    if (
+      error.response?.status === 401 &&
+      typeof window !== "undefined"
+    ) {
+      localStorage.removeItem("token");
+      localStorage.removeItem("user");
     }
 
     return Promise.reject(error);
