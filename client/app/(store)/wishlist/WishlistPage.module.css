@@ -1,4 +1,10 @@
-.errorState,
+.actions {
+  display: flex;
+  justify-content: flex-end;
+
+  margin-bottom: 2rem;
+}
+
 .emptyState {
   display: flex;
   flex-direction: column;
@@ -7,51 +13,42 @@
 
   text-align: center;
 
+  gap: 1rem;
+
   padding: 5rem 2rem;
 
   border: 1px solid var(--color-border);
   border-radius: var(--radius-xl);
 
   background: var(--color-surface);
-
-  gap: 1rem;
 }
 
-.errorState h2,
+.icon {
+  font-size: 4rem;
+}
+
 .emptyState h2 {
   color: var(--color-text);
 
-  font-size: 1.75rem;
+  font-size: 1.8rem;
+
   font-weight: 700;
 }
 
-.errorState p,
 .emptyState p {
-  max-width: 520px;
-
   color: var(--color-muted);
+
+  max-width: 480px;
 
   line-height: 1.7;
 }
 
-.emptyIcon {
-  font-size: 4rem;
-
-  line-height: 1;
-}
-
 @media (max-width: 768px) {
-  .errorState,
-  .emptyState {
-    padding: 3rem 1.5rem;
+  .actions {
+    justify-content: center;
   }
 
-  .emptyIcon {
+  .icon {
     font-size: 3rem;
-  }
-
-  .errorState h2,
-  .emptyState h2 {
-    font-size: 1.5rem;
   }
 }

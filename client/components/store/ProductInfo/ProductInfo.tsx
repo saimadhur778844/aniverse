@@ -11,7 +11,7 @@ import AddToCartButton from "../AddToCartButton";
 import WishlistButton from "../WishlistButton";
 import StockBadge from "../StockBadge";
 
-import useCart from "@/hooks/useCart";
+import useCart from "@/lib/hooks/useCart";
 
 import styles from "./ProductInfo.module.css";
 
@@ -41,11 +41,19 @@ export default function ProductInfo({
         product.originalPrice) *
         100
     );
-  }, [product.originalPrice, product.price]);
+  }, [
+    product.originalPrice,
+    product.price,
+  ]);
 
-  const handleAddToCart = useCallback(() => {
-    addToCart(product, quantity);
-  }, [addToCart, product, quantity]);
+  const handleAddToCart =
+    useCallback(() => {
+      addToCart(product, quantity);
+    }, [
+      addToCart,
+      product,
+      quantity,
+    ]);
 
   return (
     <div className={styles.container}>
@@ -60,23 +68,39 @@ export default function ProductInfo({
       {product.rating !== undefined && (
         <Rating
           rating={product.rating}
-          reviewCount={product.reviewCount}
+          reviewCount={
+            product.reviewCount
+          }
         />
       )}
 
       <div className={styles.priceSection}>
         <h2 className={styles.price}>
-          ₹{product.price.toLocaleString()}
+          ₹
+          {product.price.toLocaleString(
+            "en-IN"
+          )}
         </h2>
 
         {product.originalPrice && (
-          <span className={styles.originalPrice}>
-            ₹{product.originalPrice.toLocaleString()}
+          <span
+            className={
+              styles.originalPrice
+            }
+          >
+            ₹
+            {product.originalPrice.toLocaleString(
+              "en-IN"
+            )}
           </span>
         )}
 
         {discountPercentage && (
-          <span className={styles.discount}>
+          <span
+            className={
+              styles.discount
+            }
+          >
             {discountPercentage}% OFF
           </span>
         )}
@@ -88,7 +112,11 @@ export default function ProductInfo({
 
       <ProductMeta product={product} />
 
-      <p className={styles.description}>
+      <p
+        className={
+          styles.description
+        }
+      >
         {product.description}
       </p>
 
@@ -105,12 +133,7 @@ export default function ProductInfo({
         />
 
         <WishlistButton
-          onClick={() =>
-            console.log(
-              "Wishlist:",
-              product._id
-            )
-          }
+          product={product}
         />
       </div>
     </div>

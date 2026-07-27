@@ -1,0 +1,74 @@
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+
+  padding: 2rem;
+
+  background: var(--surface);
+
+  border-radius: 20px;
+
+  border: 1px solid rgba(255,255,255,.08);
+}
+
+.heading {
+  color: white;
+
+  font-size: 1.5rem;
+}
+
+.rating {
+  display: flex;
+  gap: .5rem;
+}
+
+.star {
+  background: transparent;
+
+  border: none;
+
+  font-size: 2rem;
+
+  color: #666;
+
+  cursor: pointer;
+
+  transition: .2s;
+}
+
+.star:hover {
+  transform: scale(1.1);
+}
+
+.active {
+  color: var(--gold);
+}
+
+.input,
+.textarea {
+  width: 100%;
+
+  padding: 1rem;
+
+  border-radius: 12px;
+
+  border: 1px solid rgba(255,255,255,.08);
+
+  background: var(--background);
+
+  color: white;
+
+  outline: none;
+}
+
+.input:focus,
+.textarea:focus {
+  border-color: var(--primary);
+}
+
+.textarea {
+  resize: vertical;
+
+  min-height: 160px;
+}

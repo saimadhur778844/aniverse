@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 
 import Sidebar from "@/components/admin/Sidebar/Sidebar";
 import Topbar from "@/components/admin/Topbar/Topbar";
-import { useAuth } from "@/context/AuthContext";
+import { useAuth } from "@/context/AuthContext/AuthContext";
 
 export default function AdminLayout({
   children,

@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 
-import useCart from "@/hooks/useCart";
+import useCart from "@/lib/hooks/useCart";
 
 import styles from "./CartSummary.module.css";
 

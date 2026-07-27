@@ -1,8 +1,18 @@
 "use client";
 
+import styles from "./SortDropdown.module.css";
+
+export type SortOption =
+  | "featured"
+  | "newest"
+  | "price-asc"
+  | "price-desc"
+  | "rating"
+  | "name";
+
 interface SortDropdownProps {
-  value: string;
-  onChange: (value: string) => void;
+  value: SortOption;
+  onChange: (value: SortOption) => void;
 }
 
 export default function SortDropdown({
@@ -10,21 +20,57 @@ export default function SortDropdown({
   onChange,
 }: SortDropdownProps) {
   return (
-    <select
-      value={value}
-      onChange={(e) => onChange(e.target.value)}
-      className="border rounded-lg px-4 py-2 bg-white"
-    >
-      <option value="newest">Newest</option>
-      <option value="price-asc">
-        Price: Low to High
-      </option>
-      <option value="price-desc">
-        Price: High to Low
-      </option>
-      <option value="rating">
-        Highest Rated
-      </option>
-    </select>
+    <div className={styles.container}>
+      <label
+        htmlFor="sort-products"
+        className={styles.label}
+      >
+        Sort By
+      </label>
+
+      <div className={styles.selectWrapper}>
+        <select
+          id="sort-products"
+          value={value}
+          onChange={(e) =>
+            onChange(
+              e.target.value as SortOption
+            )
+          }
+          className={styles.select}
+        >
+          <option value="featured">
+            Featured
+          </option>
+
+          <option value="newest">
+            Newest
+          </option>
+
+          <option value="price-asc">
+            Price: Low → High
+          </option>
+
+          <option value="price-desc">
+            Price: High → Low
+          </option>
+
+          <option value="rating">
+            Highest Rated
+          </option>
+
+          <option value="name">
+            Name (A–Z)
+          </option>
+        </select>
+
+        <span
+          className={styles.arrow}
+          aria-hidden="true"
+        >
+          ▼
+        </span>
+      </div>
+    </div>
   );
 }

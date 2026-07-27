@@ -1,6 +1,6 @@
 "use client";
 
-import useCart from "@/hooks/useCart";
+import useCart from "@/lib/hooks/useCart";
 import CartItem from "./CartItem";
 import CartSummary from "./CartSummary";
 

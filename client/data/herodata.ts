@@ -26,7 +26,7 @@ export const heroData: HeroSlide[] = [
     description:
       "Discover officially licensed One Piece figures, statues, keychains, posters and exclusive collectibles for every Straw Hat fan.",
 
-    image: "/images/hero/luffy.png",
+    image: "/images/hero/onepiece.webp",
 
     href: "/products?anime=one-piece",
 
@@ -49,7 +49,7 @@ export const heroData: HeroSlide[] = [
     description:
       "Explore premium Naruto figures, Akatsuki collectibles, kunai replicas and exclusive merchandise from the Hidden Leaf Village.",
 
-    image: "/images/hero/naruto.png",
+    image: "/images/hero/naruto.webp",
 
     href: "/products?anime=naruto",
 
@@ -72,7 +72,7 @@ export const heroData: HeroSlide[] = [
     description:
       "Bring home beautifully crafted Demon Slayer collectibles featuring Tanjiro, Nezuko, Zenitsu, Inosuke and the Hashira.",
 
-    image: "/images/hero/tanjiro.png",
+    image: "/images/hero/demonslayer.webp",
 
     href: "/products?anime=demon-slayer",
 
@@ -95,7 +95,7 @@ export const heroData: HeroSlide[] = [
     description:
       "Premium Jujutsu Kaisen figures, acrylic stands, apparel and collectibles featuring Gojo, Yuji, Megumi and Sukuna.",
 
-    image: "/images/hero/gojo.png",
+    image: "/images/hero/jjk.webp",
 
     href: "/products?anime=jujutsu-kaisen",
 
@@ -118,7 +118,7 @@ export const heroData: HeroSlide[] = [
     description:
       "Explore premium Attack on Titan figures and collectibles inspired by Eren, Levi, Mikasa and the legendary Survey Corps.",
 
-    image: "/images/hero/eren.png",
+    image: "/images/hero/dbz.webp",
 
     href: "/products?anime=attack-on-titan",
 

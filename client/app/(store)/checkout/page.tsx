@@ -8,11 +8,11 @@ import { useCart } from "@/context/CartContext/CartContext";
 import { createOrder } from "@/services/orderService";
 import { createPaymentSession } from "@/services/paymentService";
 
-import CheckoutHeader from "@/components/checkout/CheckoutHeader";
-import CustomerInformation from "@/components/checkout/CustomerInformation";
-import ShippingAddress from "@/components/checkout/ShippingAddress";
-import PaymentMethod from "@/components/checkout/PaymentMethod";
-import OrderSummary from "@/components/checkout/OrderSummary";
+import CheckoutHeader from "@/components/store/checkout/CheckoutHeader";
+import CustomerInformation from "@/components/store/checkout/CustomerInformation";
+import ShippingAddress from "@/components/store/checkout/ShippingAddress";
+import PaymentMethod from "@/components/store/checkout/PaymentMethod";
+import OrderSummary from "@/components/store/checkout/OrderSummary";
 
 type CheckoutForm = {
   fullName: string;
@@ -57,7 +57,7 @@ export default function CheckoutPage() {
   const onChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
-    setForm((prev) => ({
+    setForm((prev: CheckoutForm) => ({
       ...prev,
       [e.target.name]: e.target.value,
     }));
@@ -87,7 +87,7 @@ export default function CheckoutPage() {
       setLoading(true);
 
       const order = await createOrder({
-        items: items.map((item) => ({
+        items: items.map((item: any) => ({
           product: item.product._id,
           quantity: item.quantity,
         })),
@@ -106,7 +106,7 @@ export default function CheckoutPage() {
 
       const cashfree = await load({
         mode:
-          process.env.NEXT_PUBLIC_CASHFREE_ENV === "PRODUCTION"
+          (process as any)?.env?.NEXT_PUBLIC_CASHFREE_ENV === "PRODUCTION"
             ? "production"
             : "sandbox",
       });

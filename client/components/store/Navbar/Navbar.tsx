@@ -2,10 +2,14 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import clsx from "clsx";
-import useCart from "@/hooks/useCart";
+
+import useCart from "@/lib/hooks/useCart";
+import { useWishlist } from "@/context/WishlistContext/WishlistContext";
+
 import { CartDrawer } from "@/components/store/cart";
+
 import {
   Search,
   Heart,
@@ -16,32 +20,46 @@ import {
 } from "lucide-react";
 
 import { navigation } from "@/data/navigation";
+
 import styles from "./Navbar.module.css";
 
 export default function Navbar() {
   const pathname = usePathname();
+  const router = useRouter();
 
   const [mobileOpen, setMobileOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [cartOpen, setCartOpen] = useState(false);
+
   const { totalItems } = useCart();
+
+  const {
+    totalItems: wishlistItems,
+  } = useWishlist();
 
   return (
     <header className={styles.navbar}>
       <div className={styles.container}>
         {/* Logo */}
-        <Link href="/" className={styles.logo}>
-          <span className={styles.logoAccent}>ANI</span>VERSE
+        <Link
+          href="/"
+          className={styles.logo}
+        >
+          <span className={styles.logoAccent}>
+            ANI
+          </span>
+          VERSE
         </Link>
 
-        {/* Navigation */}
+        {/* Desktop Navigation */}
         <nav className={styles.menu}>
           {navigation.map((item) => (
             <Link
               key={item.label}
               href={item.href}
               className={clsx(styles.link, {
-                [styles.active]: pathname === item.href,
+                [styles.active]:
+                  pathname === item.href,
               })}
             >
               {item.label}
@@ -51,76 +69,134 @@ export default function Navbar() {
 
         {/* Right Side */}
         <div className={styles.actions}>
-          <button className={styles.iconButton}>
+          {/* Wishlist */}
+          <Link
+            href="/wishlist"
+            className={styles.iconButton}
+            aria-label="Wishlist"
+          >
             <Heart size={22} />
-          </button>
 
+            {wishlistItems > 0 && (
+              <span className={styles.badge}>
+                {wishlistItems > 99
+                  ? "99+"
+                  : wishlistItems}
+              </span>
+            )}
+          </Link>
+
+          {/* Cart */}
           <button
             className={styles.iconButton}
-            onClick={() => setCartOpen(true)}
+            onClick={() =>
+              setCartOpen(true)
+            }
+            aria-label="Cart"
           >
             <ShoppingCart size={22} />
 
             {totalItems > 0 && (
               <span className={styles.badge}>
-                {totalItems > 99 ? "99+" : totalItems}
+                {totalItems > 99
+                  ? "99+"
+                  : totalItems}
               </span>
             )}
           </button>
 
-          {/* Expandable Search */}
+          {/* Search */}
           <div
             className={`${styles.searchWrapper} ${
-              searchOpen ? styles.searchOpen : ""
+              searchOpen
+                ? styles.searchOpen
+                : ""
             }`}
           >
             {searchOpen ? (
               <>
-                <Search size={18} className={styles.searchIcon} />
+                <Search
+                  size={18}
+                  className={
+                    styles.searchIcon
+                  }
+                />
 
                 <input
-                  type="text"
-                  placeholder="Search anime, figures, katanas..."
-                  className={styles.searchInput}
+                  type="search"
+                  placeholder="Search anime, figures..."
+                  className={
+                    styles.searchInput
+                  }
                   autoFocus
                   onKeyDown={(e) => {
-                    if (e.key === "Enter") {
-                      const value = e.currentTarget.value.trim();
+                    if (
+                      e.key === "Enter"
+                    ) {
+                      const value =
+                        e.currentTarget.value.trim();
 
-                      if (value) {
-                        window.location.href = `/products?search=${encodeURIComponent(value)}`;
-                      }
+                      if (!value) return;
+
+                      router.push(
+                        `/products?search=${encodeURIComponent(
+                          value
+                        )}`
+                      );
+
+                      setSearchOpen(false);
                     }
                   }}
                 />
 
                 <button
-                  className={styles.closeSearch}
-                  onClick={() => setSearchOpen(false)}
+                  className={
+                    styles.closeSearch
+                  }
+                  onClick={() =>
+                    setSearchOpen(false)
+                  }
                 >
                   <X size={18} />
                 </button>
               </>
             ) : (
               <button
-                className={styles.iconButton}
-                onClick={() => setSearchOpen(true)}
+                className={
+                  styles.iconButton
+                }
+                onClick={() =>
+                  setSearchOpen(true)
+                }
+                aria-label="Search"
               >
                 <Search size={22} />
               </button>
             )}
           </div>
 
-          <button className={styles.loginButton}>
+          {/* Login */}
+          <Link
+            href="/login"
+            className={styles.loginButton}
+          >
             <User size={18} />
             Login
-          </button>
+          </Link>
 
+          {/* Mobile */}
           <button
             className={styles.mobileButton}
-            onClick={() => setMobileOpen(!mobileOpen)}
+            onClick={() =>
+              setMobileOpen(!mobileOpen)
+            }
+            aria-label="Menu"
           >
-            {mobileOpen ? <X size={26} /> : <Menu size={26} />}
+            {mobileOpen ? (
+              <X size={26} />
+            ) : (
+              <Menu size={26} />
+            )}
           </button>
         </div>
       </div>
@@ -132,24 +208,70 @@ export default function Navbar() {
             <Link
               key={item.label}
               href={item.href}
-              className={clsx(styles.mobileLink, {
-                [styles.active]: pathname === item.href,
-              })}
-              onClick={() => setMobileOpen(false)}
+              className={clsx(
+                styles.mobileLink,
+                {
+                  [styles.active]:
+                    pathname ===
+                    item.href,
+                }
+              )}
+              onClick={() =>
+                setMobileOpen(false)
+              }
             >
               {item.label}
             </Link>
           ))}
+
+          <Link
+            href="/wishlist"
+            className={
+              styles.mobileLink
+            }
+            onClick={() =>
+              setMobileOpen(false)
+            }
+          >
+            ❤️ Wishlist
+            {wishlistItems > 0 &&
+              ` (${wishlistItems})`}
+          </Link>
+
+          <button
+            className={
+              styles.mobileCart
+            }
+            onClick={() => {
+              setCartOpen(true);
+              setMobileOpen(false);
+            }}
+          >
+            🛒 Cart
+            {totalItems > 0 &&
+              ` (${totalItems})`}
+          </button>
+
+          <Link
+            href="/login"
+            className={
+              styles.mobileLink
+            }
+            onClick={() =>
+              setMobileOpen(false)
+            }
+          >
+            👤 Login
+          </Link>
         </nav>
       )}
+
       <CartDrawer
-      open={cartOpen}
-      onClose={() => setCartOpen(false)}
-    >
-      <p style={{ color: "white" }}>
-        Cart is empty
-      </p>
-    </CartDrawer>
+        open={cartOpen}
+        onClose={() =>
+          setCartOpen(false)
+        }
+      />
     </header>
   );
 }

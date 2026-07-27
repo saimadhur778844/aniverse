@@ -3,9 +3,13 @@
 import Section from "@/components/store/Section";
 import SectionHeader from "@/components/store/SectionHeader";
 import ProductGrid from "@/components/store/ProductGrid";
+import ProductGridSkeleton from "@/components/store/ProductGridSkeleton";
 import ProductToolbar from "@/components/store/ProductToolbar";
+import Button from "@/components/shared/Button";
 
-import useProducts from "@/hooks/useProducts";
+import useProducts from "@/lib/hooks/useProducts";
+
+import styles from "./ProductsPage.module.css";
 
 export default function ProductsPage() {
   const {
@@ -30,9 +34,10 @@ export default function ProductsPage() {
       <Section>
         <SectionHeader
           title="Products"
-          subtitle="Loading products..."
+          subtitle="Browse our complete collection."
         />
-        <p>Loading products...</p>
+
+        <ProductGridSkeleton count={8} />
       </Section>
     );
   }
@@ -44,7 +49,18 @@ export default function ProductsPage() {
           title="Products"
           subtitle="Browse our complete collection."
         />
-        <p>{error}</p>
+
+        <div className={styles.errorState}>
+          <h2>Something went wrong</h2>
+
+          <p>{error}</p>
+
+          <Button
+            onClick={() => window.location.reload()}
+          >
+            Try Again
+          </Button>
+        </div>
       </Section>
     );
   }
@@ -53,7 +69,9 @@ export default function ProductsPage() {
     <Section>
       <SectionHeader
         title="Products"
-        subtitle={`${total} product${total !== 1 ? "s" : ""} available`}
+        subtitle={`${total.toLocaleString()} product${
+          total !== 1 ? "s" : ""
+        } available`}
       />
 
       <ProductToolbar
@@ -70,7 +88,27 @@ export default function ProductsPage() {
       {products.length > 0 ? (
         <ProductGrid products={products} />
       ) : (
-        <p>No products found.</p>
+        <div className={styles.emptyState}>
+          <div className={styles.emptyIcon}>
+            📦
+          </div>
+
+          <h2>No products found</h2>
+
+          <p>
+            We couldn't find any products matching
+            your current search or filters.
+          </p>
+
+          <Button
+            onClick={() => {
+              setSearch("");
+              setSelectedCategory("");
+            }}
+          >
+            Clear Filters
+          </Button>
+        </div>
       )}
     </Section>
   );

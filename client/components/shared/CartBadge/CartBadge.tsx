@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { ShoppingCart } from "lucide-react";
-import { useCart } from "@/hooks/useCart";
+import useCart from "@/lib/hooks/useCart";
 import styles from "./CartBadge.module.css";
 
 export default function CartBadge() {
@@ -14,10 +14,7 @@ export default function CartBadge() {
 
       {totalItems > 0 && (
         <span className={styles.badge}>
-          {totalItems}
-        </span>
-        <span className={styles.badge}>
-        {totalItems > 99 ? "99+" : totalItems}
+          {totalItems > 99 ? "99+" : totalItems}
         </span>
       )}
     </Link>

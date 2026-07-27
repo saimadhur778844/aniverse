@@ -70,3 +70,29 @@
     font-size: 0.95rem;
   }
 }
+
+.active {
+  background: var(--color-primary);
+
+  color: var(--color-text-inverse);
+}
+
+.active .icon {
+  color: #ff1744;
+
+  animation: wishlistPop 250ms ease;
+}
+
+@keyframes wishlistPop {
+  0% {
+    transform: scale(0.85);
+  }
+
+  60% {
+    transform: scale(1.3);
+  }
+
+  100% {
+    transform: scale(1);
+  }
+}

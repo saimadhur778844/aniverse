@@ -43,7 +43,14 @@ export default function CategorySection() {
           subtitle="Browse collectibles by category."
         />
 
-        <p>Loading categories...</p>
+        <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-4">
+          {Array.from({ length: 4 }).map((_, index) => (
+            <div
+              key={index}
+              className="skeleton h-36 w-full rounded-2xl"
+            />
+          ))}
+        </div>
       </Section>
     );
   }

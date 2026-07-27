@@ -250,3 +250,48 @@
     border-top: 1px solid rgba(255, 255, 255, 0.08);
   }
 }
+/* Wishlist & Cart badge animation */
+
+.badge {
+  animation: badgePop 0.25s ease;
+}
+
+@keyframes badgePop {
+  0% {
+    transform: scale(0.7);
+  }
+
+  70% {
+    transform: scale(1.15);
+  }
+
+  100% {
+    transform: scale(1);
+  }
+}
+
+/* Mobile Cart */
+
+.mobileCart {
+  display: flex;
+
+  align-items: center;
+
+  padding: 14px 0;
+
+  background: transparent;
+
+  border: none;
+
+  color: white;
+
+  font-size: 1rem;
+
+  cursor: pointer;
+
+  text-align: left;
+}
+
+.mobileCart:hover {
+  color: var(--primary);
+}

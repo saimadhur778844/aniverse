@@ -1,3 +1,5 @@
+"use client";
+
 import Link from "next/link";
 import Image from "next/image";
 
@@ -6,6 +8,9 @@ import Button from "@/components/shared/Button";
 import Badge from "@/components/shared/Badge";
 import Rating from "@/components/store/Rating";
 import StockBadge from "@/components/store/StockBadge";
+
+import { useCart } from "@/context/CartContext/CartContext";
+import { useWishlist } from "@/context/WishlistContext/WishlistContext";
 
 import { Product } from "@/types/product";
 
@@ -22,6 +27,17 @@ export default function ProductCard({
     typeof product.category === "string"
       ? product.category
       : product.category?.name ?? "Uncategorized";
+
+  const { addToCart } = useCart();
+
+  const {
+    toggleWishlist,
+    isInWishlist,
+  } = useWishlist();
+
+  const inWishlist = isInWishlist(
+    product._id
+  );
 
   return (
     <Link
@@ -54,14 +70,25 @@ export default function ProductCard({
 
           <button
             type="button"
-            className={styles.wishlistButton}
-            aria-label="Add to wishlist"
+            className={`${styles.wishlistButton} ${
+              inWishlist
+                ? styles.activeWishlist
+                : ""
+            }`}
+            aria-label={
+              inWishlist
+                ? "Remove from wishlist"
+                : "Add to wishlist"
+            }
+            aria-pressed={inWishlist}
             onClick={(e) => {
               e.preventDefault();
               e.stopPropagation();
+
+              toggleWishlist(product);
             }}
           >
-            ♡
+            {inWishlist ? "♥" : "♡"}
           </button>
         </div>
 
@@ -110,6 +137,12 @@ export default function ProductCard({
               disabled={
                 product.stock <= 0
               }
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+
+                addToCart(product, 1);
+              }}
             >
               {product.stock > 0
                 ? "Add to Cart"

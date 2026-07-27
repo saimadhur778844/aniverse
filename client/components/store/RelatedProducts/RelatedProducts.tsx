@@ -13,6 +13,7 @@ import { productService } from "@/services/productService";
 import Section from "../Section";
 import SectionHeader from "../SectionHeader";
 import ProductGrid from "../ProductGrid";
+import ProductGridSkeleton from "../ProductGridSkeleton";
 
 import styles from "./RelatedProducts.module.css";
 
@@ -76,9 +77,7 @@ export default function RelatedProducts({
       />
 
       {loading ? (
-        <div className={styles.loading}>
-          Loading recommendations...
-        </div>
+        <ProductGridSkeleton count={4} />
       ) : (
         <ProductGrid products={products} />
       )}

@@ -1,0 +1,130 @@
+.card {
+  display: flex;
+  flex-direction: column;
+
+  overflow: hidden;
+
+  height: 100%;
+}
+
+.image,
+.category,
+.title,
+.titleSmall,
+.rating,
+.stock,
+.price,
+.button {
+  position: relative;
+
+  overflow: hidden;
+
+  background: var(--color-surface-2);
+
+  border-radius: var(--radius-md);
+}
+
+.image::after,
+.category::after,
+.title::after,
+.titleSmall::after,
+.rating::after,
+.stock::after,
+.price::after,
+.button::after {
+  content: "";
+
+  position: absolute;
+
+  inset: 0;
+
+  transform: translateX(-100%);
+
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgb(255 255 255 / 8%),
+    transparent
+  );
+
+  animation: shimmer 1.3s infinite;
+}
+
+.image {
+  aspect-ratio: 1;
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+
+  gap: 0.85rem;
+
+  padding: 1.25rem;
+
+  flex: 1;
+}
+
+.category {
+  width: 90px;
+  height: 14px;
+}
+
+.title {
+  width: 80%;
+  height: 20px;
+}
+
+.titleSmall {
+  width: 55%;
+  height: 20px;
+}
+
+.rating {
+  width: 100px;
+  height: 18px;
+}
+
+.stock {
+  width: 90px;
+  height: 18px;
+}
+
+.footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  gap: 1rem;
+
+  margin-top: auto;
+}
+
+.price {
+  width: 90px;
+  height: 28px;
+}
+
+.button {
+  width: 120px;
+  height: 42px;
+}
+
+@keyframes shimmer {
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .image::after,
+  .category::after,
+  .title::after,
+  .titleSmall::after,
+  .rating::after,
+  .stock::after,
+  .price::after,
+  .button::after {
+    animation: none;
+  }
+}

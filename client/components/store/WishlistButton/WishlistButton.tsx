@@ -1,24 +1,51 @@
 "use client";
 
+import { Product } from "@/types/product";
+import { useWishlist } from "@/context/WishlistContext/WishlistContext";
+
 import styles from "./WishlistButton.module.css";
 
 interface Props {
-  onClick: () => void;
+  product: Product;
 }
 
 export default function WishlistButton({
-  onClick,
+  product,
 }: Props) {
+  const {
+    toggleWishlist,
+    isInWishlist,
+  } = useWishlist();
+
+  const inWishlist = isInWishlist(
+    product._id
+  );
+
   return (
     <button
       type="button"
-      className={styles.button}
-      onClick={onClick}
-      aria-label="Add product to wishlist"
+      className={`${styles.button} ${
+        inWishlist ? styles.active : ""
+      }`}
+      onClick={() =>
+        toggleWishlist(product)
+      }
+      aria-label={
+        inWishlist
+          ? "Remove from wishlist"
+          : "Add to wishlist"
+      }
+      aria-pressed={inWishlist}
     >
-      <span className={styles.icon}>♡</span>
+      <span className={styles.icon}>
+        {inWishlist ? "♥" : "♡"}
+      </span>
 
-      <span>Wishlist</span>
+      <span>
+        {inWishlist
+          ? "In Wishlist"
+          : "Add to Wishlist"}
+      </span>
     </button>
   );
 }

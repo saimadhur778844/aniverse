@@ -44,7 +44,7 @@ export default function ProductModal({
     const fetchCategories = async () => {
       try {
         const data = await getCategories();
-        setCategories(data.categories || data);
+        setCategories(Array.isArray(data) ? data : []);
       } catch (error) {
         console.error(error);
       }

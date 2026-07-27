@@ -6,10 +6,17 @@ export default function Loading() {
     <Section>
       <SectionHeader
         title="Products"
-        subtitle="Loading..."
+        subtitle="Browse our complete collection."
       />
 
-      <p>Loading products...</p>
+      <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+        {Array.from({ length: 6 }).map((_, index) => (
+          <div
+            key={index}
+            className="skeleton h-64 w-full rounded-2xl"
+          />
+        ))}
+      </div>
     </Section>
   );
 }

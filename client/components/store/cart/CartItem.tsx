@@ -3,7 +3,7 @@
 import Image from "next/image";
 import { Trash2, Minus, Plus } from "lucide-react";
 
-import useCart from "@/hooks/useCart";
+import useCart from "@/lib/hooks/useCart";
 import { CartItem as CartItemType } from "@/types/cart";
 
 import styles from "./CartItem.module.css";

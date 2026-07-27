@@ -1,4 +1,4 @@
-import AnimeCard from "@/components/ui/AnimeCard";
+import AnimeCard from "@/components/shared/AnimeCard";
 import featuredAnime from "@/data/featuredAnime";
 import { Anime } from "@/types/anime";
 

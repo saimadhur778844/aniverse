@@ -9,6 +9,7 @@ import {
 import Section from "../Section";
 import SectionHeader from "../SectionHeader";
 import ProductGrid from "../ProductGrid";
+import ProductGridSkeleton from "../ProductGridSkeleton";
 import Button from "@/components/shared/Button";
 
 import { productService } from "@/services/productService";
@@ -79,11 +80,7 @@ export default function FeaturedSection() {
           className={styles.state}
           aria-live="polite"
         >
-          <div className="spinner" />
-          <p>
-            Loading featured
-            collectibles...
-          </p>
+          <ProductGridSkeleton count={4} />
         </div>
       )}
 

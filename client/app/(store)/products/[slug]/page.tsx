@@ -65,7 +65,21 @@ export default function ProductDetailsPage() {
   if (loading) {
     return (
       <Section>
-        <p>Loading product...</p>
+        <div className="space-y-6">
+          <div className="skeleton h-10 w-48 rounded-full" />
+          <div className={styles.layout}>
+            <div className="space-y-4">
+              <div className="skeleton h-96 w-full rounded-3xl" />
+              <div className="skeleton h-20 w-full rounded-2xl" />
+            </div>
+            <div className="space-y-4">
+              <div className="skeleton h-8 w-32 rounded-full" />
+              <div className="skeleton h-12 w-3/4 rounded-full" />
+              <div className="skeleton h-24 w-full rounded-2xl" />
+              <div className="skeleton h-14 w-full rounded-2xl" />
+            </div>
+          </div>
+        </div>
       </Section>
     );
   }

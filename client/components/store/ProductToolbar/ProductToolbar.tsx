@@ -2,7 +2,9 @@
 
 import SearchBar from "../SearchBar";
 import CategoryDropdown from "../CategoryDropdown";
-import SortDropdown from "../SortDropdown";
+import SortDropdown, {
+  SortOption,
+} from "../SortDropdown";
 
 import { Category } from "@/types/category";
 
@@ -18,8 +20,8 @@ interface ProductToolbarProps {
   selectedCategory: string;
   onCategoryChange: (value: string) => void;
 
-  sort: string;
-  onSortChange: (value: string) => void;
+  sort: SortOption;
+  onSortChange: (value: SortOption) => void;
 }
 
 export default function ProductToolbar({
@@ -33,11 +35,21 @@ export default function ProductToolbar({
   onSortChange,
 }: ProductToolbarProps) {
   return (
-    <div className={styles.toolbar}>
+    <section
+      className={styles.toolbar}
+      aria-label="Product controls"
+    >
       <div className={styles.left}>
-        <span>
-          {total} Product{total !== 1 ? "s" : ""}
-        </span>
+        <h3 className={styles.count}>
+          {total.toLocaleString()}{" "}
+          Product
+          {total !== 1 ? "s" : ""}
+        </h3>
+
+        <p className={styles.subtitle}>
+          Browse our latest anime
+          collectibles
+        </p>
       </div>
 
       <div className={styles.right}>
@@ -57,6 +69,6 @@ export default function ProductToolbar({
           onChange={onSortChange}
         />
       </div>
-    </div>
+    </section>
   );
 }
