@@ -7,6 +7,7 @@ import clsx from "clsx";
 
 import useCart from "@/lib/hooks/useCart";
 import { useWishlist } from "@/context/WishlistContext/WishlistContext";
+import { useAuth } from "@/context/AuthContext/AuthContext";
 
 import { CartDrawer } from "@/components/store/cart";
 
@@ -17,6 +18,7 @@ import {
   User,
   Menu,
   X,
+  LogOut,
 } from "lucide-react";
 
 import { navigation } from "@/data/navigation";
@@ -33,9 +35,19 @@ export default function Navbar() {
 
   const { totalItems } = useCart();
 
+  const { totalItems: wishlistItems } = useWishlist();
+
   const {
-    totalItems: wishlistItems,
-  } = useWishlist();
+    user,
+    isAuthenticated,
+    logout,
+  } = useAuth();
+
+  const handleLogout = () => {
+    logout();
+    setMobileOpen(false);
+    router.push("/");
+  };
 
   return (
     <header className={styles.navbar}>
@@ -175,14 +187,34 @@ export default function Navbar() {
             )}
           </div>
 
-          {/* Login */}
-          <Link
-            href="/login"
-            className={styles.loginButton}
-          >
-            <User size={18} />
-            Login
-          </Link>
+          {/* Authentication */}
+          {isAuthenticated ? (
+            <>
+              <Link
+                href="/account"
+                className={styles.loginButton}
+              >
+                <User size={18} />
+                {user?.name}
+              </Link>
+
+              <button
+                onClick={handleLogout}
+                className={styles.iconButton}
+                aria-label="Logout"
+              >
+                <LogOut size={20} />
+              </button>
+            </>
+          ) : (
+            <Link
+              href="/login"
+              className={styles.loginButton}
+            >
+              <User size={18} />
+              Login
+            </Link>
+          )}
 
           {/* Mobile */}
           <button
@@ -252,17 +284,42 @@ export default function Navbar() {
               ` (${totalItems})`}
           </button>
 
-          <Link
-            href="/login"
-            className={
-              styles.mobileLink
-            }
-            onClick={() =>
-              setMobileOpen(false)
-            }
-          >
-            👤 Login
-          </Link>
+          {isAuthenticated ? (
+            <>
+              <Link
+                href="/account"
+                className={
+                  styles.mobileLink
+                }
+                onClick={() =>
+                  setMobileOpen(false)
+                }
+              >
+                👤 {user?.name}
+              </Link>
+
+              <button
+                className={
+                  styles.mobileCart
+                }
+                onClick={handleLogout}
+              >
+                🚪 Logout
+              </button>
+            </>
+          ) : (
+            <Link
+              href="/login"
+              className={
+                styles.mobileLink
+              }
+              onClick={() =>
+                setMobileOpen(false)
+              }
+            >
+              👤 Login
+            </Link>
+          )}
         </nav>
       )}
 

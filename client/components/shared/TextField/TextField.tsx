@@ -3,6 +3,7 @@
 import {
   forwardRef,
   InputHTMLAttributes,
+  useId,
 } from "react";
 import clsx from "clsx";
 
@@ -32,11 +33,8 @@ const TextField = forwardRef<
     },
     ref
   ) => {
-    const inputId =
-      id ??
-      `textfield-${Math.random()
-        .toString(36)
-        .substring(2, 9)}`;
+    const generatedId = useId();
+    const inputId = id ?? generatedId;
 
     return (
       <div
@@ -54,8 +52,9 @@ const TextField = forwardRef<
 
             {required && (
               <span
+                aria-hidden="true"
                 style={{
-                  color: "var(--primary)",
+                  color: "var(--color-primary)",
                   marginLeft: 4,
                 }}
               >

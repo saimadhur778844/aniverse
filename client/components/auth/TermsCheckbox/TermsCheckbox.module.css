@@ -8,28 +8,36 @@
   display: flex;
   align-items: flex-start;
   gap: 10px;
-
-  color: var(--color-muted);
-  font-size: .92rem;
-  line-height: 1.5;
+  cursor: pointer;
 }
 
-.label input {
-  margin-top: 3px;
+.checkbox {
+  width: 18px;
+  height: 18px;
+  margin-top: 2px;
   accent-color: var(--color-primary);
+  flex-shrink: 0;
 }
 
-.label a {
+.text {
+  color: var(--color-muted);
+  font-size: 0.95rem;
+  line-height: 1.6;
+}
+
+.text a {
   color: var(--color-primary);
-  text-decoration: none;
   font-weight: 600;
+  text-decoration: none;
+  transition: color 0.2s ease;
 }
 
-.label a:hover {
-  color: var(--color-primary-light);
+.text a:hover {
+  color: var(--color-secondary);
 }
 
 .error {
+  margin-left: 28px;
   color: var(--color-danger);
-  font-size: .85rem;
+  font-size: 0.85rem;
 }

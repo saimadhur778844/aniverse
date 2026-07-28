@@ -1,80 +1,92 @@
 "use client";
 
-import { useState } from "react";
+import {
+  forwardRef,
+  InputHTMLAttributes,
+  useState,
+} from "react";
+
 import styles from "./PasswordField.module.css";
 
-interface PasswordFieldProps {
-  id: string;
+interface PasswordFieldProps
+  extends InputHTMLAttributes<HTMLInputElement> {
   label: string;
-  value: string;
-  placeholder?: string;
   error?: string;
-  required?: boolean;
-  autoComplete?: string;
-  onChange: (
-    e: React.ChangeEvent<HTMLInputElement>
-  ) => void;
 }
 
-export default function PasswordField({
-  id,
-  label,
-  value,
-  placeholder,
-  error,
-  required = false,
-  autoComplete = "current-password",
-  onChange,
-}: PasswordFieldProps) {
-  const [showPassword, setShowPassword] =
-    useState(false);
+const PasswordField = forwardRef<
+  HTMLInputElement,
+  PasswordFieldProps
+>(
+  (
+    {
+      id,
+      label,
+      error,
+      className,
+      type,
+      ...props
+    },
+    ref
+  ) => {
+    const [showPassword, setShowPassword] =
+      useState(false);
 
-  return (
-    <div className={styles.field}>
-      <label
-        htmlFor={id}
-        className={styles.label}
-      >
-        {label}
-      </label>
-
-      <div
-        className={`${styles.inputWrapper} ${
-          error ? styles.errorBorder : ""
-        }`}
-      >
-        <input
-          id={id}
-          type={showPassword ? "text" : "password"}
-          value={value}
-          placeholder={placeholder}
-          autoComplete={autoComplete}
-          required={required}
-          onChange={onChange}
-          className={styles.input}
-        />
-
-        <button
-          type="button"
-          className={styles.toggle}
-          onClick={() =>
-            setShowPassword((prev) => !prev)
-          }
-          aria-label={
-            showPassword
-              ? "Hide password"
-              : "Show password"
-          }
+    return (
+      <div className={styles.field}>
+        <label
+          htmlFor={id}
+          className={styles.label}
         >
-          {showPassword ? "🙈" : "👁"}
-        </button>
-      </div>
+          {label}
+        </label>
 
-      {error && (
-        <span className={styles.error}>
-          {error}
-        </span>
-      )}
-    </div>
-  );
-}
+        <div
+          className={`${styles.inputWrapper} ${
+            error ? styles.errorBorder : ""
+          }`}
+        >
+          <input
+            ref={ref}
+            id={id}
+            type={
+              showPassword
+                ? "text"
+                : "password"
+            }
+            className={`${styles.input} ${
+              className ?? ""
+            }`}
+            {...props}
+          />
+
+          <button
+            type="button"
+            className={styles.toggle}
+            onClick={() =>
+              setShowPassword((prev) => !prev)
+            }
+            aria-label={
+              showPassword
+                ? "Hide password"
+                : "Show password"
+            }
+          >
+            {showPassword ? "🙈" : "👁"}
+          </button>
+        </div>
+
+        {error && (
+          <span className={styles.error}>
+            {error}
+          </span>
+        )}
+      </div>
+    );
+  }
+);
+
+PasswordField.displayName =
+  "PasswordField";
+
+export default PasswordField;
