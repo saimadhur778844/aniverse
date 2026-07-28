@@ -56,14 +56,21 @@
 }
 
 /* ==========================================================
-   BASE
+   RESET
 ========================================================== */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
 
 html {
   scroll-behavior: smooth;
 }
 
 body {
+  margin: 0;
   background: var(--color-background);
   color: var(--color-text);
   font-family: var(--font-sans);
@@ -146,7 +153,7 @@ img {
 }
 
 /* ==========================================================
-   CUSTOM UTILITIES
+   UTILITIES
 ========================================================== */
 
 @utility glass {
@@ -232,7 +239,6 @@ img {
     linear-gradient(#fff 0 0);
 
   mask-composite: exclude;
-
   pointer-events: none;
 }
 
@@ -257,35 +263,115 @@ img {
 }
 
 /* ==========================================================
-   FORMS
-========================================================== */
-
-input,
-textarea,
-button {
-  transition: all 0.25s ease;
-}
-
-input:focus,
-textarea:focus {
-  outline: none;
-}
-
-input:focus-visible,
-textarea:focus-visible,
-button:focus-visible {
-  outline: 2px solid var(--color-primary);
-  outline-offset: 2px;
-}
-
-/* ==========================================================
    LINKS
 ========================================================== */
 
 a {
+  color: inherit;
+  text-decoration: none;
   transition: color 0.2s ease;
 }
 
 a:hover {
   color: var(--color-primary);
+}
+
+/* ==========================================================
+   BUTTONS
+========================================================== */
+
+button {
+  transition:
+    background-color 0.25s ease,
+    color 0.25s ease,
+    transform 0.25s ease,
+    border-color 0.25s ease;
+}
+
+button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* ==========================================================
+   FORMS
+========================================================== */
+
+input,
+textarea,
+select {
+  font: inherit;
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+  outline: none;
+}
+
+input:focus-visible,
+textarea:focus-visible,
+button:focus-visible,
+select:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+.form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.form-label {
+  color: var(--color-text);
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+.form-helper {
+  color: var(--color-muted);
+  font-size: 0.85rem;
+}
+
+.form-error {
+  color: var(--color-danger);
+  font-size: 0.85rem;
+}
+
+.input-field {
+  width: 100%;
+  padding: 0.9rem 1rem;
+
+  border-radius: var(--radius-sm);
+
+  border: 1px solid var(--color-border);
+
+  background: var(--color-surface);
+
+  color: var(--color-text);
+
+  transition:
+    border-color .25s ease,
+    box-shadow .25s ease,
+    background .25s ease;
+}
+
+.input-field::placeholder {
+  color: var(--color-muted);
+}
+
+.input-field:hover {
+  border-color: var(--color-secondary);
+}
+
+.input-field:focus {
+  border-color: var(--color-primary);
+
+  box-shadow:
+    0 0 0 4px rgba(236,72,153,.18);
+}
+
+.input-error {
+  border-color: var(--color-danger) !important;
 }
