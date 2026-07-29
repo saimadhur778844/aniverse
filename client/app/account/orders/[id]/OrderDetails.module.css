@@ -1,0 +1,137 @@
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.back {
+  display: inline-flex;
+  align-items: center;
+  gap: .5rem;
+
+  width: fit-content;
+
+  color: var(--color-primary);
+  text-decoration: none;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+}
+
+.header h1 {
+  margin: 0;
+}
+
+.header p {
+  margin-top: .5rem;
+  color: var(--color-muted);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 2rem;
+}
+
+.left,
+.right {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.card {
+  padding: 1.5rem;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+}
+
+.card h2 {
+  margin: 0 0 1.5rem;
+}
+
+.products {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.product {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+}
+
+.image {
+  width: 90px;
+  height: 90px;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.image img {
+  object-fit: cover;
+}
+
+.info {
+  flex: 1;
+}
+
+.info h3 {
+  margin: 0 0 .5rem;
+}
+
+.info p {
+  color: var(--color-muted);
+  margin-bottom: .5rem;
+}
+
+.payment {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+}
+
+.actions {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.primary,
+.secondary {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: .6rem;
+
+  padding: .9rem;
+
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.primary {
+  border: none;
+  background: var(--color-primary);
+  color: white;
+}
+
+.secondary {
+  background: transparent;
+  border: 1px solid var(--color-border);
+  color: var(--color-text);
+}
+
+@media (max-width: 900px) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
+}

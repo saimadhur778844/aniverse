@@ -1,0 +1,60 @@
+.timeline {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.step {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+
+  position: relative;
+}
+
+.icon {
+  width: 42px;
+  height: 42px;
+
+  border-radius: 50%;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background: var(--color-surface);
+  border: 2px solid var(--color-border);
+
+  color: var(--color-muted);
+
+  flex-shrink: 0;
+
+  z-index: 2;
+}
+
+.completed {
+  background: rgba(34, 197, 94, .15);
+  border-color: var(--color-success);
+  color: var(--color-success);
+}
+
+.line {
+  position: absolute;
+
+  left: 20px;
+  top: 42px;
+
+  width: 2px;
+  height: 30px;
+
+  background: var(--color-border);
+}
+
+.completedLine {
+  background: var(--color-success);
+}
+
+.step span {
+  font-weight: 500;
+  color: var(--color-text);
+}

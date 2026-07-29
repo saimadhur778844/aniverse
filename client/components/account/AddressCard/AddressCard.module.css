@@ -1,0 +1,31 @@
+.card {
+  padding: 1.5rem;
+
+  background: var(--color-surface);
+
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+}
+
+.card h3 {
+  margin: 0 0 1rem;
+
+  color: var(--color-text);
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  gap: .45rem;
+}
+
+.content p {
+  margin: 0;
+
+  color: var(--color-muted);
+}
+
+.content p:first-child {
+  color: var(--color-text);
+  font-weight: 600;
+}
