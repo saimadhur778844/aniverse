@@ -1,0 +1,161 @@
+.dashboard {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.hero {
+  background: linear-gradient(
+    135deg,
+    var(--color-primary),
+    var(--color-secondary)
+  );
+
+  color: white;
+
+  padding: 2rem;
+
+  border-radius: 20px;
+}
+
+.hero h1 {
+  font-size: 2rem;
+  margin-bottom: .5rem;
+}
+
+.hero span {
+  color: var(--color-gold);
+}
+
+.hero p {
+  opacity: .9;
+}
+
+.stats {
+  display: grid;
+  grid-template-columns: repeat(4,1fr);
+  gap: 1.5rem;
+}
+
+.card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+
+  border-radius: 18px;
+
+  padding: 1.5rem;
+
+  text-align: center;
+
+  transition: .25s;
+}
+
+.card:hover {
+  transform: translateY(-4px);
+}
+
+.card svg {
+  color: var(--color-primary);
+  margin-bottom: .75rem;
+}
+
+.card h2 {
+  margin-bottom: .3rem;
+}
+
+.quickActions h2,
+.orders h2 {
+  margin-bottom: 1rem;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(2,1fr);
+  gap: 1rem;
+}
+
+.action {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  padding: 18px;
+
+  text-decoration: none;
+
+  color: var(--color-text);
+
+  background: var(--color-surface);
+
+  border: 1px solid var(--color-border);
+
+  border-radius: 14px;
+
+  transition: .25s;
+}
+
+.action:hover {
+  background: var(--color-primary);
+  color: white;
+}
+
+.empty {
+  text-align: center;
+
+  padding: 4rem 2rem;
+
+  border-radius: 20px;
+
+  background: var(--color-surface);
+
+  border: 1px dashed var(--color-border);
+}
+
+.empty svg {
+  color: var(--color-primary);
+  margin-bottom: 1rem;
+}
+
+.shopButton {
+  display: inline-block;
+
+  margin-top: 1.5rem;
+
+  padding: 12px 24px;
+
+  border-radius: 12px;
+
+  background: var(--color-primary);
+
+  color: white;
+
+  text-decoration: none;
+}
+
+.shopButton:hover {
+  background: var(--color-secondary);
+}
+
+@media (max-width: 992px) {
+
+  .stats {
+    grid-template-columns: repeat(2,1fr);
+  }
+
+  .grid {
+    grid-template-columns: 1fr;
+  }
+
+}
+
+@media (max-width: 640px) {
+
+  .stats {
+    grid-template-columns: 1fr;
+  }
+
+  .hero h1 {
+    font-size: 1.6rem;
+  }
+
+}
