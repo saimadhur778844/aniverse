@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 
-import { productService } from "@/services/productService";
+import productService from "@/services/productService";
 import { Product } from "@/types/product";
 
 import Section from "@/components/store/Section";
@@ -28,12 +28,12 @@ export default function ProductDetailsPage() {
         setLoading(true);
         setError("");
 
-        const response = await productService.getProduct(
+        const product = await productService.getProduct(
           params.slug as string
         );
 
         if (mounted) {
-          setProduct(response.product);
+          setProduct(product);
         }
       } catch (err) {
         console.error(err);

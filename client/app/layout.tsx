@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 
+import QueryProvider from "@/providers/QueryProvider";
+
 import { AuthProvider } from "@/context/AuthContext/AuthContext";
 import { CartProvider } from "@/context/CartContext";
 import { WishlistProvider } from "@/context/WishlistContext/WishlistContext";
@@ -33,13 +35,15 @@ export default function RootLayout({
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
-        <AuthProvider>
-          <CartProvider>
-            <WishlistProvider>
-              {children}
-            </WishlistProvider>
-          </CartProvider>
-        </AuthProvider>
+        <QueryProvider>
+          <AuthProvider>
+            <CartProvider>
+              <WishlistProvider>
+                {children}
+              </WishlistProvider>
+            </CartProvider>
+          </AuthProvider>
+        </QueryProvider>
       </body>
     </html>
   );

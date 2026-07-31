@@ -1,5 +1,6 @@
-import api from "@/lib/axios";
-import { Product } from "@/types/product";
+import api from "./api";
+
+import type { Product } from "@/types/product";
 
 export interface GetProductsParams {
   featured?: boolean;
@@ -18,6 +19,11 @@ export interface ProductResponse {
   products: Product[];
 }
 
+export interface SingleProductResponse {
+  success: boolean;
+  product: Product;
+}
+
 export interface ProductPayload {
   name: string;
   anime: string;
@@ -29,66 +35,64 @@ export interface ProductPayload {
   featured: boolean;
 }
 
-const getProducts = async (
-  params?: GetProductsParams
-): Promise<ProductResponse> => {
-  const { data } = await api.get("/products", {
-    params,
-  });
+class ProductService {
+  async getProducts(
+    params?: GetProductsParams
+  ): Promise<ProductResponse> {
+    const { data } = await api.get<ProductResponse>(
+      "/products",
+      {
+        params,
+      }
+    );
 
-  return data;
-};
+    return data;
+  }
 
-const getProduct = async (slug: string) => {
-  const response = await api.get(`/products/${slug}`);
-  return response.data;
-};
+  async getProduct(
+    slug: string
+  ): Promise<Product> {
+    const { data } =
+      await api.get<SingleProductResponse>(
+        `/products/${slug}`
+      );
 
-// const getProduct = async (slug: string): Promise<Product> => {
-//   const { data } = await api.get(`/products/${slug}`);
-//   return data.product;
-// };
+    return data.product;
+  }
 
-const createProduct = async (
-  product: ProductPayload
-) => {
-  const { data } = await api.post("/products", product);
-  return data;
-};
+  async createProduct(
+    product: ProductPayload
+  ): Promise<Product> {
+    const { data } =
+      await api.post<SingleProductResponse>(
+        "/products",
+        product
+      );
 
-const updateProduct = async (
-  id: string,
-  product: ProductPayload
-) => {
-  const { data } = await api.put(
-    `/products/${id}`,
-    product
-  );  
+    return data.product;
+  }
 
-  return data;
-};
+  async updateProduct(
+    id: string,
+    product: ProductPayload
+  ): Promise<Product> {
+    const { data } =
+      await api.put<SingleProductResponse>(
+        `/products/${id}`,
+        product
+      );
 
-const deleteProduct = async (id: string) => {
-  const { data } = await api.delete(`/products/${id}`);
-  return data;
-};
+    return data.product;
+  }
 
-/* ---------- Named Exports (Backward Compatible) ---------- */
+  async deleteProduct(
+    id: string
+  ): Promise<void> {
+    await api.delete(`/products/${id}`);
+  }
+}
 
-export {
-  getProducts,
-  getProduct,
-  createProduct,
-  updateProduct,
-  deleteProduct,
-};
+export const productService =
+  new ProductService();
 
-/* ---------- Service Object (Recommended) ---------- */
-
-export const productService = {
-  getProducts,
-  getProduct,
-  createProduct,
-  updateProduct,
-  deleteProduct,
-};
+export default productService;

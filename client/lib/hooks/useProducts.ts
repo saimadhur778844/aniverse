@@ -1,8 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { productService } from "@/services/productService";
-import { categoryService } from "@/services/categoryService";
+import productService from "@/services/productService";
+import categoryService from "@/services/categoryService";
 import { Product } from "@/types/product";
 import { Category } from "@/services/categoryService";
 

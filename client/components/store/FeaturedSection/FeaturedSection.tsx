@@ -12,7 +12,7 @@ import ProductGrid from "../ProductGrid";
 import ProductGridSkeleton from "../ProductGridSkeleton";
 import Button from "@/components/shared/Button";
 
-import { productService } from "@/services/productService";
+import productService from "@/services/productService";
 import { Product } from "@/types/product";
 
 import styles from "./FeaturedSection.module.css";

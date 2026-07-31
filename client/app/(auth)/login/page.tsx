@@ -16,9 +16,9 @@ import LoadingButton from "@/components/auth/LoadingButton/LoadingButton";
 import {
   loginSchema,
   LoginForm,
-} from "@/lib/validations/auth";
+} from "@/lib/validators/auth";
 
-import { login as loginUser } from "@/services/authService";
+import authService from "@/services/authService";
 import { useAuth } from "@/context/AuthContext/AuthContext";
 
 export default function LoginPage() {
@@ -50,9 +50,7 @@ export default function LoginPage() {
     setServerError("");
 
     try {
-      const response =
-        await loginUser(values);
-
+      const response = await authService.login(values);
       login(
         response.token,
         response.user

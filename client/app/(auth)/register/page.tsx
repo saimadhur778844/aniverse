@@ -18,9 +18,9 @@ import TermsCheckbox from "@/components/auth/TermsCheckbox/TermsCheckbox";
 import {
   registerSchema,
   RegisterForm,
-} from "@/lib/validations/auth";
+} from "@/lib/validators/auth";
 
-import { register as registerUser } from "@/services/authService";
+import authService from "@/services/authService";
 import { useAuth } from "@/context/AuthContext/AuthContext";
 
 export default function RegisterPage() {
@@ -59,7 +59,7 @@ export default function RegisterPage() {
     setServerError("");
 
     try {
-        const response = await registerUser({
+        const response = await authService.register({
         name: values.name,
         email: values.email,
         password: values.password,

@@ -1,56 +1,102 @@
-import api from "@/lib/axios";
+import api from "./api";
+
 import type {
   LoginForm,
   RegisterForm,
-} from "@/lib/validations/auth";
+} from "@/lib/validators/auth";
+
 import type { User } from "@/context/AuthContext/AuthContext";
 
-interface AuthResponse {
+export interface AuthResponse {
   success: boolean;
+  message?: string;
   token: string;
   user: User;
 }
 
-interface ProfileResponse {
+export interface ProfileResponse {
   success: boolean;
   user: User;
 }
 
-export const login = async (
-  payload: LoginForm
-): Promise<AuthResponse> => {
-  const { data } = await api.post(
-    "/auth/login",
-    payload
-  );
+class AuthService {
+  async login(
+    payload: LoginForm
+  ): Promise<AuthResponse> {
+    const { data } = await api.post<AuthResponse>(
+      "/auth/login",
+      payload
+    );
 
-  return data;
-};
+    this.persistAuth(data);
 
-export const register = async (
-  payload: Pick<
-    RegisterForm,
-    "name" | "email" | "password"
-  >
-): Promise<AuthResponse> => {
-  const { data } = await api.post(
-    "/auth/register",
-    payload
-  );
+    return data;
+  }
 
-  return data;
-};
+  async register(
+    payload: Pick<
+      RegisterForm,
+      "name" | "email" | "password"
+    >
+  ): Promise<AuthResponse> {
+    const { data } = await api.post<AuthResponse>(
+      "/auth/register",
+      payload
+    );
 
-export const getProfile =
-  async (): Promise<ProfileResponse> => {
-    const { data } = await api.get(
+    this.persistAuth(data);
+
+    return data;
+  }
+
+  async getProfile(): Promise<User> {
+    const { data } = await api.get<ProfileResponse>(
       "/auth/profile"
     );
 
-    return data;
-  };
+    return data.user;
+  }
 
-export const logout = () => {
-  localStorage.removeItem("token");
-  localStorage.removeItem("user");
-};
+  logout(): void {
+    if (typeof window === "undefined") return;
+
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+  }
+
+  getToken(): string | null {
+    if (typeof window === "undefined") {
+      return null;
+    }
+
+    return localStorage.getItem("token");
+  }
+
+  getStoredUser(): User | null {
+    if (typeof window === "undefined") {
+      return null;
+    }
+
+    const user = localStorage.getItem("user");
+
+    return user ? JSON.parse(user) : null;
+  }
+
+  isAuthenticated(): boolean {
+    return !!this.getToken();
+  }
+
+  private persistAuth(data: AuthResponse): void {
+    if (typeof window === "undefined") return;
+
+    localStorage.setItem("token", data.token);
+    localStorage.setItem(
+      "user",
+      JSON.stringify(data.user)
+    );
+  }
+}
+
+const authService = new AuthService();
+
+export default authService;

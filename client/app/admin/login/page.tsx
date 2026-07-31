@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { login as loginService } from "@/services/authService";
+import authService from "@/services/authService";
 import { useAuth } from "@/context/AuthContext/AuthContext";
 
 export default function AdminLoginPage() {
@@ -21,9 +21,12 @@ export default function AdminLoginPage() {
     try {
       setLoading(true);
 
-      const data = await loginService(email, password);
+      const response = await authService.login({
+        email,
+        password,
+      });
 
-      login(data.token, data.user);
+      login(response.token, response.user);
 
       router.push("/admin/dashboard");
     } catch (error: any) {

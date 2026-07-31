@@ -8,6 +8,7 @@ import categoryRoutes from "./routes/categoryRoutes.js";
 import errorHandler from "./middleware/errorHandler.js";
 import paymentRoutes from "./routes/paymentRoutes.js";
 import orderRoutes from "./routes/orderRoutes.js";
+import dashboardRoutes from "./routes/dashboardRoutes.js";
 
 import * as CF from "cashfree-pg";
 
@@ -23,6 +24,7 @@ app.use("/api/categories", categoryRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/orders", orderRoutes);
 app.use("/api/payments", paymentRoutes);
+app.use("/api/dashboard", dashboardRoutes);
 
 
 app.use(errorHandler);

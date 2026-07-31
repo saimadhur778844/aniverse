@@ -9,7 +9,7 @@ import {
   useCallback,
 } from "react";
 
-import { getProfile } from "@/services/authService";
+import authService from "@/services/authService";
 
 export type User = {
   id: string;
@@ -41,15 +41,11 @@ export function AuthProvider({
   children: ReactNode;
 }) {
   const [user, setUser] = useState<User | null>(null);
-
   const [token, setToken] = useState<string | null>(null);
-
-  const [loading, setLoading] =
-    useState(true);
+  const [loading, setLoading] = useState(true);
 
   const logout = useCallback(async () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
+    authService.logout();
 
     setUser(null);
     setToken(null);
@@ -57,26 +53,22 @@ export function AuthProvider({
 
   const refreshUser = useCallback(async () => {
     try {
-      const storedToken =
-        localStorage.getItem("token");
+      const storedToken = authService.getToken();
 
       if (!storedToken) {
-        setLoading(false);
+        setUser(null);
+        setToken(null);
         return;
       }
 
       setToken(storedToken);
 
-      const profile =
-        await getProfile();
+      // getProfile() now returns User directly
+      const currentUser = await authService.getProfile();
 
-      setUser(profile.user);
-
-      localStorage.setItem(
-        "user",
-        JSON.stringify(profile.user)
-      );
-    } catch {
+      setUser(currentUser);
+    } catch (error) {
+      console.error("Failed to refresh user:", error);
       await logout();
     } finally {
       setLoading(false);
@@ -84,6 +76,17 @@ export function AuthProvider({
   }, [logout]);
 
   useEffect(() => {
+    const storedToken = authService.getToken();
+    const storedUser = authService.getStoredUser();
+
+    if (storedToken) {
+      setToken(storedToken);
+    }
+
+    if (storedUser) {
+      setUser(storedUser);
+    }
+
     refreshUser();
   }, [refreshUser]);
 
@@ -91,11 +94,7 @@ export function AuthProvider({
     jwt: string,
     userData: User
   ) => {
-    localStorage.setItem(
-      "token",
-      jwt
-    );
-
+    localStorage.setItem("token", jwt);
     localStorage.setItem(
       "user",
       JSON.stringify(userData)
@@ -111,13 +110,8 @@ export function AuthProvider({
         user,
         token,
         loading,
-
-        isAuthenticated:
-          !!user && !!token,
-
-        isAdmin:
-          user?.role === "admin",
-
+        isAuthenticated: !!user && !!token,
+        isAdmin: user?.role === "admin",
         login,
         logout,
         refreshUser,
@@ -129,8 +123,7 @@ export function AuthProvider({
 }
 
 export function useAuth() {
-  const context =
-    useContext(AuthContext);
+  const context = useContext(AuthContext);
 
   if (!context) {
     throw new Error(

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { getCategories } from "@/services/categoryService";
+import categoryService from "@/services/categoryService";
 import { productService } from "@/services/productService";
 import { uploadImage } from "@/services/uploadService";
 import { Product } from "@/types/product";
@@ -43,7 +43,7 @@ export default function ProductModal({
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const data = await getCategories();
+        const data = await categoryService.getCategories();
         setCategories(Array.isArray(data) ? data : []);
       } catch (error) {
         console.error(error);

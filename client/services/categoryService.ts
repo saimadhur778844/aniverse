@@ -1,4 +1,4 @@
-import api from "@/lib/axios";
+import api from "./api";
 
 export interface Category {
   _id: string;
@@ -9,47 +9,68 @@ export interface Category {
   isActive?: boolean;
 }
 
-const getCategories = async (): Promise<Category[]> => {
-  const { data } = await api.get("/categories");
+export interface CategoryResponse {
+  success?: boolean;
+  categories: Category[];
+}
 
-  // Supports both:
-  // [ ... ]
-  // { categories: [...] }
-  return Array.isArray(data) ? data : data.categories;
-};
+export interface SingleCategoryResponse {
+  success?: boolean;
+  category: Category;
+}
 
-const createCategory = async (category: Partial<Category>) => {
-  const { data } = await api.post("/categories", category);
-  return data;
-};
+export interface CategoryPayload {
+  name: string;
+  slug?: string;
+  description?: string;
+  image?: string;
+  isActive?: boolean;
+}
 
-const updateCategory = async (
-  id: string,
-  category: Partial<Category>
-) => {
-  const { data } = await api.put(`/categories/${id}`, category);
-  return data;
-};
+class CategoryService {
+  async getCategories(): Promise<Category[]> {
+    const { data } = await api.get<Category[] | CategoryResponse>(
+      "/categories"
+    );
 
-const deleteCategory = async (id: string) => {
-  const { data } = await api.delete(`/categories/${id}`);
-  return data;
-};
+    return Array.isArray(data)
+      ? data
+      : data.categories;
+  }
 
-/* ---------- Named Exports ---------- */
+  async createCategory(
+    category: CategoryPayload
+  ): Promise<Category> {
+    const { data } =
+      await api.post<SingleCategoryResponse>(
+        "/categories",
+        category
+      );
 
-export {
-  getCategories,
-  createCategory,
-  updateCategory,
-  deleteCategory,
-};
+    return data.category;
+  }
 
-/* ---------- Service Object ---------- */
+  async updateCategory(
+    id: string,
+    category: CategoryPayload
+  ): Promise<Category> {
+    const { data } =
+      await api.put<SingleCategoryResponse>(
+        `/categories/${id}`,
+        category
+      );
 
-export const categoryService = {
-  getCategories,
-  createCategory,
-  updateCategory,
-  deleteCategory,
-};
+    return data.category;
+  }
+
+  async deleteCategory(
+    id: string
+  ): Promise<void> {
+    await api.delete(`/categories/${id}`);
+  }
+}
+
+const categoryService =
+  new CategoryService();
+
+export default categoryService;
