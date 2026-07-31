@@ -4,20 +4,28 @@ import {
   getOrderById,
   getOrders,
   updateOrderStatus,
+  getMyOrders,
+  cancelOrder,
+  reorder,
 } from "../controllers/orderController.js";
 
 const router = express.Router();
 
 // Customer
 router.post("/", createOrder);
+router.get("/my-orders", getMyOrders);
 
 // Admin
 router.get("/", getOrders);
 
-// Order Details
+// Shared
 router.get("/:id", getOrderById);
 
-// Update Order Status
+// Customer
+router.patch("/:id/cancel", cancelOrder);
+router.post("/:id/reorder", reorder);
+
+// Admin
 router.patch("/:id/status", updateOrderStatus);
 
 export default router;

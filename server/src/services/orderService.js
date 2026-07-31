@@ -230,3 +230,55 @@ export const updatePaymentStatus = async (
 
   return order;
 };
+
+export const getMyOrders = async (userId) => {
+  return await Order.find({ user: userId })
+    .populate("items.product")
+    .sort({ createdAt: -1 });
+};
+
+export const cancelOrder = async (id, userId) => {
+  const order = await Order.findOne({
+    _id: id,
+    user: userId,
+  });
+
+  if (!order) {
+    throw new Error("Order not found.");
+  }
+
+  if (
+    order.orderStatus === "Delivered" ||
+    order.orderStatus === "Cancelled"
+  ) {
+    throw new Error("Order cannot be cancelled.");
+  }
+
+  order.orderStatus = "Cancelled";
+
+  await order.save();
+
+  return order;
+};
+
+export const reorder = async (id, userId) => {
+  const oldOrder = await Order.findById(id);
+
+  if (!oldOrder) {
+    throw new Error("Order not found.");
+  }
+
+  const payload = {
+    user: userId,
+    items: oldOrder.items.map((item) => ({
+      product: item.product.toString(),
+      quantity: item.quantity,
+    })),
+    shippingAddress: oldOrder.shippingAddress,
+    shippingCharge: oldOrder.shippingCharge,
+    tax: oldOrder.tax,
+    discount: oldOrder.discount,
+  };
+
+  return await createOrder(payload);
+};

@@ -2,17 +2,17 @@ import type { Product } from "./product";
 import type { User } from "./user";
 
 export type OrderStatus =
-  | "pending"
-  | "processing"
-  | "shipped"
-  | "delivered"
-  | "cancelled";
+  | "Pending"
+  | "Processing"
+  | "Shipped"
+  | "Delivered"
+  | "Cancelled";
 
 export type PaymentStatus =
-  | "pending"
-  | "paid"
-  | "failed"
-  | "refunded";
+  | "Pending"
+  | "Paid"
+  | "Failed"
+  | "Refunded";
 
 export interface OrderItem {
   product: string | Product;
@@ -32,66 +32,37 @@ export interface ShippingAddress {
   phone?: string;
 }
 
+export interface PaymentInfo {
+  status: PaymentStatus;
+  method?: string;
+  paymentId?: string;
+  paidAt?: string;
+}
+
 export interface Order {
-  /**
-   * MongoDB ObjectId
-   */
   _id: string;
+  orderNumber: string;
 
-  /**
-   * Human-readable order number.
-   * Example: ANV-20260729-0001
-   */
-  orderNumber?: string;
-
-  /**
-   * Customer
-   */
   user: string | User;
 
-  /**
-   * Ordered products
-   */
   items: OrderItem[];
 
-  /**
-   * Shipping destination
-   */
   shippingAddress: ShippingAddress;
 
-  /**
-   * Pricing
-   */
   subtotal: number;
-  shippingCost?: number;
+  shippingCharge: number;
+  tax: number;
+  discount: number;
   total: number;
 
-  /**
-   * Order lifecycle
-   */
-  status: OrderStatus;
+  orderStatus: OrderStatus;
 
-  /**
-   * Payment
-   */
-  paymentStatus?: PaymentStatus;
-  paymentMethod?: string;
-  paymentId?: string;
+  payment: PaymentInfo;
 
-  /**
-   * Courier / Tracking
-   */
   courier?: string;
   trackingNumber?: string;
-
-  /**
-   * Customer/Admin Notes
-   */
   notes?: string;
 
-  /**
-   * Timestamps
-   */
-  createdAt?: string;
-  updatedAt?: string;
+  createdAt: string;
+  updatedAt: string;
 }
