@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import Counter from "./Counter.js";
 
 const orderItemSchema = new mongoose.Schema(
   {
@@ -80,8 +81,8 @@ const shippingAddressSchema = new mongoose.Schema(
 const paymentSchema = new mongoose.Schema(
   {
     method: {
-    type: String,
-    default: "Cashfree",
+      type: String,
+      default: "Cashfree",
     },
 
     status: {
@@ -103,6 +104,12 @@ const orderSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
       default: null,
+    },
+
+    orderNumber: {
+      type: String,
+      unique: true,
+      index: true,
     },
 
     items: {
@@ -163,8 +170,60 @@ const orderSchema = new mongoose.Schema(
   }
 );
 
-orderSchema.index({ user: 1, createdAt: -1 });
-orderSchema.index({ orderStatus: 1 });
-orderSchema.index({ "payment.status": 1 });
+/**
+ * Generate Order Number
+ * Example:
+ * ANI-20260731-000001
+ */
+orderSchema.pre("save", async function (next) {
+  if (this.orderNumber) {
+    return next();
+  }
+
+  try {
+    const counter = await Counter.findOneAndUpdate(
+      {
+        name: "orders",
+      },
+      {
+        $inc: {
+          value: 1,
+        },
+      },
+      {
+        upsert: true,
+        new: true,
+      }
+    );
+
+    const today = new Date();
+
+    const date =
+      today.getFullYear().toString() +
+      String(today.getMonth() + 1).padStart(2, "0") +
+      String(today.getDate()).padStart(2, "0");
+
+    this.orderNumber = `ANI-${date}-${String(
+      counter.value
+    ).padStart(6, "0")}`;
+
+    next();
+  } catch (error) {
+    next(error);
+  }
+});
+
+orderSchema.index({
+  user: 1,
+  createdAt: -1,
+});
+
+orderSchema.index({
+  orderStatus: 1,
+});
+
+orderSchema.index({
+  "payment.status": 1,
+});
 
 export default mongoose.model("Order", orderSchema);
