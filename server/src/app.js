@@ -9,6 +9,8 @@ import errorHandler from "./middleware/errorHandler.js";
 import paymentRoutes from "./routes/paymentRoutes.js";
 import orderRoutes from "./routes/orderRoutes.js";
 import dashboardRoutes from "./routes/dashboardRoutes.js";
+import inventoryRoutes from "./routes/inventoryRoutes.js";
+import customerRoutes from "./routes/customerRoutes.js";
 
 import * as CF from "cashfree-pg";
 
@@ -25,7 +27,14 @@ app.use("/api/auth", authRoutes);
 app.use("/api/orders", orderRoutes);
 app.use("/api/payments", paymentRoutes);
 app.use("/api/dashboard", dashboardRoutes);
-
+app.use(
+  "/api/inventory",
+  inventoryRoutes
+);
+app.use(
+  "/api/customers",
+  customerRoutes
+);
 
 app.use(errorHandler);
 

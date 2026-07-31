@@ -27,8 +27,10 @@
     "react": "19.2.4",
     "react-dom": "19.2.4",
     "react-hook-form": "^7.83.0",
+    "react-hot-toast": "^2.6.0",
     "react-icons": "^5.7.0",
     "react-swipeable": "^7.0.2",
+    "recharts": "^3.10.1",
     "slugify": "^1.6.9",
     "zod": "^4.4.3"
   },
@@ -49,6 +51,8 @@
     "lucide-react@1.26.0": true,
     "@cashfreepayments/cashfree-js@1.0.7": true,
     "@tanstack/react-query@5.101.4": true,
-    "@tanstack/react-query-devtools@5.101.4": true
+    "@tanstack/react-query-devtools@5.101.4": true,
+    "recharts@3.10.1": true,
+    "react-hot-toast@2.6.0": true
   }
 }
