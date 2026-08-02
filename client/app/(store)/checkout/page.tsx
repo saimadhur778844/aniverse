@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { load } from "@cashfreepayments/cashfree-js";
 
 import { useCart } from "@/context/CartContext/CartContext";
-import { createOrder } from "@/services/orderService";
+import createOrder from "@/services/orderService";
 import { createPaymentSession } from "@/services/paymentService";
 
 import CheckoutHeader from "@/components/store/checkout/CheckoutHeader";
@@ -13,6 +13,8 @@ import CustomerInformation from "@/components/store/checkout/CustomerInformation
 import ShippingAddress from "@/components/store/checkout/ShippingAddress";
 import PaymentMethod from "@/components/store/checkout/PaymentMethod";
 import OrderSummary from "@/components/store/checkout/OrderSummary";
+import couponService from "@/services/couponService";
+import orderService from "@/services/orderService";
 
 type CheckoutForm = {
   fullName: string;
@@ -30,6 +32,16 @@ export default function CheckoutPage() {
   const { items, subtotal, clearCart, isEmpty } = useCart();
 
   const [loading, setLoading] = useState(false);
+
+  const [couponCode, setCouponCode] = useState("");
+
+const [discount, setDiscount] = useState(0);
+
+const [appliedCoupon, setAppliedCoupon] =
+  useState("");
+
+const [couponLoading, setCouponLoading] =
+  useState(false);
 
   const [form, setForm] = useState<CheckoutForm>({
     fullName: "",
@@ -52,7 +64,10 @@ export default function CheckoutPage() {
     return 99;
   }, [subtotal]);
 
-  const total = subtotal + shipping;
+  const total =
+  subtotal +
+  shipping -
+  discount;
 
   const onChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -79,28 +94,69 @@ export default function CheckoutPage() {
 
     return true;
   };
+const applyCoupon = async () => {
+  if (!couponCode.trim()) {
+    alert("Enter a coupon code.");
+    return;
+  }
 
+  try {
+    setCouponLoading(true);
+
+    const result =
+      await couponService.validateCoupon(
+        couponCode,
+        subtotal
+      );
+
+    setDiscount(result.discount);
+
+    setAppliedCoupon(
+      result.coupon.code
+    );
+
+    alert("Coupon applied successfully.");
+  } catch (error: any) {
+    alert(
+      error?.message ??
+        "Invalid coupon."
+    );
+  } finally {
+    setCouponLoading(false);
+  }
+};
+const removeCoupon = () => {
+  setCouponCode("");
+
+  setAppliedCoupon("");
+
+  setDiscount(0);
+};
   const handleCheckout = async () => {
     if (!validate()) return;
 
     try {
       setLoading(true);
 
-      const order = await createOrder({
-        items: items.map((item: any) => ({
-          product: item.product._id,
-          quantity: item.quantity,
-        })),
-        shippingAddress: {
-          fullName: form.fullName,
-          email: form.email,
-          phone: form.phone,
-          addressLine1: form.address,
-          city: form.city,
-          state: form.state,
-          pincode: form.pincode,
-        },
-      });
+const order = await orderService.createOrder({
+  couponCode:
+    appliedCoupon || undefined,
+
+  items: items.map((item: any) => ({
+    product: item.product._id,
+    quantity: item.quantity,
+  })),
+
+  shippingAddress: {
+  fullName: form.fullName,
+  email: form.email,
+  phone: form.phone,
+  address: form.address,
+  city: form.city,
+  state: form.state,
+  pincode: form.pincode,
+},
+});
 
       const payment = await createPaymentSession(order.order._id);
 
@@ -158,13 +214,25 @@ export default function CheckoutPage() {
           </div>
 
           <OrderSummary
-            items={items}
-            subtotal={subtotal}
-            shipping={shipping}
-            total={total}
-            loading={loading}
-            onCheckout={handleCheckout}
-          />
+  items={items}
+  subtotal={subtotal}
+  shipping={shipping}
+  discount={discount}
+
+  couponCode={couponCode}
+  couponLoading={couponLoading}
+  appliedCoupon={appliedCoupon}
+
+  onCouponChange={setCouponCode}
+  onApplyCoupon={applyCoupon}
+  onRemoveCoupon={removeCoupon}
+
+  total={total}
+
+  loading={loading}
+
+  onCheckout={handleCheckout}
+/>
 
         </div>
 

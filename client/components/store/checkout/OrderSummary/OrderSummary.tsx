@@ -11,6 +11,16 @@ type Props = {
   items: CartItem[];
   subtotal: number;
   shipping: number;
+  discount: number;
+
+  couponCode: string;
+  couponLoading: boolean;
+  appliedCoupon: string;
+
+  onCouponChange: (value: string) => void;
+  onApplyCoupon: () => void;
+  onRemoveCoupon: () => void;
+
   total: number;
   loading: boolean;
   onCheckout: () => void;
@@ -20,7 +30,19 @@ export default function OrderSummary({
   items,
   subtotal,
   shipping,
+
+  discount,
+
+  couponCode,
+  couponLoading,
+  appliedCoupon,
+
+  onCouponChange,
+  onApplyCoupon,
+  onRemoveCoupon,
+
   total,
+
   loading,
   onCheckout,
 }: Props) {
@@ -145,27 +167,92 @@ export default function OrderSummary({
           </div>
 
           {/* Totals */}
+            {/* Coupon */}
 
+<div className="mt-8 rounded-2xl border border-[#343454] bg-[#202033] p-5">
+
+  <h3 className="mb-4 font-semibold text-white">
+    Have a Coupon?
+  </h3>
+
+  <div className="flex gap-3">
+
+    <input
+      value={couponCode}
+      onChange={(e) =>
+        onCouponChange(e.target.value.toUpperCase())
+      }
+      placeholder="Enter coupon code"
+      className="flex-1 rounded-xl border border-[#343454] bg-[#171726] px-4 py-3 text-white outline-none transition focus:border-pink-500"
+    />
+
+    {appliedCoupon ? (
+      <button
+        onClick={onRemoveCoupon}
+        className="rounded-xl bg-red-600 px-5 text-white hover:bg-red-500"
+      >
+        Remove
+      </button>
+    ) : (
+      <button
+        onClick={onApplyCoupon}
+        disabled={couponLoading}
+        className="rounded-xl bg-pink-600 px-5 text-white hover:bg-pink-500 disabled:opacity-50"
+      >
+        {couponLoading
+          ? "Applying..."
+          : "Apply"}
+      </button>
+    )}
+
+  </div>
+
+  {appliedCoupon && (
+
+    <div className="mt-4 rounded-xl border border-emerald-500/30 bg-emerald-500/10 p-3">
+
+      <p className="text-sm font-medium text-emerald-400">
+        ✓ Coupon "{appliedCoupon}" applied successfully
+      </p>
+
+    </div>
+
+  )}
+
+</div>
           <div className="my-8 border-t border-[#343454]" />
 
           <div className="space-y-5">
 
-            <PriceRow
-              title="Subtotal"
-              value={`₹${subtotal.toLocaleString()}`}
-            />
+  <PriceRow
+    title="Subtotal"
+    value={`₹${subtotal.toLocaleString()}`}
+  />
 
-            <PriceRow
-              title="Shipping"
-              value={shipping === 0 ? "FREE" : `₹${shipping}`}
-            />
+  <PriceRow
+    title="Shipping"
+    value={
+      shipping === 0
+        ? "FREE"
+        : `₹${shipping}`
+    }
+  />
 
-            <PriceRow
-              title="GST"
-              value="Included"
-            />
+  {discount > 0 && (
 
-          </div>
+    <PriceRow
+      title="Discount"
+      value={`-₹${discount.toLocaleString()}`}
+    />
+
+  )}
+
+  <PriceRow
+    title="GST"
+    value="Included"
+  />
+
+</div>
 
           <div className="my-8 border-t border-[#343454]" />
 

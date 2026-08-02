@@ -17,7 +17,7 @@ export default function CustomerStatusBadge({
     );
   }
 
-  if (orders >= 1) {
+  if (orders > 0) {
     return (
       <span className="rounded-full bg-emerald-500/15 px-3 py-1 text-xs font-medium text-emerald-400">
         Active

@@ -11,6 +11,7 @@ import orderRoutes from "./routes/orderRoutes.js";
 import dashboardRoutes from "./routes/dashboardRoutes.js";
 import inventoryRoutes from "./routes/inventoryRoutes.js";
 import customerRoutes from "./routes/customerRoutes.js";
+import couponRoutes from "./routes/couponRoutes.js";
 
 import * as CF from "cashfree-pg";
 
@@ -34,6 +35,10 @@ app.use(
 app.use(
   "/api/customers",
   customerRoutes
+);
+app.use(
+  "/api/coupons",
+  couponRoutes
 );
 
 app.use(errorHandler);

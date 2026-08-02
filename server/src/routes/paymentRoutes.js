@@ -1,9 +1,32 @@
 import express from "express";
 
-import { createPaymentSession } from "../controllers/paymentController.js";
+import {
+  createPaymentSession,
+  verifyPaymentStatus,
+} from "../controllers/paymentController.js";
 
 const router = express.Router();
 
-router.post("/create-session", createPaymentSession);
+/*
+|--------------------------------------------------------------------------
+| Payment Session
+|--------------------------------------------------------------------------
+*/
+
+router.post(
+  "/create-session",
+  createPaymentSession
+);
+
+/*
+|--------------------------------------------------------------------------
+| Verify Payment
+|--------------------------------------------------------------------------
+*/
+
+router.get(
+  "/verify/:orderId",
+  verifyPaymentStatus
+);
 
 export default router;

@@ -175,44 +175,42 @@ const orderSchema = new mongoose.Schema(
  * Example:
  * ANI-20260731-000001
  */
-orderSchema.pre("save", async function (next) {
+/**
+ * Generate Order Number
+ * Example:
+ * ANI-20260802-000001
+ */
+orderSchema.pre("save", async function () {
   if (this.orderNumber) {
-    return next();
+    return;
   }
 
-  try {
-    const counter = await Counter.findOneAndUpdate(
-      {
-        name: "orders",
+  const counter = await Counter.findOneAndUpdate(
+    {
+      name: "orders",
+    },
+    {
+      $inc: {
+        value: 1,
       },
-      {
-        $inc: {
-          value: 1,
-        },
-      },
-      {
-        upsert: true,
-        new: true,
-      }
-    );
+    },
+    {
+      upsert: true,
+      new: true,
+    }
+  );
 
-    const today = new Date();
+  const today = new Date();
 
-    const date =
-      today.getFullYear().toString() +
-      String(today.getMonth() + 1).padStart(2, "0") +
-      String(today.getDate()).padStart(2, "0");
+  const date =
+    today.getFullYear().toString() +
+    String(today.getMonth() + 1).padStart(2, "0") +
+    String(today.getDate()).padStart(2, "0");
 
-    this.orderNumber = `ANI-${date}-${String(
-      counter.value
-    ).padStart(6, "0")}`;
-
-    next();
-  } catch (error) {
-    next(error);
-  }
+  this.orderNumber = `ANI-${date}-${String(
+    counter.value
+  ).padStart(6, "0")}`;
 });
-
 orderSchema.index({
   user: 1,
   createdAt: -1,

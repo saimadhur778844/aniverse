@@ -2,28 +2,37 @@ import api from "./api";
 
 import type {
   Order,
-  OrderItem,
-  ShippingAddress,
+  CreateShippingAddress,
 } from "@/types/order";
 
 export interface CreateOrderPayload {
-  items: OrderItem[];
-  shippingAddress: ShippingAddress;
+  items: {
+    product: string;
+    quantity: number;
+  }[];
+
+  shippingAddress: CreateShippingAddress;
+
+  couponCode?: string;
 }
 
 export interface CreateOrderResponse {
   success: boolean;
+
   message?: string;
+
   order: Order;
 }
 
 export interface OrdersResponse {
   success: boolean;
+
   orders: Order[];
 }
 
 export interface OrderResponse {
   success: boolean;
+
   order: Order;
 }
 

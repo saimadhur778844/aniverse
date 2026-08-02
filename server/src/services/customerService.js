@@ -54,28 +54,43 @@ export const getCustomers = async ({
 
       const orderCount = orders.length;
 
-      const totalSpent = orders.reduce(
+      const spent = orders.reduce(
         (sum, order) => sum + order.total,
         0
       );
 
       const averageOrderValue =
         orderCount > 0
-          ? totalSpent / orderCount
+          ? spent / orderCount
           : 0;
 
       return {
         _id: user._id,
+
         name: user.name,
+
         email: user.email,
+
         role: user.role,
+
         createdAt: user.createdAt,
-        orders: orderCount,
-        spent: totalSpent,
+
+        orderCount,
+
+        spent,
+
         averageOrderValue,
+
         lastOrder:
           orders.length > 0
-            ? orders[0]
+            ? {
+                _id: orders[0]._id,
+                orderNumber:
+                  orders[0].orderNumber,
+                total: orders[0].total,
+                createdAt:
+                  orders[0].createdAt,
+              }
             : null,
       };
     })
@@ -124,12 +139,26 @@ export const getCustomerById = async (
 
   return {
     _id: user._id,
+
     name: user.name,
+
     email: user.email,
+
     role: user.role,
+
     createdAt: user.createdAt,
-    orders,
+
+    orderCount: orders.length,
+
     spent,
+
     averageOrderValue,
+
+    orders: orders.map((order) => ({
+      _id: order._id,
+      orderNumber: order.orderNumber,
+      total: order.total,
+      createdAt: order.createdAt,
+    })),
   };
 };

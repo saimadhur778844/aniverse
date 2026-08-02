@@ -7,18 +7,25 @@ export interface CustomerOrderSummary {
 
 export interface Customer {
   _id: string;
+
   name: string;
+
   email: string;
+
   role: string;
+
   createdAt: string;
 
-  orders: number;
+  orderCount: number;
+
   spent: number;
+
   averageOrderValue: number;
 
   lastOrder?: CustomerOrderSummary | null;
 }
 
-export interface CustomerDetails extends Customer {
+export interface CustomerDetails
+  extends Omit<Customer, "lastOrder"> {
   orders: CustomerOrderSummary[];
 }
