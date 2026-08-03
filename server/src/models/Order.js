@@ -147,6 +147,20 @@ const orderSchema = new mongoose.Schema(
       default: 0,
     },
 
+    coupon: {
+  code: {
+    type: String,
+  },
+
+  type: {
+    type: String,
+  },
+
+  value: {
+    type: Number,
+  },
+},
+
     total: {
       type: Number,
       required: true,
@@ -211,6 +225,7 @@ orderSchema.pre("save", async function () {
     counter.value
   ).padStart(6, "0")}`;
 });
+
 orderSchema.index({
   user: 1,
   createdAt: -1,

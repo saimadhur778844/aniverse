@@ -119,3 +119,22 @@
 
   border-color: var(--primary);
 }
+.images {
+  display: flex;
+  gap: 12px;
+  margin-top: 16px;
+  flex-wrap: wrap;
+}
+
+.reviewImage {
+  width: 90px;
+  height: 90px;
+  object-fit: cover;
+  border-radius: 12px;
+  border: 1px solid rgba(255,255,255,.08);
+  transition: transform .2s ease;
+}
+
+.reviewImage:hover {
+  transform: scale(1.05);
+}

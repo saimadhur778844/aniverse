@@ -76,6 +76,21 @@ class OrderService {
     );
   }
 
+  async getReviewableOrder(
+  productId: string
+): Promise<{
+  canReview: boolean;
+
+  orderId: string | null;
+}> {
+  const { data } =
+    await api.get(
+      `/orders/reviewable/${productId}`
+    );
+
+  return data;
+}
+
   async reorder(
     id: string
   ): Promise<CreateOrderResponse> {
@@ -88,5 +103,7 @@ class OrderService {
 }
 
 const orderService = new OrderService();
+
+
 
 export default orderService;

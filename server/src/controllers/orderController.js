@@ -7,6 +7,9 @@ import {
   cancelOrder as cancelOrderService,
   reorder as reorderService,
 } from "../services/orderService.js";
+import {
+  getReviewableOrder,
+} from "../services/orderService.js";
 
 // @desc    Create Order
 // @route   POST /api/orders
@@ -174,5 +177,38 @@ export const updateOrderStatus = async (req, res, next) => {
     });
   } catch (error) {
     next(error);
+  }
+};
+
+/*
+|--------------------------------------------------------------------------
+| Can Review Product
+|--------------------------------------------------------------------------
+*/
+
+export const canReviewProduct = async (
+  req,
+  res
+) => {
+  try {
+    const order =
+      await getReviewableOrder(
+        req.user._id,
+        req.params.productId
+      );
+
+    return res.json({
+      success: true,
+
+      canReview: !!order,
+
+      orderId: order?._id ?? null,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+
+      message: error.message,
+    });
   }
 };

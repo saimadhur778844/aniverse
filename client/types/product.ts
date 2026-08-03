@@ -37,6 +37,8 @@ export interface Product {
    */
   originalPrice?: number;
 
+  averageRating?: number;
+
   stock: number;
 
   featured: boolean;

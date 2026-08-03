@@ -132,14 +132,6 @@ export const createOrder = async (payload) => {
     }
 
     if (bulkOperations.length) {
-      await Product.bulkWrite(
-        bulkOperations,
-        {
-          session,
-        }
-      );
-    }
-    if (bulkOperations.length) {
   await Product.bulkWrite(
     bulkOperations,
     {
@@ -187,22 +179,6 @@ export const createOrder = async (payload) => {
     |--------------------------------------------------------------------------
     */
 
-    if (couponCode) {
-      await Coupon.findOneAndUpdate(
-        {
-          code:
-            couponCode.toUpperCase(),
-        },
-        {
-          $inc: {
-            usedCount: 1,
-          },
-        },
-        {
-          session,
-        }
-      );
-    }
 
     await session.commitTransaction();
 
@@ -510,4 +486,29 @@ export const reorder = async (
   return await createOrder(
     payload
   );
+};
+
+/*
+|--------------------------------------------------------------------------
+| Get Reviewable Order
+|--------------------------------------------------------------------------
+*/
+
+export const getReviewableOrder = async (
+  userId,
+  productId
+) => {
+  const order = await Order.findOne({
+    user: userId,
+
+    orderStatus: "Delivered",
+
+    "items.product": productId,
+  })
+    .sort({
+      createdAt: -1,
+    })
+    .select("_id");
+
+  return order;
 };

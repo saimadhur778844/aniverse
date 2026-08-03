@@ -6,6 +6,8 @@ import {
   verifyPayment,
 } from "../services/paymentService.js";
 
+import Coupon from "../models/Coupon.js";
+
 /*
 |--------------------------------------------------------------------------
 | Create Payment Session
@@ -127,3 +129,131 @@ export const verifyPaymentStatus =
       });
     }
   };
+  /*
+|--------------------------------------------------------------------------
+| Cashfree Webhook
+|--------------------------------------------------------------------------
+*/
+
+export const paymentWebhook = async (req, res) => {
+  try {
+    console.log("Cashfree Webhook");
+
+    console.log(req.body);
+
+    const {
+      order,
+      payment,
+    } = req.body.data || {};
+
+    if (!order || !payment) {
+      return res.json({
+        success: true,
+      });
+    }
+
+    const dbOrder = await Order.findOne({
+      "payment.gatewayOrderId": order.order_id,
+    });
+
+    if (!dbOrder) {
+      return res.status(404).json({
+        success: false,
+        message: "Order not found.",
+      });
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Ignore duplicate webhooks
+    |--------------------------------------------------------------------------
+    */
+
+    if (
+      dbOrder.payment.status === "Paid"
+    ) {
+      return res.json({
+        success: true,
+      });
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Payment Success
+    |--------------------------------------------------------------------------
+    */
+
+if (
+  payment.payment_status ===
+  "SUCCESS"
+) {
+  dbOrder.payment.status =
+    "Paid";
+
+  dbOrder.payment.method =
+    payment.payment_group;
+
+  dbOrder.payment.paymentId =
+    payment.cf_payment_id;
+
+  dbOrder.payment.gatewayPaymentId =
+    payment.cf_payment_id;
+
+  dbOrder.payment.paidAt =
+    new Date();
+
+  dbOrder.orderStatus =
+    "Confirmed";
+
+  if (
+    dbOrder.coupon?.code
+  ) {
+    await Coupon.findOneAndUpdate(
+      {
+        code:
+          dbOrder.coupon.code,
+      },
+      {
+        $inc: {
+          usedCount: 1,
+        },
+      }
+    );
+  }
+
+  await dbOrder.save();
+
+  console.log(
+    "Order Updated:",
+    dbOrder.orderNumber
+  );
+}
+
+    /*
+    |--------------------------------------------------------------------------
+    | Payment Failed
+    |--------------------------------------------------------------------------
+    */
+
+    if (
+      payment.payment_status ===
+      "FAILED"
+    ) {
+      dbOrder.payment.status =
+        "Failed";
+
+      await dbOrder.save();
+    }
+
+    return res.json({
+      success: true,
+    });
+  } catch (error) {
+    console.error(error);
+
+    return res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};

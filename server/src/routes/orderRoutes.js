@@ -8,6 +8,10 @@ import {
   cancelOrder,
   reorder,
 } from "../controllers/orderController.js";
+import {
+  canReviewProduct,
+} from "../controllers/orderController.js";
+import protect from "../middleware/protect.js";
 
 const router = express.Router();
 
@@ -17,6 +21,12 @@ router.get("/my-orders", getMyOrders);
 
 // Admin
 router.get("/", getOrders);
+
+router.get(
+  "/reviewable/:productId",
+  protect,
+  canReviewProduct
+);
 
 // Shared
 router.get("/:id", getOrderById);
