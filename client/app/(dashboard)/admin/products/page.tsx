@@ -10,6 +10,7 @@ import ProductModal from "@/components/admin/ProductModal/ProductModal";
 import ProductSearch from "@/components/admin/ProductSearch";
 import ProductStats from "@/components/admin/ProductStats";
 import ProductTable from "@/components/admin/ProductTable";
+import { notify } from "@/utils/toast";
 
 export default function ProductsPage() {
   const [products, setProducts] = useState<Product[]>([]);
@@ -75,11 +76,11 @@ export default function ProductsPage() {
 
       await loadProducts();
 
-      alert("Product deleted.");
+      notify.success("Product deleted.");
     } catch (error) {
       console.error(error);
 
-      alert("Failed to delete product.");
+      notify.error("Failed to delete product.");
     }
   };
 

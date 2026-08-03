@@ -7,7 +7,7 @@ import { AuthProvider } from "@/context/AuthContext/AuthContext";
 import { CartProvider } from "@/context/CartContext";
 import { WishlistProvider } from "@/context/WishlistContext/WishlistContext";
 
-import ToastProvider from "@/components/admin/shared/ToastProvider";
+import { Toaster } from "sonner";
 
 import "./globals.css";
 
@@ -37,27 +37,23 @@ export default function RootLayout({
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
-
         <QueryProvider>
-
           <AuthProvider>
-
             <CartProvider>
-
               <WishlistProvider>
-
                 {children}
-
-                <ToastProvider />
-
               </WishlistProvider>
-
             </CartProvider>
-
           </AuthProvider>
-
         </QueryProvider>
 
+        <Toaster
+          position="top-right"
+          richColors
+          closeButton
+          duration={3000}
+          theme="dark"
+        />
       </body>
     </html>
   );

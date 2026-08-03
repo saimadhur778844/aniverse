@@ -15,6 +15,7 @@ import PaymentMethod from "@/components/store/checkout/PaymentMethod";
 import OrderSummary from "@/components/store/checkout/OrderSummary";
 import couponService from "@/services/couponService";
 import orderService from "@/services/orderService";
+import { notify } from "@/utils/toast";
 
 type CheckoutForm = {
   fullName: string;
@@ -88,7 +89,7 @@ const [couponLoading, setCouponLoading] =
       !form.state ||
       !form.pincode
     ) {
-      alert("Please fill all fields.");
+      notify.error("Please fill all fields.");
       return false;
     }
 
@@ -96,9 +97,13 @@ const [couponLoading, setCouponLoading] =
   };
 const applyCoupon = async () => {
   if (!couponCode.trim()) {
-    alert("Enter a coupon code.");
+    notify.error("Enter a coupon code.");
     return;
   }
+
+  const loadingToast = notify.loading(
+    "Validating coupon..."
+  );
 
   try {
     setCouponLoading(true);
@@ -109,15 +114,21 @@ const applyCoupon = async () => {
         subtotal
       );
 
+    notify.dismiss(loadingToast);
+
     setDiscount(result.discount);
 
     setAppliedCoupon(
       result.coupon.code
     );
 
-    alert("Coupon applied successfully.");
+    notify.success(
+      "Coupon applied successfully."
+    );
   } catch (error: any) {
-    alert(
+    notify.dismiss(loadingToast);
+
+    notify.error(
       error?.message ??
         "Invalid coupon."
     );
@@ -131,62 +142,105 @@ const removeCoupon = () => {
   setAppliedCoupon("");
 
   setDiscount(0);
+
+  notify.info(
+    "Coupon removed."
+  );
 };
   const handleCheckout = async () => {
-    if (!validate()) return;
+  if (!validate()) return;
 
-    try {
-      setLoading(true);
+  const loadingToast =
+    notify.loading(
+      "Preparing secure checkout..."
+    );
 
-const order = await orderService.createOrder({
-  couponCode:
-    appliedCoupon || undefined,
+  try {
+    setLoading(true);
 
-  items: items.map((item: any) => ({
-    product: item.product._id,
-    quantity: item.quantity,
-  })),
+    const order =
+      await orderService.createOrder({
+        couponCode:
+          appliedCoupon || undefined,
 
-  shippingAddress: {
-  fullName: form.fullName,
-  email: form.email,
-  phone: form.phone,
-  address: form.address,
-  city: form.city,
-  state: form.state,
-  pincode: form.pincode,
-},
-});
+        items: items.map(
+          (item: any) => ({
+            product:
+              item.product._id,
+            quantity:
+              item.quantity,
+          })
+        ),
 
-      const payment = await createPaymentSession(order.order._id);
+        shippingAddress: {
+          fullName:
+            form.fullName,
+          email:
+            form.email,
+          phone:
+            form.phone,
+          address:
+            form.address,
+          city:
+            form.city,
+          state:
+            form.state,
+          pincode:
+            form.pincode,
+        },
+      });
 
-      const cashfree = await load({
+    const payment =
+      await createPaymentSession(
+        order.order._id
+      );
+
+    const cashfree =
+      await load({
         mode:
-          (process as any)?.env?.NEXT_PUBLIC_CASHFREE_ENV === "PRODUCTION"
+          (process as any)?.env
+            ?.NEXT_PUBLIC_CASHFREE_ENV ===
+          "PRODUCTION"
             ? "production"
             : "sandbox",
       });
 
-      if (!cashfree) {
-        throw new Error("Unable to initialize Cashfree.");
-      }
-
-      await cashfree.checkout({
-        paymentSessionId: payment.payment_session_id,
-        redirectTarget: "_self",
-      });
-
-      clearCart();
-
-      router.push(`/orders/${order.order._id}`);
-    } catch (error) {
-      console.error(error);
-      alert("Unable to process payment.");
-    } finally {
-      setLoading(false);
+    if (!cashfree) {
+      throw new Error(
+        "Unable to initialize Cashfree."
+      );
     }
-  };
 
+    notify.dismiss(
+      loadingToast
+    );
+
+    await cashfree.checkout({
+      paymentSessionId:
+        payment.payment_session_id,
+      redirectTarget:
+        "_self",
+    });
+
+    clearCart();
+
+    router.push(
+      `/orders/${order.order._id}`
+    );
+  } catch (error) {
+    console.error(error);
+
+    notify.dismiss(
+      loadingToast
+    );
+
+    notify.error(
+      "Payment could not be started. Please try again."
+    );
+  } finally {
+    setLoading(false);
+  }
+};
   if (isEmpty) return null;
 
   return (

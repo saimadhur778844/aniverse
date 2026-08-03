@@ -7,6 +7,7 @@ import {
 import Button from "@/components/shared/Button";
 
 import reviewService from "@/services/reviewService";
+import { notify } from "@/utils/toast";
 
 interface Props {
   productId: string;
@@ -43,10 +44,7 @@ export default function ReviewForm({
 
   async function submit() {
     if (!comment.trim()) {
-      alert(
-        "Please enter your review."
-      );
-
+      notify.error("Please enter your review.");
       return;
     }
 
@@ -75,13 +73,11 @@ export default function ReviewForm({
 
       setRating(5);
 
-      alert(
-        "Review submitted successfully."
-      );
+      notify.success("Review submitted successfully.");
 
       onSuccess?.();
     } catch (error: any) {
-      alert(
+      notify.error(
         error?.response?.data
           ?.message ??
           "Unable to submit review."

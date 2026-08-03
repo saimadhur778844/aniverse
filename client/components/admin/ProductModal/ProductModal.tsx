@@ -5,6 +5,7 @@ import categoryService from "@/services/categoryService";
 import { productService } from "@/services/productService";
 import { uploadImage } from "@/services/uploadService";
 import { Product } from "@/types/product";
+import { notify } from "@/utils/toast";
 
 interface ProductModalProps {
   open: boolean;
@@ -126,16 +127,16 @@ export default function ProductModal({
           payload
         );
 
-        alert("Product updated successfully!");
+        notify.success("Product updated successfully!");
       } else {
         if (!image) {
-          alert("Please select an image.");
+          notify.error("Please select an image.");
           return;
         }
 
         await productService.createProduct(payload);
 
-        alert("Product created successfully!");
+        notify.success("Product created successfully!");
       }
 
       onSuccess();
@@ -157,9 +158,9 @@ export default function ProductModal({
       console.error(error);
 
       if (error.response) {
-        alert(error.response.data.message);
+        notify.error(error.response.data.message);
       } else {
-        alert(error.message);
+        notify.error(error.message);
       }
     } finally {
       setLoading(false);
