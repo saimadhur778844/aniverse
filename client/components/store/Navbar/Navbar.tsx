@@ -33,7 +33,7 @@ export default function Navbar() {
   const [searchOpen, setSearchOpen] = useState(false);
   const [cartOpen, setCartOpen] = useState(false);
 
- const { totalItems } = useCart();
+  const { totalItems } = useCart();
 
   const { totalItems: wishlistItems } = useWishlist();
 
@@ -43,7 +43,6 @@ export default function Navbar() {
     logout,
   } = useAuth();
 
-  
   const handleLogout = () => {
     logout();
     setMobileOpen(false);
@@ -66,7 +65,7 @@ export default function Navbar() {
 
         {/* Desktop Navigation */}
         <nav className={styles.menu}>
-          {/* {navigation.map((item) => (
+          {navigation.map((item) => (
             <Link
               key={item.label}
               href={item.href}
@@ -77,8 +76,7 @@ export default function Navbar() {
             >
               {item.label}
             </Link>
-          ))} */}
-          <Link href="/">Home</Link>
+          ))}
         </nav>
 
         {/* Right Side */}
@@ -238,7 +236,7 @@ export default function Navbar() {
       {/* Mobile Menu */}
       {mobileOpen && (
         <nav className={styles.mobileMenu}>
-          {/* {navigation.map((item) => (
+          {navigation.map((item) => (
             <Link
               key={item.label}
               href={item.href}
@@ -256,8 +254,7 @@ export default function Navbar() {
             >
               {item.label}
             </Link>
-          ))} */}
-          <Link href="/">Home</Link>
+          ))}
 
           <Link
             href="/wishlist"
@@ -326,12 +323,12 @@ export default function Navbar() {
         </nav>
       )}
 
-      {/* <CartDrawer
+      <CartDrawer
         open={cartOpen}
         onClose={() =>
           setCartOpen(false)
         }
-      /> */}
+      />
     </header>
   );
 }

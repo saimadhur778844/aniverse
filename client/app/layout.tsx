@@ -36,7 +36,7 @@ export default function RootLayout({
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-      {/* <body className="min-h-full flex flex-col">
+      <body className="min-h-full flex flex-col">
         <QueryProvider>
           <AuthProvider>
             <CartProvider>
@@ -54,12 +54,7 @@ export default function RootLayout({
           duration={3000}
           theme="dark"
         />
-      </body> */}
-      <body>
-  <h1 style={{ color: "white", background: "black" }}>
-    ROOT LAYOUT WORKING
-  </h1>
-</body>
+      </body>
     </html>
   );
 }
