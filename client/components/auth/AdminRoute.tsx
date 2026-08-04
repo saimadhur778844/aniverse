@@ -51,7 +51,23 @@ export default function AdminRoute({
           color: "white",
         }}
       >
-        Loading...
+        <div
+  style={{
+    minHeight: "60vh",
+    display: "grid",
+    placeItems: "center",
+  }}
+>
+
+  <div className="flex items-center gap-3 text-white">
+
+    <div className="h-6 w-6 animate-spin rounded-full border-2 border-pink-500 border-t-transparent" />
+
+    <span>Checking permissions...</span>
+
+  </div>
+
+</div>
       </div>
     );
   }

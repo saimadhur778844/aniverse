@@ -6,22 +6,33 @@ import * as reviewService from "../services/reviewService.js";
 |--------------------------------------------------------------------------
 */
 
-export const createReview = async (req, res) => {
+export const createReview = async (
+  req,
+  res,
+  next
+) => {
   try {
-    const review = await reviewService.createReview({
-      user: req.user._id,
-      ...req.body,
-    });
+    if (!req.user) {
+      return res.status(401).json({
+        success: false,
+        message: "Unauthorized.",
+      });
+    }
 
-    return res.status(201).json({
+    const review =
+      await reviewService.createReview({
+        user: req.user._id,
+        ...req.body,
+      });
+
+    res.status(201).json({
       success: true,
+      message:
+        "Review created successfully.",
       review,
     });
   } catch (error) {
-    return res.status(400).json({
-      success: false,
-      message: error.message,
-    });
+    next(error);
   }
 };
 
@@ -31,27 +42,22 @@ export const createReview = async (req, res) => {
 |--------------------------------------------------------------------------
 */
 
-export const getProductReviews = async (
-  req,
-  res
-) => {
-  try {
-    const reviews =
-      await reviewService.getProductReviews(
-        req.params.productId
-      );
+export const getProductReviews =
+  async (req, res, next) => {
+    try {
+      const reviews =
+        await reviewService.getProductReviews(
+          req.params.productId
+        );
 
-    return res.json({
-      success: true,
-      reviews,
-    });
-  } catch (error) {
-    return res.status(500).json({
-      success: false,
-      message: error.message,
-    });
-  }
-};
+      res.status(200).json({
+        success: true,
+        reviews,
+      });
+    } catch (error) {
+      next(error);
+    }
+  };
 
 /*
 |--------------------------------------------------------------------------
@@ -61,9 +67,17 @@ export const getProductReviews = async (
 
 export const updateReview = async (
   req,
-  res
+  res,
+  next
 ) => {
   try {
+    if (!req.user) {
+      return res.status(401).json({
+        success: false,
+        message: "Unauthorized.",
+      });
+    }
+
     const review =
       await reviewService.updateReview(
         req.params.id,
@@ -71,15 +85,14 @@ export const updateReview = async (
         req.body
       );
 
-    return res.json({
+    res.status(200).json({
       success: true,
+      message:
+        "Review updated successfully.",
       review,
     });
   } catch (error) {
-    return res.status(400).json({
-      success: false,
-      message: error.message,
-    });
+    next(error);
   }
 };
 
@@ -91,22 +104,29 @@ export const updateReview = async (
 
 export const deleteReview = async (
   req,
-  res
+  res,
+  next
 ) => {
   try {
+    if (!req.user) {
+      return res.status(401).json({
+        success: false,
+        message: "Unauthorized.",
+      });
+    }
+
     await reviewService.deleteReview(
       req.params.id,
       req.user._id
     );
 
-    return res.json({
+    res.status(200).json({
       success: true,
+      message:
+        "Review deleted successfully.",
     });
   } catch (error) {
-    return res.status(400).json({
-      success: false,
-      message: error.message,
-    });
+    next(error);
   }
 };
 
@@ -116,44 +136,42 @@ export const deleteReview = async (
 |--------------------------------------------------------------------------
 */
 
-export const getAllReviews = async (
-  req,
-  res
-) => {
-  try {
-    const reviews =
-      await reviewService.getAllReviews();
+export const getAllReviews =
+  async (req, res, next) => {
+    try {
+      const reviews =
+        await reviewService.getAllReviews();
 
-    return res.json({
-      success: true,
-      reviews,
-    });
-  } catch (error) {
-    return res.status(500).json({
-      success: false,
-      message: error.message,
-    });
-  }
-};
+      res.status(200).json({
+        success: true,
+        reviews,
+      });
+    } catch (error) {
+      next(error);
+    }
+  };
 
-export const toggleVisibility = async (
-  req,
-  res
-) => {
-  try {
-    const review =
-      await reviewService.toggleVisibility(
-        req.params.id
-      );
+/*
+|--------------------------------------------------------------------------
+| Toggle Visibility
+|--------------------------------------------------------------------------
+*/
 
-    return res.json({
-      success: true,
-      review,
-    });
-  } catch (error) {
-    return res.status(400).json({
-      success: false,
-      message: error.message,
-    });
-  }
-};
+export const toggleVisibility =
+  async (req, res, next) => {
+    try {
+      const review =
+        await reviewService.toggleVisibility(
+          req.params.id
+        );
+
+      res.status(200).json({
+        success: true,
+        message:
+          "Review visibility updated successfully.",
+        review,
+      });
+    } catch (error) {
+      next(error);
+    }
+  };

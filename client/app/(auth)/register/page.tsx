@@ -22,6 +22,7 @@ import {
 
 import authService from "@/services/authService";
 import { useAuth } from "@/context/AuthContext/AuthContext";
+import { notify } from "@/utils/toast";
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -58,24 +59,45 @@ export default function RegisterPage() {
   ) => {
     setServerError("");
 
+    const loadingToast =
+      notify.loading(
+        "Creating your account..."
+      );
+
     try {
-        const response = await authService.register({
-        name: values.name,
-        email: values.email,
-        password: values.password,
+      const response =
+        await authService.register({
+          name: values.name,
+          email: values.email,
+          password: values.password,
         });
+
+      notify.dismiss(
+        loadingToast
+      );
 
       login(
         response.token,
         response.user
       );
 
+      notify.success(
+        `Welcome to Aniverse, ${response.user.name}!`
+      );
+
       router.push("/");
     } catch (error: any) {
-      setServerError(
-        error?.response?.data?.message ??
-          "Registration failed."
+      notify.dismiss(
+        loadingToast
       );
+
+      const message =
+        error?.response?.data?.message ??
+        "Registration failed. Please try again.";
+
+      setServerError(message);
+
+      notify.error(message);
     }
   };
 
@@ -170,8 +192,9 @@ export default function RegisterPage() {
           />
 
           <LoadingButton
-            loading={isSubmitting}
             type="submit"
+            loading={isSubmitting}
+            loadingText="Creating Account..."
           >
             Create Account
           </LoadingButton>

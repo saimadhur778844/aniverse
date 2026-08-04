@@ -1,11 +1,38 @@
-import { generateInvoice } from "../services/invoiceService.js";
+import mongoose from "mongoose";
+
+import {
+  generateInvoice,
+} from "../services/invoiceService.js";
+
+/*
+|--------------------------------------------------------------------------
+| Download Invoice
+|--------------------------------------------------------------------------
+*/
 
 export const downloadInvoice = async (
   req,
-  res
+  res,
+  next
 ) => {
   try {
+    if (!req.user) {
+      return res.status(401).json({
+        success: false,
+        message: "Unauthorized.",
+      });
+    }
+
     const { orderId } = req.params;
+
+    if (
+      !mongoose.isValidObjectId(orderId)
+    ) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid order id.",
+      });
+    }
 
     res.setHeader(
       "Content-Type",
@@ -19,18 +46,12 @@ export const downloadInvoice = async (
 
     await generateInvoice(
       orderId,
+      req.user,
       res
     );
   } catch (error) {
-    console.error(error);
-
     if (!res.headersSent) {
-      res.status(500).json({
-        success: false,
-        message:
-          error.message ||
-          "Unable to generate invoice.",
-      });
+      next(error);
     }
   }
 };

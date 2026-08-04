@@ -10,12 +10,16 @@ import {
 } from "../controllers/reviewController.js";
 
 import protect from "../middleware/protect.js";
+import admin from "../middleware/admin.js";
+
+import { validate } from "../middleware/validate.js";
+import { reviewSchema } from "../validators/reviewValidator.js";
 
 const router = express.Router();
 
 /*
 |--------------------------------------------------------------------------
-| Customer
+| Public
 |--------------------------------------------------------------------------
 */
 
@@ -24,15 +28,23 @@ router.get(
   getProductReviews
 );
 
+/*
+|--------------------------------------------------------------------------
+| Customer
+|--------------------------------------------------------------------------
+*/
+
 router.post(
   "/",
   protect,
+  validate(reviewSchema),
   createReview
 );
 
 router.put(
   "/:id",
   protect,
+  validate(reviewSchema),
   updateReview
 );
 
@@ -51,12 +63,14 @@ router.delete(
 router.get(
   "/",
   protect,
+  admin,
   getAllReviews
 );
 
 router.patch(
   "/:id/toggle",
   protect,
+  admin,
   toggleVisibility
 );
 

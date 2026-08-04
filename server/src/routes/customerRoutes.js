@@ -5,16 +5,29 @@ import {
   getCustomerById,
 } from "../controllers/customerController.js";
 
+import protect from "../middleware/protect.js";
+import admin from "../middleware/admin.js";
+
 const router = express.Router();
 
 /*
 |--------------------------------------------------------------------------
-| Customers
+| Admin Routes
 |--------------------------------------------------------------------------
 */
 
-router.get("/", getCustomers);
+router.get(
+  "/",
+  protect,
+  admin,
+  getCustomers
+);
 
-router.get("/:id", getCustomerById);
+router.get(
+  "/:id",
+  protect,
+  admin,
+  getCustomerById
+);
 
 export default router;

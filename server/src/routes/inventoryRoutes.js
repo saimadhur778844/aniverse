@@ -6,17 +6,39 @@ import {
   updateStock,
 } from "../controllers/inventoryController.js";
 
+import protect from "../middleware/protect.js";
+import admin from "../middleware/admin.js";
+
+import { validate } from "../middleware/validate.js";
+import { inventoryAdjustmentSchema } from "../validators/inventoryValidator.js";
+
 const router = express.Router();
 
-router.get("/", getInventoryList);
+/*
+|--------------------------------------------------------------------------
+| Admin Routes
+|--------------------------------------------------------------------------
+*/
+
+router.get(
+  "/",
+  protect,
+  admin,
+  getInventoryList
+);
 
 router.get(
   "/analytics",
+  protect,
+  admin,
   getAnalytics
 );
 
 router.patch(
   "/:id/adjust",
+  protect,
+  admin,
+  validate(inventoryAdjustmentSchema),
   updateStock
 );
 

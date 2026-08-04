@@ -1,3 +1,5 @@
+import mongoose from "mongoose";
+
 import {
   getInventory,
   adjustStock,
@@ -23,15 +25,16 @@ export const getInventoryList = async (
       lowStock = false,
     } = req.query;
 
-    const data = await getInventory({
-      page: Number(page),
-      limit: Number(limit),
-      search,
-      lowStock:
-        lowStock === "true",
-    });
+    const data =
+      await getInventory({
+        page: Number(page),
+        limit: Number(limit),
+        search,
+        lowStock:
+          lowStock === "true",
+      });
 
-    res.json({
+    res.status(200).json({
       success: true,
       data,
     });
@@ -55,7 +58,7 @@ export const getAnalytics = async (
     const data =
       await getInventoryAnalytics();
 
-    res.json({
+    res.status(200).json({
       success: true,
       data,
     });
@@ -76,19 +79,41 @@ export const updateStock = async (
   next
 ) => {
   try {
+    if (
+      !mongoose.isValidObjectId(
+        req.params.id
+      )
+    ) {
+      return res.status(400).json({
+        success: false,
+        message:
+          "Invalid product id.",
+      });
+    }
+
+    const quantity = Number(
+      req.body.quantity
+    );
+
+    if (quantity <= 0) {
+      return res.status(400).json({
+        success: false,
+        message:
+          "Quantity must be greater than zero.",
+      });
+    }
+
     const product =
       await adjustStock({
         productId: req.params.id,
-        quantity: Number(
-          req.body.quantity
-        ),
+        quantity,
         type: req.body.type,
         reason: req.body.reason,
         user:
-          req.user?._id || null,
+          req.user?._id ?? null,
       });
 
-    res.json({
+    res.status(200).json({
       success: true,
       message:
         "Inventory updated successfully.",

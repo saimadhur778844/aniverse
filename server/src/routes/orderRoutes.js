@@ -1,4 +1,5 @@
 import express from "express";
+
 import {
   createOrder,
   getOrderById,
@@ -7,20 +8,43 @@ import {
   getMyOrders,
   cancelOrder,
   reorder,
-} from "../controllers/orderController.js";
-import {
   canReviewProduct,
 } from "../controllers/orderController.js";
+
 import protect from "../middleware/protect.js";
+import admin from "../middleware/admin.js";
 
 const router = express.Router();
 
-// Customer
-router.post("/", createOrder);
-router.get("/my-orders", getMyOrders);
+/*
+|--------------------------------------------------------------------------
+| Customer
+|--------------------------------------------------------------------------
+*/
 
-// Admin
-router.get("/", getOrders);
+router.post(
+  "/",
+  protect,
+  createOrder
+);
+
+router.get(
+  "/my-orders",
+  protect,
+  getMyOrders
+);
+
+router.patch(
+  "/:id/cancel",
+  protect,
+  cancelOrder
+);
+
+router.post(
+  "/:id/reorder",
+  protect,
+  reorder
+);
 
 router.get(
   "/reviewable/:productId",
@@ -28,14 +52,36 @@ router.get(
   canReviewProduct
 );
 
-// Shared
-router.get("/:id", getOrderById);
+/*
+|--------------------------------------------------------------------------
+| Admin
+|--------------------------------------------------------------------------
+*/
 
-// Customer
-router.patch("/:id/cancel", cancelOrder);
-router.post("/:id/reorder", reorder);
+router.get(
+  "/",
+  protect,
+  admin,
+  getOrders
+);
 
-// Admin
-router.patch("/:id/status", updateOrderStatus);
+router.patch(
+  "/:id/status",
+  protect,
+  admin,
+  updateOrderStatus
+);
+
+/*
+|--------------------------------------------------------------------------
+| Shared
+|--------------------------------------------------------------------------
+*/
+
+router.get(
+  "/:id",
+  protect,
+  getOrderById
+);
 
 export default router;

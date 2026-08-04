@@ -2,52 +2,77 @@
 
 import Image from "next/image";
 
-import Button from "@/components/shared/Button";
 import SectionCard from "@/components/shared/SectionCard";
+import LoadingButton from "@/components/auth/LoadingButton/LoadingButton";
 
 import { CartItem } from "@/types/cart";
 
 type Props = {
   items: CartItem[];
+
   subtotal: number;
+
   shipping: number;
+
   discount: number;
 
   couponCode: string;
+
   couponLoading: boolean;
+
   appliedCoupon: string;
 
-  onCouponChange: (value: string) => void;
+  onCouponChange: (
+    value: string
+  ) => void;
+
   onApplyCoupon: () => void;
+
   onRemoveCoupon: () => void;
 
   total: number;
+
   loading: boolean;
+
   onCheckout: () => void;
 };
 
 export default function OrderSummary({
   items,
+
   subtotal,
+
   shipping,
 
   discount,
 
   couponCode,
+
   couponLoading,
+
   appliedCoupon,
 
   onCouponChange,
+
   onApplyCoupon,
+
   onRemoveCoupon,
 
   total,
 
   loading,
+
   onCheckout,
 }: Props) {
-  const remaining = Math.max(0, 1999 - subtotal);
-  const progress = Math.min((subtotal / 1999) * 100, 100);
+  const remaining = Math.max(
+    0,
+    1999 - subtotal
+  );
+
+  const progress = Math.min(
+    (subtotal / 1999) * 100,
+    100
+  );
 
   return (
     <div className="sticky top-24">
@@ -71,7 +96,10 @@ export default function OrderSummary({
               </h2>
 
               <p className="mt-1 text-sm text-gray-400">
-                {items.length} item{items.length > 1 ? "s" : ""}
+                {items.length} item
+                {items.length > 1
+                  ? "s"
+                  : ""}
               </p>
 
             </div>
@@ -101,7 +129,9 @@ export default function OrderSummary({
             <div className="mt-4 h-2 overflow-hidden rounded-full bg-[#343454]">
 
               <div
-                style={{ width: `${progress}%` }}
+                style={{
+                  width: `${progress}%`,
+                }}
                 className="h-full rounded-full bg-gradient-to-r from-pink-500 to-purple-500 transition-all duration-500"
               />
 
@@ -155,7 +185,11 @@ export default function OrderSummary({
                 <div className="text-right">
 
                   <p className="font-bold text-pink-400">
-                    ₹{(item.product.price * item.quantity).toLocaleString()}
+                    ₹
+                    {(
+                      item.product.price *
+                      item.quantity
+                    ).toLocaleString()}
                   </p>
 
                 </div>
@@ -165,96 +199,108 @@ export default function OrderSummary({
             ))}
 
           </div>
+                    {/* Coupon */}
+
+          <div className="mt-8 rounded-2xl border border-[#343454] bg-[#202033] p-5">
+
+            <h3 className="mb-4 text-lg font-semibold text-white">
+              Have a Coupon?
+            </h3>
+
+            <div className="flex gap-3">
+
+              <input
+                value={couponCode}
+                onChange={(e) =>
+                  onCouponChange(
+                    e.target.value.toUpperCase()
+                  )
+                }
+                placeholder="Enter coupon code"
+                className="flex-1 rounded-xl border border-[#343454] bg-[#171726] px-4 py-3 text-white outline-none transition-all duration-300 placeholder:text-gray-500 focus:border-pink-500"
+              />
+
+              {appliedCoupon ? (
+
+                <button
+                  type="button"
+                  onClick={onRemoveCoupon}
+                  className="rounded-xl bg-red-600 px-5 py-3 font-semibold text-white transition-all duration-300 hover:bg-red-500"
+                >
+                  Remove
+                </button>
+
+              ) : (
+
+                <LoadingButton
+                  type="button"
+                  loading={couponLoading}
+                  loadingText="Applying..."
+                  onClick={onApplyCoupon}
+                  className="rounded-xl bg-gradient-to-r from-pink-600 to-purple-600 px-5 py-3 font-semibold text-white transition-all duration-300 hover:from-pink-500 hover:to-purple-500"
+                >
+                  Apply
+                </LoadingButton>
+
+              )}
+
+            </div>
+
+            {appliedCoupon && (
+
+              <div className="mt-4 rounded-xl border border-emerald-500/30 bg-emerald-500/10 p-4">
+
+                <p className="text-sm font-semibold text-emerald-400">
+                  ✓ Coupon "{appliedCoupon}" applied successfully
+                </p>
+
+              </div>
+
+            )}
+
+          </div>
+
+          {/* Divider */}
+
+          <div className="my-8 border-t border-[#343454]" />
 
           {/* Totals */}
-            {/* Coupon */}
-
-<div className="mt-8 rounded-2xl border border-[#343454] bg-[#202033] p-5">
-
-  <h3 className="mb-4 font-semibold text-white">
-    Have a Coupon?
-  </h3>
-
-  <div className="flex gap-3">
-
-    <input
-      value={couponCode}
-      onChange={(e) =>
-        onCouponChange(e.target.value.toUpperCase())
-      }
-      placeholder="Enter coupon code"
-      className="flex-1 rounded-xl border border-[#343454] bg-[#171726] px-4 py-3 text-white outline-none transition focus:border-pink-500"
-    />
-
-    {appliedCoupon ? (
-      <button
-        onClick={onRemoveCoupon}
-        className="rounded-xl bg-red-600 px-5 text-white hover:bg-red-500"
-      >
-        Remove
-      </button>
-    ) : (
-      <button
-        onClick={onApplyCoupon}
-        disabled={couponLoading}
-        className="rounded-xl bg-pink-600 px-5 text-white hover:bg-pink-500 disabled:opacity-50"
-      >
-        {couponLoading
-          ? "Applying..."
-          : "Apply"}
-      </button>
-    )}
-
-  </div>
-
-  {appliedCoupon && (
-
-    <div className="mt-4 rounded-xl border border-emerald-500/30 bg-emerald-500/10 p-3">
-
-      <p className="text-sm font-medium text-emerald-400">
-        ✓ Coupon "{appliedCoupon}" applied successfully
-      </p>
-
-    </div>
-
-  )}
-
-</div>
-          <div className="my-8 border-t border-[#343454]" />
 
           <div className="space-y-5">
 
-  <PriceRow
-    title="Subtotal"
-    value={`₹${subtotal.toLocaleString()}`}
-  />
+            <PriceRow
+              title="Subtotal"
+              value={`₹${subtotal.toLocaleString()}`}
+            />
 
-  <PriceRow
-    title="Shipping"
-    value={
-      shipping === 0
-        ? "FREE"
-        : `₹${shipping}`
-    }
-  />
+            <PriceRow
+              title="Shipping"
+              value={
+                shipping === 0
+                  ? "FREE"
+                  : `₹${shipping.toLocaleString()}`
+              }
+            />
 
-  {discount > 0 && (
+            {discount > 0 && (
 
-    <PriceRow
-      title="Discount"
-      value={`-₹${discount.toLocaleString()}`}
-    />
+              <PriceRow
+                title="Discount"
+                value={`-₹${discount.toLocaleString()}`}
+              />
 
-  )}
+            )}
 
-  <PriceRow
-    title="GST"
-    value="Included"
-  />
+            <PriceRow
+              title="GST"
+              value="Included"
+            />
 
-</div>
+          </div>
 
           <div className="my-8 border-t border-[#343454]" />
+
+          {/* Grand Total */}
 
           <div className="flex items-center justify-between">
 
@@ -275,41 +321,58 @@ export default function OrderSummary({
             </span>
 
           </div>
+                    {/* Checkout Button */}
 
-          <Button
-            fullWidth
+          <LoadingButton
+            type="button"
+            loading={loading}
+            loadingText="Preparing Checkout..."
             onClick={onCheckout}
-            disabled={loading}
-            className="mt-8 h-16 text-lg"
+            className="mt-8 h-16 w-full rounded-2xl bg-gradient-to-r from-pink-600 via-purple-600 to-pink-600 text-lg font-bold text-white shadow-lg transition-all duration-300 hover:scale-[1.02] hover:shadow-pink-500/30"
           >
-            {loading
-              ? "Processing..."
-              : "🔒 Proceed to Secure Payment"}
-          </Button>
+            🔒 Proceed to Secure Payment
+          </LoadingButton>
 
-          {/* Trust */}
+          <p className="mt-4 text-center text-xs text-gray-500">
+            Your payment is encrypted and securely processed through
+            Cashfree Payments.
+          </p>
 
-          <div className="mt-8 grid grid-cols-2 gap-4">
+          {/* Trust Section */}
 
-            <TrustCard
-              emoji="🛡️"
-              title="Authentic"
-            />
+          <div className="mt-10">
 
-            <TrustCard
-              emoji="📦"
-              title="Packaging"
-            />
+            <h3 className="mb-5 text-center text-sm font-semibold uppercase tracking-wider text-gray-400">
+              Why Shop With Aniverse?
+            </h3>
 
-            <TrustCard
-              emoji="💳"
-              title="Secure"
-            />
+            <div className="grid grid-cols-2 gap-4">
 
-            <TrustCard
-              emoji="🎧"
-              title="Support"
-            />
+              <TrustCard
+                emoji="🛡️"
+                title="100% Authentic"
+                subtitle="Official licensed collectibles"
+              />
+
+              <TrustCard
+                emoji="📦"
+                title="Premium Packaging"
+                subtitle="Extra-safe packing for figures"
+              />
+
+              <TrustCard
+                emoji="💳"
+                title="Secure Payments"
+                subtitle="Protected by Cashfree"
+              />
+
+              <TrustCard
+                emoji="🎧"
+                title="24×7 Support"
+                subtitle="We're here whenever you need us"
+              />
+
+            </div>
 
           </div>
 
@@ -320,7 +383,6 @@ export default function OrderSummary({
     </div>
   );
 }
-
 function PriceRow({
   title,
   value,
@@ -329,7 +391,7 @@ function PriceRow({
   value: string;
 }) {
   return (
-    <div className="flex justify-between">
+    <div className="flex items-center justify-between">
 
       <span className="text-gray-400">
         {title}
@@ -346,19 +408,25 @@ function PriceRow({
 function TrustCard({
   emoji,
   title,
+  subtitle,
 }: {
   emoji: string;
   title: string;
+  subtitle: string;
 }) {
   return (
-    <div className="rounded-2xl border border-[#343454] bg-[#202033] p-4 text-center transition hover:border-pink-500/40">
+    <div className="rounded-2xl border border-[#343454] bg-[#202033] p-5 text-center transition-all duration-300 hover:-translate-y-1 hover:border-pink-500/50 hover:shadow-lg hover:shadow-pink-500/10">
 
-      <div className="text-3xl">
+      <div className="text-4xl">
         {emoji}
       </div>
 
-      <p className="mt-2 font-semibold text-white">
+      <h4 className="mt-3 font-semibold text-white">
         {title}
+      </h4>
+
+      <p className="mt-2 text-xs leading-5 text-gray-400">
+        {subtitle}
       </p>
 
     </div>

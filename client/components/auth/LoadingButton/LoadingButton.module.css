@@ -1,40 +1,24 @@
 .button {
-  width: 100%;
-  padding: 0.95rem 1.25rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.65rem;
 
   border: none;
-  border-radius: var(--radius-sm);
+  border-radius: 12px;
 
-  background: linear-gradient(
-    135deg,
-    var(--color-primary),
-    var(--color-secondary)
-  );
+  padding: 0.85rem 1.4rem;
 
-  color: white;
-  font-weight: 700;
-  font-size: 1rem;
-
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 10px;
+  font-size: 0.95rem;
+  font-weight: 600;
 
   cursor: pointer;
 
-  transition:
-    transform .25s ease,
-    opacity .25s ease,
-    box-shadow .25s ease;
-}
-
-.button:hover:not(:disabled) {
-  transform: translateY(-2px);
-  box-shadow: var(--shadow-glow);
+  transition: all 0.2s ease;
 }
 
 .button:disabled {
-  opacity: .7;
+  opacity: 0.75;
   cursor: not-allowed;
 }
 
@@ -42,12 +26,12 @@
   width: 18px;
   height: 18px;
 
-  border: 2px solid rgba(255,255,255,.35);
-  border-top-color: white;
+  border: 2px solid rgba(255, 255, 255, 0.35);
+  border-top-color: #ffffff;
 
-  border-radius: 50%;
+  border-radius: 9999px;
 
-  animation: spin .8s linear infinite;
+  animation: spin 0.7s linear infinite;
 }
 
 @keyframes spin {

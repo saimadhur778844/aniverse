@@ -7,36 +7,84 @@ import {
   updateCoupon,
   deleteCoupon,
   toggleCouponStatus,
-} from "../controllers/couponController.js";
-import {
   validateCoupon,
 } from "../controllers/couponController.js";
+
+import protect from "../middleware/protect.js";
+import admin from "../middleware/admin.js";
+
+import { validate } from "../middleware/validate.js";
+import { couponSchema } from "../validators/couponValidator.js";
+
 const router = express.Router();
 
 /*
 |--------------------------------------------------------------------------
-| Coupon Routes
+| Public
 |--------------------------------------------------------------------------
 */
-
-router.post("/", createCoupon);
-
-router.get("/", getCoupons);
 
 router.post(
   "/validate",
   validateCoupon
 );
 
-router.get("/:id", getCouponById);
+/*
+|--------------------------------------------------------------------------
+| Admin
+|--------------------------------------------------------------------------
+*/
 
-router.put("/:id", updateCoupon);
+router.get(
+  "/",
+  protect,
+  admin,
+  getCoupons
+);
 
-router.delete("/:id", deleteCoupon);
+router.get(
+  "/:id",
+  protect,
+  admin,
+  getCouponById
+);
+
+router.post(
+  "/",
+  protect,
+  admin,
+  validate(couponSchema),
+  createCoupon
+);
+
+router.put(
+  "/:id",
+  protect,
+  admin,
+  validate(couponSchema),
+  updateCoupon
+);
+
+router.patch(
+  "/:id",
+  protect,
+  admin,
+  validate(couponSchema),
+  updateCoupon
+);
 
 router.patch(
   "/:id/toggle",
+  protect,
+  admin,
   toggleCouponStatus
+);
+
+router.delete(
+  "/:id",
+  protect,
+  admin,
+  deleteCoupon
 );
 
 export default router;

@@ -3,6 +3,9 @@
 import { useEffect, useState } from "react";
 
 import Modal from "@/components/shared/Modal";
+import LoadingButton from "@/components/auth/LoadingButton/LoadingButton";
+
+import { notify } from "@/utils/toast";
 
 import type { Coupon } from "@/types/coupon";
 
@@ -48,8 +51,10 @@ export default function CouponModal({
     if (coupon) {
       setForm({
         ...coupon,
-        startDate: coupon.startDate?.slice(0, 10),
-        expiryDate: coupon.expiryDate?.slice(0, 10),
+        startDate:
+          coupon.startDate?.slice(0, 10),
+        expiryDate:
+          coupon.expiryDate?.slice(0, 10),
       });
     } else {
       setForm(initialForm);
@@ -69,11 +74,13 @@ export default function CouponModal({
   }
 
   function validate() {
-    if (!form.code?.trim())
+    if (!form.code?.trim()) {
       return "Coupon code is required.";
+    }
 
-    if (!form.value || form.value <= 0)
+    if (!form.value || form.value <= 0) {
       return "Discount value must be greater than 0.";
+    }
 
     if (
       form.type === "percentage" &&
@@ -82,11 +89,13 @@ export default function CouponModal({
       return "Percentage cannot exceed 100.";
     }
 
-    if (!form.startDate)
+    if (!form.startDate) {
       return "Start date is required.";
+    }
 
-    if (!form.expiryDate)
+    if (!form.expiryDate) {
       return "Expiry date is required.";
+    }
 
     if (
       new Date(form.expiryDate) <=
@@ -109,21 +118,47 @@ export default function CouponModal({
 
     return "";
   }
-
-  async function handleSave() {
+    async function handleSave() {
     const validation = validate();
 
     if (validation) {
       setError(validation);
+
+      notify.error(validation);
+
       return;
     }
+
+    const loadingToast = notify.loading(
+      coupon
+        ? "Updating coupon..."
+        : "Creating coupon..."
+    );
 
     try {
       setSaving(true);
 
+      setError("");
+
       await onSave(form);
 
+      notify.dismiss(loadingToast);
+
+      notify.success(
+        coupon
+          ? "Coupon updated successfully."
+          : "Coupon created successfully."
+      );
+
       onClose();
+    } catch (error: any) {
+      notify.dismiss(loadingToast);
+
+      notify.error(
+        error?.response?.data?.message ??
+          error?.message ??
+          "Unable to save coupon."
+      );
     } finally {
       setSaving(false);
     }
@@ -132,12 +167,13 @@ export default function CouponModal({
   return (
     <Modal
       open={open}
-      onClose={onClose}
+      onClose={saving ? () => {} : onClose}
       title={
         coupon
           ? "Edit Coupon"
           : "Create Coupon"
-      }    >
+      }
+    >
       <div className="space-y-6">
 
         {error && (
@@ -154,12 +190,15 @@ export default function CouponModal({
             </label>
 
             <input
-              className="w-full rounded-lg border border-zinc-700 bg-zinc-900 p-3"
+              disabled={saving}
+              className="w-full rounded-lg border border-zinc-700 bg-zinc-900 p-3 disabled:opacity-60"
               value={form.code ?? ""}
               onChange={(e) =>
                 update(
                   "code",
-                  e.target.value.toUpperCase()
+                  e.target.value
+                    .trimStart()
+                    .toUpperCase()
                 )
               }
             />
@@ -171,7 +210,8 @@ export default function CouponModal({
             </label>
 
             <select
-              className="w-full rounded-lg border border-zinc-700 bg-zinc-900 p-3"
+              disabled={saving}
+              className="w-full rounded-lg border border-zinc-700 bg-zinc-900 p-3 disabled:opacity-60"
               value={form.type}
               onChange={(e) =>
                 update(
@@ -197,7 +237,8 @@ export default function CouponModal({
 
             <textarea
               rows={3}
-              className="w-full rounded-lg border border-zinc-700 bg-zinc-900 p-3"
+              disabled={saving}
+              className="w-full rounded-lg border border-zinc-700 bg-zinc-900 p-3 disabled:opacity-60"
               value={form.description ?? ""}
               onChange={(e) =>
                 update(
@@ -215,7 +256,8 @@ export default function CouponModal({
 
             <input
               type="number"
-              className="w-full rounded-lg border border-zinc-700 bg-zinc-900 p-3"
+              disabled={saving}
+              className="w-full rounded-lg border border-zinc-700 bg-zinc-900 p-3 disabled:opacity-60"
               value={form.value ?? 0}
               onChange={(e) =>
                 update(
@@ -233,7 +275,8 @@ export default function CouponModal({
 
             <input
               type="number"
-              className="w-full rounded-lg border border-zinc-700 bg-zinc-900 p-3"
+              disabled={saving}
+              className="w-full rounded-lg border border-zinc-700 bg-zinc-900 p-3 disabled:opacity-60"
               value={
                 form.minimumOrderAmount ?? 0
               }
@@ -253,7 +296,8 @@ export default function CouponModal({
 
             <input
               type="number"
-              className="w-full rounded-lg border border-zinc-700 bg-zinc-900 p-3"
+              disabled={saving}
+              className="w-full rounded-lg border border-zinc-700 bg-zinc-900 p-3 disabled:opacity-60"
               value={
                 form.maximumDiscount ?? 0
               }
@@ -273,7 +317,8 @@ export default function CouponModal({
 
             <input
               type="number"
-              className="w-full rounded-lg border border-zinc-700 bg-zinc-900 p-3"
+              disabled={saving}
+              className="w-full rounded-lg border border-zinc-700 bg-zinc-900 p-3 disabled:opacity-60"
               value={
                 form.usageLimit ?? 100
               }
@@ -293,7 +338,8 @@ export default function CouponModal({
 
             <input
               type="number"
-              className="w-full rounded-lg border border-zinc-700 bg-zinc-900 p-3"
+              disabled={saving}
+              className="w-full rounded-lg border border-zinc-700 bg-zinc-900 p-3 disabled:opacity-60"
               value={
                 form.usagePerUser ?? 1
               }
@@ -313,7 +359,8 @@ export default function CouponModal({
 
             <input
               type="date"
-              className="w-full rounded-lg border border-zinc-700 bg-zinc-900 p-3"
+              disabled={saving}
+              className="w-full rounded-lg border border-zinc-700 bg-zinc-900 p-3 disabled:opacity-60"
               value={form.startDate ?? ""}
               onChange={(e) =>
                 update(
@@ -331,7 +378,8 @@ export default function CouponModal({
 
             <input
               type="date"
-              className="w-full rounded-lg border border-zinc-700 bg-zinc-900 p-3"
+              disabled={saving}
+              className="w-full rounded-lg border border-zinc-700 bg-zinc-900 p-3 disabled:opacity-60"
               value={form.expiryDate ?? ""}
               onChange={(e) =>
                 update(
@@ -347,6 +395,7 @@ export default function CouponModal({
         <label className="flex items-center gap-3">
           <input
             type="checkbox"
+            disabled={saving}
             checked={form.active ?? true}
             onChange={(e) =>
               update(
@@ -364,27 +413,34 @@ export default function CouponModal({
         <div className="flex justify-end gap-3 border-t border-zinc-800 pt-6">
 
           <button
+            type="button"
+            disabled={saving}
             onClick={onClose}
-            className="rounded-lg border border-zinc-700 px-5 py-2 hover:bg-zinc-800"
+            className="rounded-lg border border-zinc-700 px-5 py-2 transition hover:bg-zinc-800 disabled:cursor-not-allowed disabled:opacity-50"
           >
             Cancel
           </button>
 
-          <button
-            disabled={saving}
+          <LoadingButton
+            type="button"
+            loading={saving}
+            loadingText={
+              coupon
+                ? "Updating Coupon..."
+                : "Creating Coupon..."
+            }
             onClick={handleSave}
-            className="rounded-lg bg-pink-600 px-5 py-2 text-white hover:bg-pink-500 disabled:opacity-50"
+            className="rounded-lg bg-pink-600 px-5 py-2 text-white transition hover:bg-pink-500"
           >
-            {saving
-              ? "Saving..."
-              : coupon
+            {coupon
               ? "Update Coupon"
               : "Create Coupon"}
-          </button>
+          </LoadingButton>
 
         </div>
 
       </div>
+
     </Modal>
   );
 }

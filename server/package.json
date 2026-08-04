@@ -14,14 +14,20 @@
     "bcrypt": "^6.0.0",
     "cashfree-pg": "^6.0.4",
     "cloudinary": "^1.41.3",
+    "compression": "^1.8.1",
     "cors": "^2.8.6",
     "dotenv": "^17.4.2",
     "express": "^5.2.1",
+    "express-mongo-sanitize": "^2.2.0",
+    "express-rate-limit": "^8.6.1",
+    "helmet": "^8.3.0",
     "jsonwebtoken": "^9.0.3",
     "mongoose": "^9.8.0",
     "multer": "^2.2.0",
     "multer-storage-cloudinary": "^4.0.0",
-    "slugify": "^1.6.9"
+    "slugify": "^1.6.9",
+    "xss-clean": "^0.1.4",
+    "zod": "^4.4.3"
   },
   "devDependencies": {
     "nodemon": "^3.1.14"
@@ -30,6 +36,12 @@
     "cloudinary@1.41.3": true,
     "dotenv@17.4.2": true,
     "cashfree-pg@6.0.4": true,
-    "@cashfreepayments/cashfree-js@1.0.7": true
+    "@cashfreepayments/cashfree-js@1.0.7": true,
+    "zod@4.4.3": true,
+    "helmet@8.3.0": true,
+    "express-mongo-sanitize@2.2.0": true,
+    "xss-clean@0.1.4": true,
+    "compression@1.8.1": true,
+    "express-rate-limit@8.6.1": true
   }
 }

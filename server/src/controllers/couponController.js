@@ -5,8 +5,6 @@ import {
   updateCoupon as updateCouponService,
   deleteCoupon as deleteCouponService,
   toggleCouponStatus as toggleCouponStatusService,
-} from "../services/couponService.js";
-import {
   validateCoupon as validateCouponService,
 } from "../services/couponService.js";
 
@@ -22,22 +20,29 @@ export const createCoupon = async (
   next
 ) => {
   try {
-    if (!req.body || Object.keys(req.body).length === 0) {
+    if (
+      !req.body ||
+      Object.keys(req.body).length === 0
+    ) {
       return res.status(400).json({
         success: false,
-        message: "Request body is required.",
+        message:
+          "Request body is required.",
       });
     }
 
-    const coupon = await createCouponService(req.body);
+    const coupon =
+      await createCouponService(
+        req.body
+      );
 
     res.status(201).json({
       success: true,
-      message: "Coupon created successfully.",
+      message:
+        "Coupon created successfully.",
       coupon,
     });
   } catch (error) {
-    console.error("Create Coupon Error:", error);
     next(error);
   }
 };
@@ -60,18 +65,18 @@ export const getCoupons = async (
       search = "",
     } = req.query;
 
-    const result = await getCouponsService({
-      page: Number(page),
-      limit: Number(limit),
-      search,
-    });
+    const result =
+      await getCouponsService({
+        page: Number(page),
+        limit: Number(limit),
+        search,
+      });
 
     res.status(200).json({
       success: true,
       ...result,
     });
   } catch (error) {
-    console.error("Get Coupons Error:", error);
     next(error);
   }
 };
@@ -88,16 +93,24 @@ export const getCouponById = async (
   next
 ) => {
   try {
-    const coupon = await getCouponByIdService(
-      req.params.id
-    );
+    if (!req.params.id) {
+      return res.status(400).json({
+        success: false,
+        message:
+          "Coupon id is required.",
+      });
+    }
+
+    const coupon =
+      await getCouponByIdService(
+        req.params.id
+      );
 
     res.status(200).json({
       success: true,
       coupon,
     });
   } catch (error) {
-    console.error("Get Coupon Error:", error);
     next(error);
   }
 };
@@ -114,25 +127,38 @@ export const updateCoupon = async (
   next
 ) => {
   try {
-    if (!req.body || Object.keys(req.body).length === 0) {
+    if (!req.params.id) {
       return res.status(400).json({
         success: false,
-        message: "Request body is required.",
+        message:
+          "Coupon id is required.",
       });
     }
 
-    const coupon = await updateCouponService(
-      req.params.id,
-      req.body
-    );
+    if (
+      !req.body ||
+      Object.keys(req.body).length === 0
+    ) {
+      return res.status(400).json({
+        success: false,
+        message:
+          "Request body is required.",
+      });
+    }
+
+    const coupon =
+      await updateCouponService(
+        req.params.id,
+        req.body
+      );
 
     res.status(200).json({
       success: true,
-      message: "Coupon updated successfully.",
+      message:
+        "Coupon updated successfully.",
       coupon,
     });
   } catch (error) {
-    console.error("Update Coupon Error:", error);
     next(error);
   }
 };
@@ -149,14 +175,24 @@ export const deleteCoupon = async (
   next
 ) => {
   try {
-    await deleteCouponService(req.params.id);
+    if (!req.params.id) {
+      return res.status(400).json({
+        success: false,
+        message:
+          "Coupon id is required.",
+      });
+    }
+
+    await deleteCouponService(
+      req.params.id
+    );
 
     res.status(200).json({
       success: true,
-      message: "Coupon deleted successfully.",
+      message:
+        "Coupon deleted successfully.",
     });
   } catch (error) {
-    console.error("Delete Coupon Error:", error);
     next(error);
   }
 };
@@ -167,26 +203,33 @@ export const deleteCoupon = async (
 |--------------------------------------------------------------------------
 */
 
-export const toggleCouponStatus = async (
-  req,
-  res,
-  next
-) => {
-  try {
-    const coupon = await toggleCouponStatusService(
-      req.params.id
-    );
+export const toggleCouponStatus =
+  async (req, res, next) => {
+    try {
+      if (!req.params.id) {
+        return res.status(400).json({
+          success: false,
+          message:
+            "Coupon id is required.",
+        });
+      }
 
-    res.status(200).json({
-      success: true,
-      message: "Coupon status updated successfully.",
-      coupon,
-    });
-  } catch (error) {
-    console.error("Toggle Coupon Error:", error);
-    next(error);
-  }
-};
+      const coupon =
+        await toggleCouponStatusService(
+          req.params.id
+        );
+
+      res.status(200).json({
+        success: true,
+        message:
+          "Coupon status updated successfully.",
+        coupon,
+      });
+    } catch (error) {
+      next(error);
+    }
+  };
+
 /*
 |--------------------------------------------------------------------------
 | Validate Coupon
@@ -201,7 +244,7 @@ export const validateCoupon =
           req.body
         );
 
-      res.json({
+      res.status(200).json({
         success: true,
         ...result,
       });

@@ -4,16 +4,19 @@ import {
   downloadInvoice,
 } from "../controllers/invoiceController.js";
 
+import protect from "../middleware/protect.js";
+
 const router = express.Router();
 
 /*
 |--------------------------------------------------------------------------
-| Download Invoice
+| Invoice
 |--------------------------------------------------------------------------
 */
 
 router.get(
   "/:orderId",
+  protect,
   downloadInvoice
 );
 
