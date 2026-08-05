@@ -1,48 +1,58 @@
 "use client";
 
-import { CheckCircle2, Clock3, Package, Truck, XCircle } from "lucide-react";
-
-import type { OrderStatus } from "@/types/order";
+import {
+  CheckCircle2,
+  Clock3,
+  Package,
+  Truck,
+  XCircle,
+} from "lucide-react";
 
 import styles from "./OrderStatusBadge.module.css";
 
 interface OrderStatusBadgeProps {
-  status: OrderStatus;
+  status?: string;
 }
 
 const STATUS_CONFIG: Record<
-  OrderStatus,
+  string,
   {
     label: string;
     icon: React.ElementType;
     className: string;
   }
 > = {
-  pending: {
+  Pending: {
     label: "Pending",
     icon: Clock3,
     className: styles.pending,
   },
 
-  processing: {
-    label: "Processing",
+  Confirmed: {
+    label: "Confirmed",
+    icon: CheckCircle2,
+    className: styles.processing,
+  },
+
+  Packed: {
+    label: "Packed",
     icon: Package,
     className: styles.processing,
   },
 
-  shipped: {
+  Shipped: {
     label: "Shipped",
     icon: Truck,
     className: styles.shipped,
   },
 
-  delivered: {
+  Delivered: {
     label: "Delivered",
     icon: CheckCircle2,
     className: styles.delivered,
   },
 
-  cancelled: {
+  Cancelled: {
     label: "Cancelled",
     icon: XCircle,
     className: styles.cancelled,
@@ -52,7 +62,9 @@ const STATUS_CONFIG: Record<
 export default function OrderStatusBadge({
   status,
 }: OrderStatusBadgeProps) {
-  const config = STATUS_CONFIG[status];
+  const config =
+    STATUS_CONFIG[status ?? "Pending"] ??
+    STATUS_CONFIG.Pending;
 
   const Icon = config.icon;
 

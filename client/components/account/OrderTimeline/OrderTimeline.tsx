@@ -3,6 +3,9 @@
 import {
   CheckCircle2,
   Clock3,
+  Package,
+  Truck,
+  XCircle,
 } from "lucide-react";
 
 import type { OrderStatus } from "@/types/order";
@@ -15,35 +18,69 @@ interface OrderTimelineProps {
 
 const STEPS = [
   {
-    key: "pending",
+    key: "Pending",
     label: "Order Placed",
+    icon: Clock3,
   },
   {
-    key: "processing",
-    label: "Processing",
+    key: "Confirmed",
+    label: "Confirmed",
+    icon: CheckCircle2,
   },
   {
-    key: "shipped",
+    key: "Packed",
+    label: "Packed",
+    icon: Package,
+  },
+  {
+    key: "Shipped",
     label: "Shipped",
+    icon: Truck,
   },
   {
-    key: "delivered",
+    key: "Delivered",
     label: "Delivered",
+    icon: CheckCircle2,
   },
 ] as const;
 
 export default function OrderTimeline({
   status,
 }: OrderTimelineProps) {
-  const currentIndex = STEPS.findIndex(
-    (step) => step.key === status
-  );
+  /*
+  |--------------------------------------------------------------------------
+  | Cancelled Orders
+  |--------------------------------------------------------------------------
+  */
+
+  if (status === "Cancelled") {
+    return (
+      <div className={styles.timeline}>
+        <div className={styles.step}>
+          <div
+            className={`${styles.icon} ${styles.completed}`}
+          >
+            <XCircle size={20} />
+          </div>
+
+          <span>Order Cancelled</span>
+        </div>
+      </div>
+    );
+  }
+
+  const currentIndex =
+    STEPS.findIndex(
+      (step) => step.key === status
+    );
 
   return (
     <div className={styles.timeline}>
       {STEPS.map((step, index) => {
         const completed =
           currentIndex >= index;
+
+        const Icon = step.icon;
 
         return (
           <div
@@ -57,16 +94,13 @@ export default function OrderTimeline({
                   : ""
               }`}
             >
-              {completed ? (
-                <CheckCircle2 size={20} />
-              ) : (
-                <Clock3 size={20} />
-              )}
+              <Icon size={20} />
             </div>
 
             <span>{step.label}</span>
 
-            {index !== STEPS.length - 1 && (
+            {index !==
+              STEPS.length - 1 && (
               <div
                 className={`${styles.line} ${
                   currentIndex > index

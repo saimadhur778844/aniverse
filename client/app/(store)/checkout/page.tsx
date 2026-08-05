@@ -254,11 +254,6 @@ const payment =
     order.order._id
   );
 
-console.log(
-  "========== PAYMENT RESPONSE =========="
-);
-
-console.log(payment);
 
 console.log(
   "NEXT_PUBLIC_CASHFREE_ENV:",
@@ -281,11 +276,6 @@ const cashfree =
         : "sandbox",
   });
 
-console.log(
-  "========== CASHFREE SDK =========="
-);
-
-console.log(cashfree);
 
 if (!cashfree) {
   throw new Error(
@@ -299,9 +289,6 @@ Open Checkout
 ----------------------------------
 */
 
-console.log(
-  "========== STARTING CHECKOUT =========="
-);
 
 const result =
   await cashfree.checkout({
@@ -312,30 +299,14 @@ const result =
       "_self",
   });
 
-console.log(
-  "========== CHECKOUT RESULT =========="
-);
 
-console.log(result);
         /*
         Browser will redirect.
         Nothing below this line
         will execute.
         */
 
-      } catch (error: any) {
-  console.log("========== CHECKOUT ERROR ==========");
-
-  console.log(error);
-
-  console.log("Status:", error?.status);
-
-  console.log("Message:", error?.message);
-
-  console.log("Data:", error?.data);
-
-  console.log("===================================");
-
+     } catch (error: any) {
   notify.dismiss(loadingToast);
 
   notify.error(
@@ -344,7 +315,7 @@ console.log(result);
   );
 } finally {
   setLoading(false);
-}
+} 
     };
 
   if (isEmpty) return null;

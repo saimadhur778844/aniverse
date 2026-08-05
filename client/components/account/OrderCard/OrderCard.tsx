@@ -49,8 +49,9 @@ export default function OrderCard({
             </span>
           </div>
         </div>
-
-        <OrderStatusBadge status={order.status} />
+          <OrderStatusBadge
+            status={order.orderStatus}
+          />
       </div>
 
       <div className={styles.body}>

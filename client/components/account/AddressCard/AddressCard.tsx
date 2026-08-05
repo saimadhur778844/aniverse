@@ -16,24 +16,23 @@ export default function AddressCard({
       <h3>Shipping Address</h3>
 
       <div className={styles.content}>
-        <p>{address.name}</p>
+        <p>
+          <strong>{address.fullName}</strong>
+        </p>
 
         <p>{address.address}</p>
 
         <p>
-          {address.city}
-          {address.state
-            ? `, ${address.state}`
-            : ""}
+          {address.city}, {address.state}
         </p>
 
-        <p>{address.postalCode}</p>
+        <p>{address.pincode}</p>
 
         <p>{address.country}</p>
 
-        {address.phone && (
-          <p>{address.phone}</p>
-        )}
+        <p>{address.phone}</p>
+
+        <p>{address.email}</p>
       </div>
     </div>
   );
