@@ -1,4 +1,5 @@
 import express from "express";
+
 import {
   createOrder,
   getOrderById,
@@ -7,25 +8,80 @@ import {
   getMyOrders,
   cancelOrder,
   reorder,
+  canReviewProduct,
 } from "../controllers/orderController.js";
+
+import protect from "../middleware/protect.js";
+import admin from "../middleware/admin.js";
 
 const router = express.Router();
 
-// Customer
-router.post("/", createOrder);
-router.get("/my-orders", getMyOrders);
+/*
+|--------------------------------------------------------------------------
+| Customer
+|--------------------------------------------------------------------------
+*/
 
-// Admin
-router.get("/", getOrders);
+router.post(
+  "/",
+  protect,
+  createOrder
+);
 
-// Shared
-router.get("/:id", getOrderById);
+router.get(
+  "/my-orders",
+  protect,
+  getMyOrders
+);
 
-// Customer
-router.patch("/:id/cancel", cancelOrder);
-router.post("/:id/reorder", reorder);
+router.patch(
+  "/:id/cancel",
+  protect,
+  cancelOrder
+);
 
-// Admin
-router.patch("/:id/status", updateOrderStatus);
+router.post(
+  "/:id/reorder",
+  protect,
+  reorder
+);
+
+router.get(
+  "/reviewable/:productId",
+  protect,
+  canReviewProduct
+);
+
+/*
+|--------------------------------------------------------------------------
+| Admin
+|--------------------------------------------------------------------------
+*/
+
+router.get(
+  "/",
+  protect,
+  admin,
+  getOrders
+);
+
+router.patch(
+  "/:id/status",
+  protect,
+  admin,
+  updateOrderStatus
+);
+
+/*
+|--------------------------------------------------------------------------
+| Shared
+|--------------------------------------------------------------------------
+*/
+
+router.get(
+  "/:id",
+  protect,
+  getOrderById
+);
 
 export default router;

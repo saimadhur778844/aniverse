@@ -20,9 +20,11 @@ import {
 
 import authService from "@/services/authService";
 import { useAuth } from "@/context/AuthContext/AuthContext";
+import { notify } from "@/utils/toast";
 
 export default function LoginPage() {
   const router = useRouter();
+
   const { login } = useAuth();
 
   const [serverError, setServerError] =
@@ -49,19 +51,35 @@ export default function LoginPage() {
   ) => {
     setServerError("");
 
+    const loadingToast =
+      notify.loading("Signing you in...");
+
     try {
-      const response = await authService.login(values);
+      const response =
+        await authService.login(values);
+
+      notify.dismiss(loadingToast);
+
       login(
         response.token,
         response.user
       );
 
+      notify.success(
+        `Welcome back, ${response.user.name}!`
+      );
+
       router.push("/");
     } catch (error: any) {
-      setServerError(
+      notify.dismiss(loadingToast);
+
+      const message =
         error?.response?.data?.message ??
-          "Login failed. Please try again."
-      );
+        "Login failed. Please try again.";
+
+      setServerError(message);
+
+      notify.error(message);
     }
   };
 
@@ -128,6 +146,7 @@ export default function LoginPage() {
           <LoadingButton
             type="submit"
             loading={isSubmitting}
+            loadingText="Signing In..."
           >
             Sign In
           </LoadingButton>

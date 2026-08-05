@@ -20,7 +20,19 @@ export default function DataTable<T>({
   if (loading) {
     return (
       <div className="rounded-2xl border border-zinc-800 bg-[#171726] p-12 text-center text-zinc-400">
-        Loading...
+        <div className="rounded-2xl border border-zinc-800 bg-[#171726] p-12">
+
+  <div className="flex items-center justify-center gap-3">
+
+    <div className="h-6 w-6 animate-spin rounded-full border-2 border-pink-500 border-t-transparent" />
+
+    <span className="text-zinc-400">
+      Loading data...
+    </span>
+
+  </div>
+
+</div>
       </div>
     );
   }

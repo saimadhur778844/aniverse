@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import authService from "@/services/authService";
 import { useAuth } from "@/context/AuthContext/AuthContext";
+import { notify } from "@/utils/toast";
 
 export default function AdminLoginPage() {
   const router = useRouter();
@@ -30,7 +31,7 @@ export default function AdminLoginPage() {
 
       router.push("/admin/dashboard");
     } catch (error: any) {
-      alert(
+      notify.error(
         error.response?.data?.message || "Login failed"
       );
     } finally {

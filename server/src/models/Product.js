@@ -159,6 +159,16 @@ const productSchema = new mongoose.Schema(
       default: false,
     },
 
+    averageRating: {
+  type: Number,
+  default: 0,
+},
+
+reviewCount: {
+  type: Number,
+  default: 0,
+},
+
     isAvailable: {
       type: Boolean,
       default: true,
@@ -206,5 +216,6 @@ productSchema.index({ category: 1 });
 productSchema.index({ featured: 1 });
 
 productSchema.index({ stock: 1 });
+
 
 export default mongoose.model("Product", productSchema);

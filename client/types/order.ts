@@ -3,6 +3,7 @@ import type { User } from "./user";
 
 export type OrderStatus =
   | "Pending"
+  | "Confirmed"
   | "Processing"
   | "Shipped"
   | "Delivered"
@@ -16,31 +17,105 @@ export type PaymentStatus =
 
 export interface OrderItem {
   product: string | Product;
+
   name: string;
+
   image?: string;
+
   quantity: number;
+
   price: number;
 }
 
+/*
+|--------------------------------------------------------------------------
+| Order Shipping Address
+|--------------------------------------------------------------------------
+*/
+
 export interface ShippingAddress {
-  name: string;
+  fullName: string;
+
+  email: string;
+
+  phone: string;
+
   address: string;
+
   city: string;
-  state?: string;
-  postalCode: string;
+
+  state: string;
+
+  pincode: string;
+
   country: string;
-  phone?: string;
 }
+
+/*
+|--------------------------------------------------------------------------
+| Checkout Request Shipping Address
+|--------------------------------------------------------------------------
+*/
+
+export interface CreateShippingAddress {
+  fullName: string;
+
+  email: string;
+
+  phone: string;
+
+  address: string;
+
+  city: string;
+
+  state: string;
+
+  pincode: string;
+}
+
+/*
+|--------------------------------------------------------------------------
+| Payment
+|--------------------------------------------------------------------------
+*/
 
 export interface PaymentInfo {
   status: PaymentStatus;
+
   method?: string;
+
   paymentId?: string;
+
+  gatewayOrderId?: string;
+
+  gatewayPaymentId?: string;
+
   paidAt?: string;
 }
 
+/*
+|--------------------------------------------------------------------------
+| Coupon
+|--------------------------------------------------------------------------
+*/
+
+export interface AppliedCoupon {
+  code: string;
+
+  type: "percentage" | "fixed";
+
+  value: number;
+}
+
+/*
+|--------------------------------------------------------------------------
+| Order
+|--------------------------------------------------------------------------
+*/
+
 export interface Order {
   _id: string;
+
   orderNumber: string;
 
   user: string | User;
@@ -50,9 +125,15 @@ export interface Order {
   shippingAddress: ShippingAddress;
 
   subtotal: number;
+
   shippingCharge: number;
+
   tax: number;
+
   discount: number;
+
+  coupon?: AppliedCoupon;
+
   total: number;
 
   orderStatus: OrderStatus;
@@ -60,9 +141,12 @@ export interface Order {
   payment: PaymentInfo;
 
   courier?: string;
+
   trackingNumber?: string;
+
   notes?: string;
 
   createdAt: string;
+
   updatedAt: string;
 }

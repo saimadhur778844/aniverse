@@ -81,7 +81,7 @@ export default function OrderDetailsDrawer({
             <div className="space-y-1 text-zinc-300">
 
               <p>
-                {order.shippingAddress.name}
+                {order.shippingAddress.fullName}
               </p>
 
               <p>
@@ -97,7 +97,7 @@ export default function OrderDetailsDrawer({
               </p>
 
               <p>
-                {order.shippingAddress.postalCode}
+                {order.shippingAddress.pincode}
               </p>
 
               <p>

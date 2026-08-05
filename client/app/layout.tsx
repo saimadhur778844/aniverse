@@ -6,7 +6,8 @@ import QueryProvider from "@/providers/QueryProvider";
 import { AuthProvider } from "@/context/AuthContext/AuthContext";
 import { CartProvider } from "@/context/CartContext";
 import { WishlistProvider } from "@/context/WishlistContext/WishlistContext";
-import ToastProvider from "@/components/admin/shared/ToastProvider";
+
+import { Toaster } from "sonner";
 
 import "./globals.css";
 
@@ -45,10 +46,14 @@ export default function RootLayout({
             </CartProvider>
           </AuthProvider>
         </QueryProvider>
-      </body>
-      <body>
-        {children}
-        <ToastProvider />
+
+        <Toaster
+          position="top-right"
+          richColors
+          closeButton
+          duration={3000}
+          theme="dark"
+        />
       </body>
     </html>
   );

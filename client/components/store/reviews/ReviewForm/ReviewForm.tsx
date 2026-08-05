@@ -2,93 +2,192 @@
 
 import { useState } from "react";
 
-import Button from "@/components/shared/Button";
+import LoadingButton from "@/components/auth/LoadingButton/LoadingButton";
 
-import styles from "./ReviewForm.module.css";
+import reviewService from "@/services/reviewService";
+import { notify } from "@/utils/toast";
 
-interface ReviewFormProps {
-  onSubmit: (review: {
-    rating: number;
-    title: string;
-    review: string;
-  }) => void;
+interface Props {
+  productId: string;
+  orderId: string;
+  onSuccess?: () => void;
 }
 
+const MAX_COMMENT_LENGTH = 500;
+
 export default function ReviewForm({
-  onSubmit,
-}: ReviewFormProps) {
+  productId,
+  orderId,
+  onSuccess,
+}: Props) {
   const [rating, setRating] = useState(5);
+
   const [title, setTitle] = useState("");
-  const [review, setReview] = useState("");
 
-  function handleSubmit(
-    e: React.FormEvent
-  ) {
-    e.preventDefault();
+  const [comment, setComment] =
+    useState("");
 
-    if (!title.trim() || !review.trim()) {
+  const [loading, setLoading] =
+    useState(false);
+
+  async function submit() {
+    if (!comment.trim()) {
+      notify.error(
+        "Please enter your review."
+      );
       return;
     }
 
-    onSubmit({
-      rating,
-      title: title.trim(),
-      review: review.trim(),
-    });
+    const loadingToast =
+      notify.loading(
+        "Submitting your review..."
+      );
 
-    setRating(5);
-    setTitle("");
-    setReview("");
+    try {
+      setLoading(true);
+
+      await reviewService.createReview({
+        product: productId,
+
+        order: orderId,
+
+        rating,
+
+        title,
+
+        comment,
+
+        images: [],
+      });
+
+      notify.dismiss(
+        loadingToast
+      );
+
+      setTitle("");
+
+      setComment("");
+
+      setRating(5);
+
+      notify.success(
+        "Thank you! Your review has been submitted."
+      );
+
+      onSuccess?.();
+    } catch (error: any) {
+      notify.dismiss(
+        loadingToast
+      );
+
+      notify.error(
+        error?.response?.data
+          ?.message ??
+          "Unable to submit review."
+      );
+    } finally {
+      setLoading(false);
+    }
   }
 
   return (
-    <form
-      className={styles.form}
-      onSubmit={handleSubmit}
-    >
-      <h2 className={styles.heading}>
+    <div className="rounded-3xl border border-[#343454] bg-[#171726] p-8">
+
+      <h2 className="text-2xl font-bold text-white">
         Write a Review
       </h2>
 
-      <div className={styles.rating}>
-        {[1, 2, 3, 4, 5].map((star) => (
-          <button
-            key={star}
-            type="button"
-            onClick={() => setRating(star)}
-            className={`${styles.star} ${
-              star <= rating
-                ? styles.active
-                : ""
-            }`}
-          >
-            ★
-          </button>
-        ))}
+      <p className="mt-2 text-sm text-gray-400">
+        Share your experience to help
+        other anime collectors.
+      </p>
+
+      {/* Rating */}
+
+      <div className="mt-8">
+
+        <p className="mb-3 text-sm font-medium text-gray-300">
+          Your Rating
+        </p>
+
+        <div className="flex gap-2">
+
+          {[1, 2, 3, 4, 5].map(
+            (star) => (
+              <button
+                key={star}
+                type="button"
+                disabled={loading}
+                onClick={() =>
+                  setRating(star)
+                }
+                className={`text-4xl transition-all duration-200 hover:scale-110 ${
+                  star <= rating
+                    ? "text-yellow-400"
+                    : "text-zinc-600"
+                }`}
+              >
+                ★
+              </button>
+            )
+          )}
+
+        </div>
+
       </div>
 
+      {/* Title */}
+
       <input
-        className={styles.input}
-        placeholder="Review title"
         value={title}
+        disabled={loading}
+        maxLength={100}
         onChange={(e) =>
-          setTitle(e.target.value)
+          setTitle(
+            e.target.value
+          )
         }
+        placeholder="Review title (optional)"
+        className="mt-8 w-full rounded-xl border border-zinc-700 bg-zinc-900 p-3 text-white outline-none transition focus:border-pink-500 disabled:opacity-60"
       />
+
+      {/* Comment */}
 
       <textarea
-        className={styles.textarea}
-        placeholder="Tell other collectors about this product..."
         rows={6}
-        value={review}
-        onChange={(e) =>
-          setReview(e.target.value)
+        value={comment}
+        disabled={loading}
+        maxLength={
+          MAX_COMMENT_LENGTH
         }
+        onChange={(e) =>
+          setComment(
+            e.target.value
+          )
+        }
+        placeholder="Share your experience with this product..."
+        className="mt-5 w-full resize-none rounded-xl border border-zinc-700 bg-zinc-900 p-4 text-white outline-none transition focus:border-pink-500 disabled:opacity-60"
       />
 
-      <Button type="submit">
+      <div className="mt-2 flex justify-end">
+
+        <span className="text-xs text-gray-500">
+          {comment.length}/
+          {MAX_COMMENT_LENGTH}
+        </span>
+
+      </div>
+
+      <LoadingButton
+        type="button"
+        loading={loading}
+        loadingText="Submitting Review..."
+        onClick={submit}
+        className="mt-8 w-full rounded-2xl bg-gradient-to-r from-pink-600 to-purple-600 py-4 font-semibold text-white transition hover:from-pink-500 hover:to-purple-500"
+      >
         Submit Review
-      </Button>
-    </form>
+      </LoadingButton>
+
+    </div>
   );
 }

@@ -1,10 +1,16 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import Image from "next/image";
+
 import categoryService from "@/services/categoryService";
 import { productService } from "@/services/productService";
 import { uploadImage } from "@/services/uploadService";
+
+import LoadingButton from "@/components/auth/LoadingButton/LoadingButton";
+
 import { Product } from "@/types/product";
+import { notify } from "@/utils/toast";
 
 interface ProductModalProps {
   open: boolean;
@@ -34,91 +40,209 @@ export default function ProductModal({
     featured: false,
   });
 
-  const [image, setImage] = useState<File | null>(null);
-  const [categories, setCategories] = useState<Category[]>([]);
-  const [loading, setLoading] = useState(false);
+  const [image, setImage] =
+    useState<File | null>(null);
+
+  const [categories, setCategories] =
+    useState<Category[]>([]);
+
+  const [loading, setLoading] =
+    useState(false);
 
   const isEditMode = !!product;
 
+  const previewImage = useMemo(() => {
+    if (image) {
+      return URL.createObjectURL(image);
+    }
+
+    return product?.image ?? "";
+  }, [image, product]);
+
   useEffect(() => {
-    const fetchCategories = async () => {
-      try {
-        const data = await categoryService.getCategories();
-        setCategories(Array.isArray(data) ? data : []);
-      } catch (error) {
-        console.error(error);
+    return () => {
+      if (image) {
+        URL.revokeObjectURL(
+          previewImage
+        );
       }
     };
+  }, [image, previewImage]);
 
-    if (open) {
-      fetchCategories();
+  useEffect(() => {
+    const fetchCategories =
+      async () => {
+        try {
+          const data =
+            await categoryService.getCategories();
 
-      if (product) {
-        setForm({
-          name: product.name,
-          anime: product.anime,
-          category:
-            typeof product.category === "string"
-              ? product.category
-              : product.category._id,
-          description: product.description,
-          price: product.price.toString(),
-          stock: product.stock.toString(),
-          featured: product.featured,
-        });
-      } else {
-        setForm({
-          name: "",
-          anime: "",
-          category: "",
-          description: "",
-          price: "",
-          stock: "",
-          featured: false,
-        });
+          setCategories(
+            Array.isArray(data)
+              ? data
+              : []
+          );
+        } catch (error) {
+          console.error(error);
 
-        setImage(null);
-      }
+          notify.error(
+            "Unable to load categories."
+          );
+        }
+      };
+
+    if (!open) return;
+
+    fetchCategories();
+
+    if (product) {
+      setForm({
+        name: product.name,
+        anime: product.anime,
+        category:
+          typeof product.category ===
+          "string"
+            ? product.category
+            : product.category._id,
+        description:
+          product.description,
+        price:
+          product.price.toString(),
+        stock:
+          product.stock.toString(),
+        featured:
+          product.featured,
+      });
+    } else {
+      setForm({
+        name: "",
+        anime: "",
+        category: "",
+        description: "",
+        price: "",
+        stock: "",
+        featured: false,
+      });
+
+      setImage(null);
     }
   }, [open, product]);
 
   const handleChange = (
     e: React.ChangeEvent<
-      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+      | HTMLInputElement
+      | HTMLTextAreaElement
+      | HTMLSelectElement
     >
   ) => {
-    const { name, value, type } = e.target;
+    const {
+      name,
+      value,
+      type,
+    } = e.target;
 
     setForm((prev) => ({
       ...prev,
+
       [name]:
         type === "checkbox"
-          ? (e.target as HTMLInputElement).checked
+          ? (
+              e.target as HTMLInputElement
+            ).checked
           : value,
     }));
   };
+    const handleSave = async () => {
+    if (!form.name.trim()) {
+      notify.error("Product name is required.");
+      return;
+    }
 
-  const handleSave = async () => {
+    if (!form.category) {
+      notify.error("Please select a category.");
+      return;
+    }
+
+    if (!form.price || Number(form.price) <= 0) {
+      notify.error("Please enter a valid price.");
+      return;
+    }
+
+    if (!form.stock || Number(form.stock) < 0) {
+      notify.error("Please enter a valid stock quantity.");
+      return;
+    }
+
+    if (!isEditMode && !image) {
+      notify.error("Please select a product image.");
+      return;
+    }
+
+    const loadingToast = notify.loading(
+      isEditMode
+        ? "Updating product..."
+        : "Creating product..."
+    );
+
     try {
       setLoading(true);
 
       let imageUrl = product?.image ?? "";
 
+      /*
+      |--------------------------------------------------------------------------
+      | Upload Image
+      |--------------------------------------------------------------------------
+      */
+
       if (image) {
-        const uploadResponse = await uploadImage(image);
-        imageUrl = uploadResponse.imageUrl;
+        notify.dismiss(loadingToast);
+
+        const uploadToast =
+          notify.loading("Uploading image...");
+
+        const uploadResponse =
+          await uploadImage(image);
+
+        notify.dismiss(uploadToast);
+
+        imageUrl =
+          uploadResponse.imageUrl;
+
+        notify.success(
+          "Image uploaded successfully."
+        );
+
+        notify.loading(
+          isEditMode
+            ? "Updating product..."
+            : "Creating product..."
+        );
       }
 
       const payload = {
-        name: form.name,
-        anime: form.anime,
+        name: form.name.trim(),
+
+        anime: form.anime.trim(),
+
         category: form.category,
-        description: form.description,
+
+        description:
+          form.description.trim(),
+
         image: imageUrl,
+
         price: Number(form.price),
+
         stock: Number(form.stock),
+
         featured: form.featured,
       };
+
+      /*
+      |--------------------------------------------------------------------------
+      | Update
+      |--------------------------------------------------------------------------
+      */
 
       if (isEditMode && product) {
         await productService.updateProduct(
@@ -126,16 +250,29 @@ export default function ProductModal({
           payload
         );
 
-        alert("Product updated successfully!");
-      } else {
-        if (!image) {
-          alert("Please select an image.");
-          return;
-        }
+        notify.dismiss();
 
-        await productService.createProduct(payload);
+        notify.success(
+          "Product updated successfully."
+        );
+      }
 
-        alert("Product created successfully!");
+      /*
+      |--------------------------------------------------------------------------
+      | Create
+      |--------------------------------------------------------------------------
+      */
+
+      else {
+        await productService.createProduct(
+          payload
+        );
+
+        notify.dismiss();
+
+        notify.success(
+          "Product created successfully."
+        );
       }
 
       onSuccess();
@@ -154,13 +291,15 @@ export default function ProductModal({
 
       onClose();
     } catch (error: any) {
+      notify.dismiss();
+
       console.error(error);
 
-      if (error.response) {
-        alert(error.response.data.message);
-      } else {
-        alert(error.message);
-      }
+      notify.error(
+        error?.response?.data?.message ??
+          error?.message ??
+          "Something went wrong."
+      );
     } finally {
       setLoading(false);
     }
@@ -169,153 +308,317 @@ export default function ProductModal({
   if (!open) return null;
 
   return (
-    <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
-      <div className="bg-white rounded-xl shadow-xl p-6 w-full max-w-2xl">
-        <h2 className="text-2xl font-bold mb-6">
-          {isEditMode ? "Edit Product" : "Add Product"}
-        </h2>
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-6 backdrop-blur-sm">
 
-        <div className="grid grid-cols-2 gap-4">
-          <input
-            type="text"
-            name="name"
-            placeholder="Product Name"
-            value={form.name}
-            onChange={handleChange}
-            className="border rounded-lg p-3"
-          />
+      <div className="w-full max-w-3xl rounded-3xl border border-zinc-800 bg-[#171726] shadow-2xl">
 
-          <input
-            type="text"
-            name="anime"
-            placeholder="Anime"
-            value={form.anime}
-            onChange={handleChange}
-            className="border rounded-lg p-3"
-          />
+        {/* Header */}
 
-          <input
-            type="number"
-            name="price"
-            placeholder="Price"
-            value={form.price}
-            onChange={handleChange}
-            className="border rounded-lg p-3"
-          />
+        <div className="flex items-center justify-between border-b border-zinc-800 px-8 py-6">
 
-          <input
-            type="number"
-            name="stock"
-            placeholder="Stock"
-            value={form.stock}
-            onChange={handleChange}
-            className="border rounded-lg p-3"
-          />
+          <div>
+
+            <h2 className="text-3xl font-bold text-white">
+              {isEditMode
+                ? "Edit Product"
+                : "Add Product"}
+            </h2>
+
+            <p className="mt-2 text-sm text-zinc-400">
+              {isEditMode
+                ? "Update your product information."
+                : "Create a new anime collectible."}
+            </p>
+
+          </div>
+
+          <button
+            type="button"
+            onClick={onClose}
+            disabled={loading}
+            className="rounded-xl bg-zinc-800 p-3 text-zinc-300 transition hover:bg-zinc-700 hover:text-white"
+          >
+            ✕
+          </button>
+
         </div>
 
-        <textarea
-          name="description"
-          placeholder="Description"
-          value={form.description}
-          onChange={handleChange}
-          rows={4}
-          className="border rounded-lg p-3 mt-4 w-full"
-        />
+        {/* Body */}
 
-        <select
-          name="category"
-          value={form.category}
-          onChange={handleChange}
-          className="border rounded-lg p-3 mt-4 w-full"
-        >
-          <option value="">Select Category</option>
+        <div className="space-y-6 p-8">
 
-          {categories.map((category) => (
-            <option
-              key={category._id}
-              value={category._id}
-            >
-              {category.name}
-            </option>
-          ))}
-        </select>
+          {/* Basic Details */}
 
-        <div className="flex items-center gap-3 mt-4">
-          <input
-            type="checkbox"
-            name="featured"
-            checked={form.featured}
+          <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
+
+            <div>
+
+              <label className="mb-2 block text-sm font-medium text-zinc-300">
+                Product Name
+              </label>
+
+              <input
+                type="text"
+                name="name"
+                value={form.name}
+                disabled={loading}
+                onChange={handleChange}
+                placeholder="Monkey D. Luffy Figure"
+                className="w-full rounded-xl border border-zinc-700 bg-zinc-900 px-4 py-3 text-white outline-none transition focus:border-pink-500 disabled:opacity-60"
+              />
+
+            </div>
+
+            <div>
+
+              <label className="mb-2 block text-sm font-medium text-zinc-300">
+                Anime
+              </label>
+
+              <input
+                type="text"
+                name="anime"
+                value={form.anime}
+                disabled={loading}
+                onChange={handleChange}
+                placeholder="One Piece"
+                className="w-full rounded-xl border border-zinc-700 bg-zinc-900 px-4 py-3 text-white outline-none transition focus:border-pink-500 disabled:opacity-60"
+              />
+
+            </div>
+
+            <div>
+
+              <label className="mb-2 block text-sm font-medium text-zinc-300">
+                Price (₹)
+              </label>
+
+              <input
+                type="number"
+                name="price"
+                value={form.price}
+                disabled={loading}
+                onChange={handleChange}
+                placeholder="2999"
+                className="w-full rounded-xl border border-zinc-700 bg-zinc-900 px-4 py-3 text-white outline-none transition focus:border-pink-500 disabled:opacity-60"
+              />
+
+            </div>
+
+            <div>
+
+              <label className="mb-2 block text-sm font-medium text-zinc-300">
+                Stock
+              </label>
+
+              <input
+                type="number"
+                name="stock"
+                value={form.stock}
+                disabled={loading}
+                onChange={handleChange}
+                placeholder="20"
+                className="w-full rounded-xl border border-zinc-700 bg-zinc-900 px-4 py-3 text-white outline-none transition focus:border-pink-500 disabled:opacity-60"
+              />
+
+            </div>
+
+          </div>
+
+          {/* Description */}
+
+          <div>
+
+            <label className="mb-2 block text-sm font-medium text-zinc-300">
+              Description
+            </label>
+                      <textarea
+            name="description"
+            rows={5}
+            value={form.description}
+            disabled={loading}
             onChange={handleChange}
+            placeholder="Describe this collectible..."
+            className="w-full resize-none rounded-xl border border-zinc-700 bg-zinc-900 px-4 py-3 text-white outline-none transition focus:border-pink-500 disabled:opacity-60"
           />
 
-          <label>Featured Product</label>
         </div>
 
-        <div className="mt-4">
-          <label className="block mb-2 font-medium">
-            {isEditMode
-              ? "Replace Product Image (Optional)"
-              : "Product Image"}
+        {/* Category */}
+
+        <div>
+
+          <label className="mb-2 block text-sm font-medium text-zinc-300">
+            Category
           </label>
 
-          <input
-            type="file"
-            accept="image/*"
-            onChange={(e) =>
-              setImage(e.target.files?.[0] || null)
-            }
-            className="w-full"
-          />
+          <select
+            name="category"
+            value={form.category}
+            disabled={loading}
+            onChange={handleChange}
+            className="w-full rounded-xl border border-zinc-700 bg-zinc-900 px-4 py-3 text-white outline-none transition focus:border-pink-500 disabled:opacity-60"
+          >
+            <option value="">
+              Select Category
+            </option>
+
+            {categories.map((category) => (
+
+              <option
+                key={category._id}
+                value={category._id}
+              >
+                {category.name}
+              </option>
+
+            ))}
+
+          </select>
+
         </div>
 
-        {image ? (
-          <img
-            src={URL.createObjectURL(image)}
-            alt="Preview"
-            className="mt-3 h-32 w-32 object-cover rounded-lg border"
-          />
-        ) : (
-          isEditMode &&
-          product?.image && (
-            <img
-              src={product.image}
-              alt={product.name}
-              className="mt-3 h-32 w-32 object-cover rounded-lg border"
-            />
-          )
-        )}
+        {/* Featured */}
 
-        <div className="flex justify-end gap-3 mt-8">
+        <div className="flex items-center justify-between rounded-2xl border border-zinc-800 bg-zinc-900 p-5">
+
+          <div>
+
+            <h3 className="font-semibold text-white">
+              Featured Product
+            </h3>
+
+            <p className="mt-1 text-sm text-zinc-400">
+              Display this product in featured sections.
+            </p>
+
+          </div>
+
+          <label className="relative inline-flex cursor-pointer items-center">
+
+            <input
+              type="checkbox"
+              name="featured"
+              checked={form.featured}
+              disabled={loading}
+              onChange={handleChange}
+              className="peer sr-only"
+            />
+
+            <div className="peer h-7 w-12 rounded-full bg-zinc-700 transition peer-checked:bg-pink-600 peer-disabled:opacity-50" />
+
+            <div className="absolute left-1 h-5 w-5 rounded-full bg-white transition-all peer-checked:translate-x-5" />
+
+          </label>
+
+        </div>
+
+        {/* Image */}
+
+        <div>
+
+          <label className="mb-3 block text-sm font-medium text-zinc-300">
+
+            {isEditMode
+              ? "Replace Product Image"
+              : "Upload Product Image"}
+
+          </label>
+
+          <div className="rounded-2xl border-2 border-dashed border-zinc-700 bg-zinc-900 p-6 transition hover:border-pink-500">
+
+            <input
+              type="file"
+              accept="image/*"
+              disabled={loading}
+              onChange={(e) =>
+                setImage(
+                  e.target.files?.[0] ??
+                    null
+                )
+              }
+              className="w-full text-sm text-zinc-400 file:mr-4 file:rounded-lg file:border-0 file:bg-pink-600 file:px-4 file:py-2 file:font-semibold file:text-white hover:file:bg-pink-500"
+            />
+
+            <p className="mt-3 text-xs text-zinc-500">
+              JPG, PNG or WEBP • Max 5 MB
+            </p>
+
+          </div>
+
+        </div>
+
+        {/* Preview */}
+
+        {previewImage && (
+
+          <div>
+
+            <label className="mb-3 block text-sm font-medium text-zinc-300">
+              Preview
+            </label>
+
+            <div className="relative h-52 w-52 overflow-hidden rounded-2xl border border-zinc-700">
+
+              <Image
+                src={previewImage}
+                alt="Preview"
+                fill
+                className="object-cover"
+              />
+
+            </div>
+
+          </div>
+
+        )}
+                {/* Footer */}
+
+        <div className="mt-10 flex flex-col-reverse gap-4 border-t border-zinc-800 pt-8 sm:flex-row sm:justify-end">
+
           <button
+            type="button"
             onClick={() => {
+              if (loading) return;
+
               setImage(null);
+
               onClose();
             }}
             disabled={loading}
-            className="px-5 py-2 border rounded-lg hover:bg-gray-100"
+            className="rounded-xl border border-zinc-700 bg-zinc-900 px-6 py-3 font-semibold text-zinc-300 transition-all duration-300 hover:border-zinc-500 hover:bg-zinc-800 hover:text-white disabled:cursor-not-allowed disabled:opacity-50"
           >
             Cancel
           </button>
 
-          <button
+          <LoadingButton
+            type="button"
+            loading={loading}
+            loadingText={
+              isEditMode
+                ? "Updating Product..."
+                : "Saving Product..."
+            }
             onClick={handleSave}
             disabled={
-              loading ||
-              !form.name ||
+              !form.name.trim() ||
               !form.price ||
               !form.category ||
               (!isEditMode && !image)
             }
-            className="bg-blue-600 text-white px-5 py-2 rounded-lg hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
+            className="rounded-xl bg-gradient-to-r from-pink-600 via-purple-600 to-pink-600 px-8 py-3 font-semibold text-white shadow-lg transition-all duration-300 hover:scale-[1.02] hover:from-pink-500 hover:via-purple-500 hover:to-pink-500 hover:shadow-pink-500/20"
           >
-            {loading
-              ? "Saving..."
-              : isEditMode
+            {isEditMode
               ? "Update Product"
               : "Save Product"}
-          </button>
+          </LoadingButton>
+
         </div>
+
       </div>
+
     </div>
+    </div>
+
   );
 }

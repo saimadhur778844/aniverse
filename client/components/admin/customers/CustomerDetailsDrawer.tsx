@@ -56,7 +56,7 @@ export default function CustomerDetailsDrawer({
             </p>
 
             <p className="mt-2 text-2xl font-bold text-white">
-              {customer.orders.length}
+              {customer.orderCount}
             </p>
           </div>
 
@@ -81,12 +81,20 @@ export default function CustomerDetailsDrawer({
                 key={order._id}
                 className="flex items-center justify-between rounded-lg bg-zinc-900 p-3"
               >
-                <span>
-                  {order.orderNumber ||
-                    order._id}
-                </span>
+                <div>
+                  <p className="font-medium text-white">
+                    {order.orderNumber ??
+                      order._id}
+                  </p>
 
-                <span>
+                  <p className="text-xs text-zinc-500">
+                    {new Date(
+                      order.createdAt
+                    ).toLocaleDateString()}
+                  </p>
+                </div>
+
+                <span className="font-semibold text-white">
                   ₹{order.total}
                 </span>
               </div>

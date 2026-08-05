@@ -4,31 +4,25 @@ import { ThumbsUp } from "lucide-react";
 
 import styles from "./ReviewCard.module.css";
 
+import type { Review } from "@/types/review";
+
 interface ReviewCardProps {
-  author: string;
-  avatar?: string;
-  rating: number;
-  title: string;
-  review: string;
-  date: string;
-  verified?: boolean;
-  helpful?: number;
+  review: Review;
 }
 
 export default function ReviewCard({
-  author,
-  avatar,
-  rating,
-  title,
   review,
-  date,
-  verified = false,
-  helpful = 0,
 }: ReviewCardProps) {
+  const author =
+    review.user?.name ?? "Anonymous";
+
+  const avatar = (review.user as any)?.avatar;
+
   return (
     <article className={styles.card}>
       <div className={styles.header}>
         <div className={styles.user}>
+
           {avatar ? (
             <img
               src={avatar}
@@ -36,8 +30,14 @@ export default function ReviewCard({
               className={styles.avatar}
             />
           ) : (
-            <div className={styles.avatarPlaceholder}>
-              {author.charAt(0).toUpperCase()}
+            <div
+              className={
+                styles.avatarPlaceholder
+              }
+            >
+              {author
+                .charAt(0)
+                .toUpperCase()}
             </div>
           )}
 
@@ -46,8 +46,12 @@ export default function ReviewCard({
               {author}
             </h4>
 
-            {verified && (
-              <span className={styles.verified}>
+            {review.verifiedPurchase && (
+              <span
+                className={
+                  styles.verified
+                }
+              >
                 ✓ Verified Purchase
               </span>
             )}
@@ -55,26 +59,60 @@ export default function ReviewCard({
         </div>
 
         <span className={styles.date}>
-          {date}
+          {new Date(
+            review.createdAt
+          ).toLocaleDateString()}
         </span>
       </div>
 
       <div className={styles.rating}>
-        {"★".repeat(rating)}
-        {"☆".repeat(5 - rating)}
+        {"★".repeat(review.rating)}
+        {"☆".repeat(
+          5 - review.rating
+        )}
       </div>
 
       <h3 className={styles.title}>
-        {title}
+        {review.title ||
+          "Customer Review"}
       </h3>
 
       <p className={styles.review}>
-        {review}
+        {review.comment}
       </p>
 
-      <button className={styles.helpful}>
+      {/* Images */}
+
+      {review.images &&
+        review.images.length >
+          0 && (
+          <div
+            className={
+              styles.images
+            }
+          >
+            {review.images.map(
+              (image) => (
+                <img
+                  key={image}
+                  src={image}
+                  alt="Review"
+                  className={
+                    styles.reviewImage
+                  }
+                />
+              )
+            )}
+          </div>
+        )}
+
+      <button
+        className={
+          styles.helpful
+        }
+      >
         <ThumbsUp size={16} />
-        Helpful ({helpful})
+        Helpful
       </button>
     </article>
   );

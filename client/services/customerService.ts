@@ -1,4 +1,5 @@
 import api from "./api";
+
 import type {
   Customer,
   CustomerDetails,
@@ -23,7 +24,7 @@ class CustomerService {
     limit?: number;
     search?: string;
   }): Promise<CustomersResponse> {
-    const { data } = await api.get(
+    const { data } = await api.get<CustomersResponse>(
       "/customers",
       {
         params,

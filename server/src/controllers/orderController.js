@@ -6,18 +6,38 @@ import {
   getMyOrders as getMyOrdersService,
   cancelOrder as cancelOrderService,
   reorder as reorderService,
+  getReviewableOrder,
 } from "../services/orderService.js";
 
-// @desc    Create Order
-// @route   POST /api/orders
-// @access  Public (temporary)
-export const createOrder = async (req, res, next) => {
+/*
+|--------------------------------------------------------------------------
+| Create Order
+|--------------------------------------------------------------------------
+*/
+
+export const createOrder = async (
+  req,
+  res,
+  next
+) => {
   try {
-    const order = await createOrderService(req.body);
+    if (!req.user) {
+      return res.status(401).json({
+        success: false,
+        message: "Unauthorized.",
+      });
+    }
+
+    const order =
+      await createOrderService({
+        ...req.body,
+        user: req.user._id,
+      });
 
     res.status(201).json({
       success: true,
-      message: "Order created successfully.",
+      message:
+        "Order created successfully.",
       order,
     });
   } catch (error) {
@@ -25,10 +45,17 @@ export const createOrder = async (req, res, next) => {
   }
 };
 
-// @desc    Get All Orders (Admin)
-// @route   GET /api/orders
-// @access  Admin
-export const getOrders = async (req, res, next) => {
+/*
+|--------------------------------------------------------------------------
+| Get Orders (Admin)
+|--------------------------------------------------------------------------
+*/
+
+export const getOrders = async (
+  req,
+  res,
+  next
+) => {
   try {
     const {
       page = 1,
@@ -38,13 +65,14 @@ export const getOrders = async (req, res, next) => {
       paymentStatus,
     } = req.query;
 
-    const result = await getOrdersService({
-      page: Number(page),
-      limit: Number(limit),
-      search,
-      status,
-      paymentStatus,
-    });
+    const result =
+      await getOrdersService({
+        page: Number(page),
+        limit: Number(limit),
+        search,
+        status,
+        paymentStatus,
+      });
 
     res.status(200).json({
       success: true,
@@ -55,17 +83,36 @@ export const getOrders = async (req, res, next) => {
   }
 };
 
-// @desc    Get Order By ID
-// @route   GET /api/orders/:id
-// @access  Public (temporary)
-export const getOrderById = async (req, res, next) => {
+/*
+|--------------------------------------------------------------------------
+| Get Order By ID
+|--------------------------------------------------------------------------
+*/
+
+export const getOrderById = async (
+  req,
+  res,
+  next
+) => {
   try {
-    const order = await getOrderByIdService(req.params.id);
+    if (!req.params.id) {
+      return res.status(400).json({
+        success: false,
+        message:
+          "Order id is required.",
+      });
+    }
+
+    const order =
+      await getOrderByIdService(
+        req.params.id
+      );
 
     if (!order) {
       return res.status(404).json({
         success: false,
-        message: "Order not found.",
+        message:
+          "Order not found.",
       });
     }
 
@@ -78,19 +125,30 @@ export const getOrderById = async (req, res, next) => {
   }
 };
 
-// @desc    Get Logged-in User Orders
-// @route   GET /api/orders/my-orders
-// @access  Private
-export const getMyOrders = async (req, res, next) => {
+/*
+|--------------------------------------------------------------------------
+| My Orders
+|--------------------------------------------------------------------------
+*/
+
+export const getMyOrders = async (
+  req,
+  res,
+  next
+) => {
   try {
     if (!req.user) {
       return res.status(401).json({
         success: false,
-        message: "Unauthorized",
+        message:
+          "Unauthorized.",
       });
     }
 
-    const orders = await getMyOrdersService(req.user._id);
+    const orders =
+      await getMyOrdersService(
+        req.user._id
+      );
 
     res.status(200).json({
       success: true,
@@ -101,26 +159,44 @@ export const getMyOrders = async (req, res, next) => {
   }
 };
 
-// @desc    Cancel Order
-// @route   PATCH /api/orders/:id/cancel
-// @access  Private
-export const cancelOrder = async (req, res, next) => {
+/*
+|--------------------------------------------------------------------------
+| Cancel Order
+|--------------------------------------------------------------------------
+*/
+
+export const cancelOrder = async (
+  req,
+  res,
+  next
+) => {
   try {
     if (!req.user) {
       return res.status(401).json({
         success: false,
-        message: "Unauthorized",
+        message:
+          "Unauthorized.",
       });
     }
 
-    const order = await cancelOrderService(
-      req.params.id,
-      req.user._id
-    );
+    if (!req.params.id) {
+      return res.status(400).json({
+        success: false,
+        message:
+          "Order id is required.",
+      });
+    }
+
+    const order =
+      await cancelOrderService(
+        req.params.id,
+        req.user._id
+      );
 
     res.status(200).json({
       success: true,
-      message: "Order cancelled successfully.",
+      message:
+        "Order cancelled successfully.",
       order,
     });
   } catch (error) {
@@ -128,26 +204,44 @@ export const cancelOrder = async (req, res, next) => {
   }
 };
 
-// @desc    Reorder
-// @route   POST /api/orders/:id/reorder
-// @access  Private
-export const reorder = async (req, res, next) => {
+/*
+|--------------------------------------------------------------------------
+| Reorder
+|--------------------------------------------------------------------------
+*/
+
+export const reorder = async (
+  req,
+  res,
+  next
+) => {
   try {
     if (!req.user) {
       return res.status(401).json({
         success: false,
-        message: "Unauthorized",
+        message:
+          "Unauthorized.",
       });
     }
 
-    const order = await reorderService(
-      req.params.id,
-      req.user._id
-    );
+    if (!req.params.id) {
+      return res.status(400).json({
+        success: false,
+        message:
+          "Order id is required.",
+      });
+    }
+
+    const order =
+      await reorderService(
+        req.params.id,
+        req.user._id
+      );
 
     res.status(201).json({
       success: true,
-      message: "Order created successfully.",
+      message:
+        "Order created successfully.",
       order,
     });
   } catch (error) {
@@ -155,24 +249,85 @@ export const reorder = async (req, res, next) => {
   }
 };
 
-// @desc    Update Order Status
-// @route   PATCH /api/orders/:id/status
-// @access  Admin
-export const updateOrderStatus = async (req, res, next) => {
-  try {
-    const { status } = req.body;
+/*
+|--------------------------------------------------------------------------
+| Update Order Status
+|--------------------------------------------------------------------------
+*/
 
-    const order = await updateOrderStatusService(
-      req.params.id,
-      status
-    );
+export const updateOrderStatus =
+  async (req, res, next) => {
+    try {
+      if (!req.params.id) {
+        return res.status(400).json({
+          success: false,
+          message:
+            "Order id is required.",
+        });
+      }
 
-    res.status(200).json({
-      success: true,
-      message: "Order status updated successfully.",
-      order,
-    });
-  } catch (error) {
-    next(error);
-  }
-};
+      const allowedStatuses = [
+        "Pending",
+        "Confirmed",
+        "Packed",
+        "Shipped",
+        "Delivered",
+        "Cancelled",
+      ];
+
+      const { status } = req.body;
+
+      if (
+        !allowedStatuses.includes(
+          status
+        )
+      ) {
+        return res.status(400).json({
+          success: false,
+          message:
+            "Invalid order status.",
+        });
+      }
+
+      const order =
+        await updateOrderStatusService(
+          req.params.id,
+          status
+        );
+
+      res.status(200).json({
+        success: true,
+        message:
+          "Order status updated successfully.",
+        order,
+      });
+    } catch (error) {
+      next(error);
+    }
+  };
+
+/*
+|--------------------------------------------------------------------------
+| Can Review Product
+|--------------------------------------------------------------------------
+*/
+
+export const canReviewProduct =
+  async (req, res, next) => {
+    try {
+      const order =
+        await getReviewableOrder(
+          req.user._id,
+          req.params.productId
+        );
+
+      res.status(200).json({
+        success: true,
+        canReview: !!order,
+        orderId:
+          order?._id ?? null,
+      });
+    } catch (error) {
+      next(error);
+    }
+  };

@@ -2,28 +2,37 @@ import api from "./api";
 
 import type {
   Order,
-  OrderItem,
-  ShippingAddress,
+  CreateShippingAddress,
 } from "@/types/order";
 
 export interface CreateOrderPayload {
-  items: OrderItem[];
-  shippingAddress: ShippingAddress;
+  items: {
+    product: string;
+    quantity: number;
+  }[];
+
+  shippingAddress: CreateShippingAddress;
+
+  couponCode?: string;
 }
 
 export interface CreateOrderResponse {
   success: boolean;
+
   message?: string;
+
   order: Order;
 }
 
 export interface OrdersResponse {
   success: boolean;
+
   orders: Order[];
 }
 
 export interface OrderResponse {
   success: boolean;
+
   order: Order;
 }
 
@@ -67,6 +76,21 @@ class OrderService {
     );
   }
 
+  async getReviewableOrder(
+  productId: string
+): Promise<{
+  canReview: boolean;
+
+  orderId: string | null;
+}> {
+  const { data } =
+    await api.get(
+      `/orders/reviewable/${productId}`
+    );
+
+  return data;
+}
+
   async reorder(
     id: string
   ): Promise<CreateOrderResponse> {
@@ -79,5 +103,7 @@ class OrderService {
 }
 
 const orderService = new OrderService();
+
+
 
 export default orderService;

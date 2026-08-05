@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { load } from "@cashfreepayments/cashfree-js";
 
 import { useCart } from "@/context/CartContext/CartContext";
-import { createOrder } from "@/services/orderService";
+import createOrder from "@/services/orderService";
 import { createPaymentSession } from "@/services/paymentService";
 
 import CheckoutHeader from "@/components/store/checkout/CheckoutHeader";
@@ -13,6 +13,9 @@ import CustomerInformation from "@/components/store/checkout/CustomerInformation
 import ShippingAddress from "@/components/store/checkout/ShippingAddress";
 import PaymentMethod from "@/components/store/checkout/PaymentMethod";
 import OrderSummary from "@/components/store/checkout/OrderSummary";
+import couponService from "@/services/couponService";
+import orderService from "@/services/orderService";
+import { notify } from "@/utils/toast";
 
 type CheckoutForm = {
   fullName: string;
@@ -30,6 +33,16 @@ export default function CheckoutPage() {
   const { items, subtotal, clearCart, isEmpty } = useCart();
 
   const [loading, setLoading] = useState(false);
+
+  const [couponCode, setCouponCode] = useState("");
+
+const [discount, setDiscount] = useState(0);
+
+const [appliedCoupon, setAppliedCoupon] =
+  useState("");
+
+const [couponLoading, setCouponLoading] =
+  useState(false);
 
   const [form, setForm] = useState<CheckoutForm>({
     fullName: "",
@@ -52,7 +65,10 @@ export default function CheckoutPage() {
     return 99;
   }, [subtotal]);
 
-  const total = subtotal + shipping;
+  const total =
+  subtotal +
+  shipping -
+  discount;
 
   const onChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -73,64 +89,158 @@ export default function CheckoutPage() {
       !form.state ||
       !form.pincode
     ) {
-      alert("Please fill all fields.");
+      notify.error("Please fill all fields.");
       return false;
     }
 
     return true;
   };
+const applyCoupon = async () => {
+  if (!couponCode.trim()) {
+    notify.error("Enter a coupon code.");
+    return;
+  }
 
+  const loadingToast = notify.loading(
+    "Validating coupon..."
+  );
+
+  try {
+    setCouponLoading(true);
+
+    const result =
+      await couponService.validateCoupon(
+        couponCode,
+        subtotal
+      );
+
+    notify.dismiss(loadingToast);
+
+    setDiscount(result.discount);
+
+    setAppliedCoupon(
+      result.coupon.code
+    );
+
+    notify.success(
+      "Coupon applied successfully."
+    );
+  } catch (error: any) {
+    notify.dismiss(loadingToast);
+
+    notify.error(
+      error?.message ??
+        "Invalid coupon."
+    );
+  } finally {
+    setCouponLoading(false);
+  }
+};
+const removeCoupon = () => {
+  setCouponCode("");
+
+  setAppliedCoupon("");
+
+  setDiscount(0);
+
+  notify.info(
+    "Coupon removed."
+  );
+};
   const handleCheckout = async () => {
-    if (!validate()) return;
+  if (!validate()) return;
 
-    try {
-      setLoading(true);
+  const loadingToast =
+    notify.loading(
+      "Preparing secure checkout..."
+    );
 
-      const order = await createOrder({
-        items: items.map((item: any) => ({
-          product: item.product._id,
-          quantity: item.quantity,
-        })),
+  try {
+    setLoading(true);
+
+    const order =
+      await orderService.createOrder({
+        couponCode:
+          appliedCoupon || undefined,
+
+        items: items.map(
+          (item: any) => ({
+            product:
+              item.product._id,
+            quantity:
+              item.quantity,
+          })
+        ),
+
         shippingAddress: {
-          fullName: form.fullName,
-          email: form.email,
-          phone: form.phone,
-          addressLine1: form.address,
-          city: form.city,
-          state: form.state,
-          pincode: form.pincode,
+          fullName:
+            form.fullName,
+          email:
+            form.email,
+          phone:
+            form.phone,
+          address:
+            form.address,
+          city:
+            form.city,
+          state:
+            form.state,
+          pincode:
+            form.pincode,
         },
       });
 
-      const payment = await createPaymentSession(order.order._id);
+    const payment =
+      await createPaymentSession(
+        order.order._id
+      );
 
-      const cashfree = await load({
+    const cashfree =
+      await load({
         mode:
-          (process as any)?.env?.NEXT_PUBLIC_CASHFREE_ENV === "PRODUCTION"
+          (process as any)?.env
+            ?.NEXT_PUBLIC_CASHFREE_ENV ===
+          "PRODUCTION"
             ? "production"
             : "sandbox",
       });
 
-      if (!cashfree) {
-        throw new Error("Unable to initialize Cashfree.");
-      }
-
-      await cashfree.checkout({
-        paymentSessionId: payment.payment_session_id,
-        redirectTarget: "_self",
-      });
-
-      clearCart();
-
-      router.push(`/orders/${order.order._id}`);
-    } catch (error) {
-      console.error(error);
-      alert("Unable to process payment.");
-    } finally {
-      setLoading(false);
+    if (!cashfree) {
+      throw new Error(
+        "Unable to initialize Cashfree."
+      );
     }
-  };
 
+    notify.dismiss(
+      loadingToast
+    );
+
+    await cashfree.checkout({
+      paymentSessionId:
+        payment.payment_session_id,
+      redirectTarget:
+        "_self",
+    });
+
+    clearCart();
+
+    router.push(
+      `/orders/${order.order._id}`
+    );
+  } catch (error) {
+    console.error(error);
+
+    notify.dismiss(
+      loadingToast
+    );
+
+    notify.error(
+      "Payment could not be started. Please try again."
+    );
+  } finally {
+    setLoading(false);
+  }
+};
   if (isEmpty) return null;
 
   return (
@@ -158,13 +268,25 @@ export default function CheckoutPage() {
           </div>
 
           <OrderSummary
-            items={items}
-            subtotal={subtotal}
-            shipping={shipping}
-            total={total}
-            loading={loading}
-            onCheckout={handleCheckout}
-          />
+  items={items}
+  subtotal={subtotal}
+  shipping={shipping}
+  discount={discount}
+
+  couponCode={couponCode}
+  couponLoading={couponLoading}
+  appliedCoupon={appliedCoupon}
+
+  onCouponChange={setCouponCode}
+  onApplyCoupon={applyCoupon}
+  onRemoveCoupon={removeCoupon}
+
+  total={total}
+
+  loading={loading}
+
+  onCheckout={handleCheckout}
+/>
 
         </div>
 

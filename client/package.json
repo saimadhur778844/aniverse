@@ -18,7 +18,11 @@
     "bcrypt": "^6.0.0",
     "cloudinary": "^2.10.0",
     "clsx": "^2.1.1",
+    "compression": "^1.8.1",
+    "express-mongo-sanitize": "^2.2.0",
+    "express-rate-limit": "^8.6.1",
     "framer-motion": "^12.42.2",
+    "helmet": "^8.3.0",
     "jsonwebtoken": "^9.0.3",
     "lucide-react": "^1.26.0",
     "mongodb": "^7.5.0",
@@ -32,6 +36,8 @@
     "react-swipeable": "^7.0.2",
     "recharts": "^3.10.1",
     "slugify": "^1.6.9",
+    "sonner": "^2.0.7",
+    "xss-clean": "^0.1.4",
     "zod": "^4.4.3"
   },
   "devDependencies": {
@@ -53,6 +59,11 @@
     "@tanstack/react-query@5.101.4": true,
     "@tanstack/react-query-devtools@5.101.4": true,
     "recharts@3.10.1": true,
-    "react-hot-toast@2.6.0": true
+    "react-hot-toast@2.6.0": true,
+    "sonner@2.0.7": true,
+    "helmet@8.3.0": true,
+    "express-rate-limit@8.6.1": true,
+    "express-mongo-sanitize@2.2.0": true,
+    "xss-clean@0.1.4": true
   }
 }

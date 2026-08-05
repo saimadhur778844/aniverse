@@ -1,0 +1,18 @@
+"use client";
+
+import { useState } from "react";
+
+export default function usePagination() {
+  const [page, setPage] =
+    useState(1);
+
+  const [pages, setPages] =
+    useState(1);
+
+  return {
+    page,
+    pages,
+    setPage,
+    setPages,
+  };
+}
