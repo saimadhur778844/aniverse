@@ -3,6 +3,10 @@ import "dotenv/config";
 import app from "./app.js";
 import connectDB from "./config/db.js";
 
+import {
+  verifyMailServer,
+} from "./services/email/emailService.js";
+
 const PORT = process.env.PORT || 5000;
 
 try {
@@ -11,6 +15,7 @@ try {
   app.listen(PORT, () => {
     console.log(`🚀 Server running on port ${PORT}`);
   });
+  await verifyMailServer();
 } catch (error) {
   console.error(error);
 }

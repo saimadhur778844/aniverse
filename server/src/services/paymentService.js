@@ -5,13 +5,16 @@ import cashfree from "../config/cashfree.js";
 import Order from "../models/Order.js";
 import Product from "../models/Product.js";
 import Coupon from "../models/Coupon.js";
+  import {
+  sendOrderConfirmationEmail,
+} from "./email/emailService.js";
 
 /*
 |--------------------------------------------------------------------------
 | Verify Payment
 |--------------------------------------------------------------------------
 */
-
+console.log("VERIFY PAYMENT SERVICE");
 export const verifyPayment = async (
   gatewayOrderId
 ) => {
@@ -19,7 +22,6 @@ export const verifyPayment = async (
     await mongoose.startSession();
 
   session.startTransaction();
-
   try {
     /*
     |--------------------------------------------------------------------------
@@ -27,13 +29,10 @@ export const verifyPayment = async (
     |--------------------------------------------------------------------------
     */
 
-    const response =
-      await cashfree.PGFetchOrder(
-        gatewayOrderId
-      );
-
-    const payment =
-      response.data;
+const { data: payment } =
+  await cashfree.get(
+    `/pg/orders/${gatewayOrderId}`
+  );
 
     const order =
       await Order.findOne({
@@ -81,60 +80,81 @@ export const verifyPayment = async (
       return order;
     }
 
-    /*
-    |--------------------------------------------------------------------------
-    | Update Payment
-    |--------------------------------------------------------------------------
-    */
-
-    /*
+/*
 |--------------------------------------------------------------------------
-| Payment Details
+| Fetch Cashfree Payments
+|--------------------------------------------------------------------------
+*/
+
+let gatewayPaymentId = "";
+let paymentMode = "";
+
+try {
+  const { data: payments } =
+  await cashfree.get(
+    `/pg/orders/${gatewayOrderId}/payments`
+  );
+
+  console.log(
+  "PAYMENTS RESPONSE:",
+  payments
+);
+
+if (
+  Array.isArray(payments) &&
+  payments.length
+) {
+  const successfulPayment =
+    payments.find(
+      (payment) =>
+        payment.payment_status ===
+        "SUCCESS"
+    );
+
+    if (successfulPayment) {
+      gatewayPaymentId =
+        successfulPayment.cf_payment_id ?? "";
+
+     const method =
+  successfulPayment.payment_method ?? {};
+
+if (method.card) {
+  paymentMode = `${method.card.card_type} (${method.card.card_network})`;
+} else if (method.upi) {
+  paymentMode = "UPI";
+} else if (method.netbanking) {
+  paymentMode = "Net Banking";
+} else if (method.wallet) {
+  paymentMode = "Wallet";
+} else {
+  paymentMode = "Unknown";
+}
+    }
+  }
+} catch (error) {
+  console.error(
+    "Unable to fetch Cashfree payment details."
+  );
+}
+
+/*
+|--------------------------------------------------------------------------
+| Update Payment
 |--------------------------------------------------------------------------
 */
 
 order.payment.status = "Paid";
 
-/*
-|--------------------------------------------------------------------------
-| Save Cashfree Payment ID
-|--------------------------------------------------------------------------
-*/
-
-let gatewayPaymentId = "";
-
-try {
-  const payments =
-    await cashfree.PGOrderFetchPayments(
-      gatewayOrderId
-    );
-
-  if (
-    Array.isArray(payments.data) &&
-    payments.data.length
-  ) {
-    const successfulPayment =
-      payments.data.find(
-        (p) =>
-          p.payment_status ===
-          "SUCCESS"
-      );
-
-    if (successfulPayment) {
-      gatewayPaymentId =
-        successfulPayment.cf_payment_id;
-    }
-  }
-} catch (error) {
-  console.log(
-    "Unable to fetch Cashfree payment id."
-  );
-}
-
 order.payment.gatewayPaymentId =
   gatewayPaymentId;
 
+order.payment.paymentMode =
+  paymentMode;
+
 order.payment.paidAt =
+  new Date();
+
+order.payment.verifiedAt =
   new Date();
 
 order.orderStatus =
@@ -191,13 +211,26 @@ order.orderStatus =
     |--------------------------------------------------------------------------
     */
 
-    await order.save({
-      session,
-    });
+await order.save({
+  session,
+});
 
-    await session.commitTransaction();
+await session.commitTransaction();
 
-    return order;
+console.log("========== EMAIL START ==========");
+console.log("Email:", order.shippingAddress.email);
+console.log("Order:", order.orderNumber);
+
+try {
+  await sendOrderConfirmationEmail(order);
+
+  console.log("========== EMAIL SENT ==========");
+} catch (error) {
+  console.error("========== EMAIL FAILED ==========");
+  console.error(error);
+}
+
+return order;
   } catch (error) {
     await session.abortTransaction();
 

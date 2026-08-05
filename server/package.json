@@ -25,6 +25,7 @@
     "mongoose": "^9.8.0",
     "multer": "^2.2.0",
     "multer-storage-cloudinary": "^4.0.0",
+    "nodemailer": "^9.0.4",
     "slugify": "^1.6.9",
     "zod": "^4.4.3"
   },
@@ -42,6 +43,7 @@
     "xss-clean@0.1.4": true,
     "compression@1.8.1": true,
     "express-rate-limit@8.6.1": true,
-    "axios@1.19.0": true
+    "axios@1.19.0": true,
+    "nodemailer@9.0.4": true
   }
 }

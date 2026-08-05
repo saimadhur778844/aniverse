@@ -91,6 +91,15 @@ const paymentSchema = new mongoose.Schema(
       default: "Pending",
     },
 
+    paymentMode: {
+      type: String,
+      default: "",
+    },
+
+    verifiedAt: {
+      type: Date,
+    },
+
     gatewayOrderId: String,
     gatewayPaymentId: String,
     paidAt: Date,
