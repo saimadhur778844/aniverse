@@ -11,9 +11,6 @@ interface OrderSummaryProps {
 export default function OrderSummary({
   order,
 }: OrderSummaryProps) {
-  const shipping =
-    order.shippingCost ?? 0;
-
   return (
     <div className={styles.card}>
       <h3>Order Summary</h3>
@@ -30,9 +27,32 @@ export default function OrderSummary({
         <span>Shipping</span>
 
         <span>
-          ₹{shipping.toLocaleString("en-IN")}
+          ₹{order.shippingCharge.toLocaleString(
+            "en-IN"
+          )}
         </span>
       </div>
+
+      <div className={styles.row}>
+        <span>Tax</span>
+
+        <span>
+          ₹{order.tax.toLocaleString("en-IN")}
+        </span>
+      </div>
+
+      {order.discount > 0 && (
+        <div className={styles.row}>
+          <span>Discount</span>
+
+          <span className={styles.discount}>
+            -₹
+            {order.discount.toLocaleString(
+              "en-IN"
+            )}
+          </span>
+        </div>
+      )}
 
       <div
         className={`${styles.row} ${styles.total}`}

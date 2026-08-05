@@ -48,11 +48,6 @@ class PaymentService {
 
       return data;
     } catch (error: any) {
-      console.error(
-        "Create Payment Session Error:"
-      );
-
-      console.error(error);
 
       throw error;
     }
@@ -74,11 +69,7 @@ class PaymentService {
 
       return data;
     } catch (error: any) {
-      console.error(
-        "Retry Payment Error:"
-      );
 
-      console.error(error);
 
       throw error;
     }
@@ -100,11 +91,6 @@ class PaymentService {
 
       return data;
     } catch (error: any) {
-      console.error(
-        "Verify Payment Error:"
-      );
-
-      console.error(error);
 
       throw error;
     }

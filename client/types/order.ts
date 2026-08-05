@@ -4,7 +4,7 @@ import type { User } from "./user";
 export type OrderStatus =
   | "Pending"
   | "Confirmed"
-  | "Processing"
+  | "Packed"
   | "Shipped"
   | "Delivered"
   | "Cancelled";
@@ -84,6 +84,8 @@ export interface PaymentInfo {
 
   method?: string;
 
+  paymentMode?: string;
+
   paymentId?: string;
 
   gatewayOrderId?: string;
@@ -91,6 +93,8 @@ export interface PaymentInfo {
   gatewayPaymentId?: string;
 
   paidAt?: string;
+
+  verifiedAt?: string;
 }
 
 /*

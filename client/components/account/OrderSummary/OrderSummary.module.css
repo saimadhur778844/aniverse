@@ -34,3 +34,8 @@
 
   color: var(--color-text);
 }
+
+.discount {
+  color: #22c55e;
+  font-weight: 600;
+}
