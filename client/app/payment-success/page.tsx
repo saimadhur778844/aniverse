@@ -6,6 +6,8 @@ import Link from "next/link";
 
 import paymentService from "@/services/paymentService";
 
+import { useCart } from "@/context/CartContext/CartContext";
+
 import type { Order } from "@/types/order";
 
 export default function PaymentSuccessPage() {
@@ -15,8 +17,13 @@ export default function PaymentSuccessPage() {
   const gatewayOrderId =
     searchParams.get("order_id");
 
+  const { clearCart } = useCart();
+
   const [loading, setLoading] =
     useState(true);
+
+  const [verified, setVerified] =
+    useState(false);
 
   const [order, setOrder] =
     useState<Order | null>(null);
@@ -25,25 +32,44 @@ export default function PaymentSuccessPage() {
     useState("");
 
   useEffect(() => {
-    if (!gatewayOrderId) {
-      setError("Missing order id.");
-
-      setLoading(false);
-
+    if (
+      !gatewayOrderId ||
+      verified
+    ) {
       return;
     }
 
+    setVerified(true);
+
     verifyPayment();
-  }, [gatewayOrderId]);
+  }, [gatewayOrderId, verified]);
 
   async function verifyPayment() {
+    if (!gatewayOrderId) {
+      setError("Missing order id.");
+      setLoading(false);
+      return;
+    }
+
     try {
       const response =
         await paymentService.verifyPayment(
-          gatewayOrderId!
+          gatewayOrderId
         );
 
       setOrder(response.order);
+
+      /*
+      ----------------------------------
+      Payment verified successfully
+      ----------------------------------
+      */
+
+      clearCart();
+
+      sessionStorage.removeItem(
+        "pendingOrder"
+      );
     } catch (err: any) {
       setError(
         err.message ??
@@ -54,64 +80,79 @@ export default function PaymentSuccessPage() {
     }
   }
 
+  /*
+  ----------------------------------
+  Loading
+  ----------------------------------
+  */
+
   if (loading) {
     return (
-      <div className="container mx-auto py-24">
+      <main className="min-h-screen bg-[#09090f] flex items-center justify-center px-6">
+        <div className="w-full max-w-lg rounded-3xl border border-zinc-800 bg-zinc-950 p-10 text-center shadow-2xl">
 
-        <div className="mx-auto max-w-lg rounded-xl border bg-white p-10 text-center shadow">
-
-          <div className="text-5xl">
+          <div className="text-6xl">
             ⏳
           </div>
 
-          <h1 className="mt-6 text-3xl font-bold">
+          <h1 className="mt-6 text-3xl font-bold text-white">
             Verifying Payment
           </h1>
 
-          <p className="mt-4 text-gray-600">
-            Please wait while we confirm your payment.
+          <p className="mt-4 text-zinc-400">
+            Please wait while we confirm
+            your payment.
           </p>
 
         </div>
-
-      </div>
+      </main>
     );
   }
 
+  /*
+  ----------------------------------
+  Error
+  ----------------------------------
+  */
+
   if (error) {
     return (
-      <div className="container mx-auto py-24">
-
-        <div className="mx-auto max-w-lg rounded-xl border bg-white p-10 text-center shadow">
+      <main className="min-h-screen bg-[#09090f] flex items-center justify-center px-6">
+        <div className="w-full max-w-lg rounded-3xl border border-zinc-800 bg-zinc-950 p-10 text-center shadow-2xl">
 
           <div className="text-6xl">
             ⚠️
           </div>
 
-          <h1 className="mt-6 text-3xl font-bold text-red-600">
+          <h1 className="mt-6 text-3xl font-bold text-red-500">
             Verification Failed
           </h1>
 
-          <p className="mt-4 text-gray-600">
+          <p className="mt-4 text-zinc-400">
             {error}
           </p>
 
           <Link
-            href="/orders"
-            className="mt-8 inline-block rounded bg-black px-6 py-3 text-white"
+            href="/"
+            className="mt-8 inline-block rounded-xl bg-pink-600 px-6 py-3 font-semibold text-white transition hover:bg-pink-500"
           >
-            View Orders
+            Back to Home
           </Link>
 
         </div>
-
-      </div>
+      </main>
     );
   }
-    return (
-    <div className="container mx-auto py-24">
 
-      <div className="mx-auto max-w-2xl rounded-xl border bg-white p-10 shadow">
+  /*
+  ----------------------------------
+  Success
+  ----------------------------------
+  */
+
+  return (
+    <main className="min-h-screen bg-[#09090f] px-6 py-16">
+      <div className="mx-auto max-w-3xl rounded-3xl border border-zinc-800 bg-zinc-950 p-10 shadow-2xl">
 
         <div className="text-center">
 
@@ -119,20 +160,20 @@ export default function PaymentSuccessPage() {
             🎉
           </div>
 
-          <h1 className="mt-6 text-4xl font-bold text-green-600">
+          <h1 className="mt-6 text-4xl font-bold text-green-500">
             Payment Successful
           </h1>
 
-          <p className="mt-4 text-gray-600">
-            Thank you for shopping with
-            <span className="font-semibold">
-              {" "}Aniverse
-            </span>.
+          <p className="mt-4 text-zinc-400">
+            Thank you for shopping with{" "}
+            <span className="font-semibold text-white">
+              Aniverse
+            </span>
           </p>
 
         </div>
 
-        <div className="mt-10 rounded-xl bg-gray-100 p-6">
+        <div className="mt-10 rounded-2xl bg-zinc-900 p-6">
 
           <InfoRow
             label="Order Number"
@@ -141,12 +182,16 @@ export default function PaymentSuccessPage() {
 
           <InfoRow
             label="Payment Status"
-            value={order?.payment.status}
+            value={
+              order?.payment.status
+            }
           />
 
           <InfoRow
             label="Order Status"
-            value={order?.orderStatus}
+            value={
+              order?.orderStatus
+            }
           />
 
           <InfoRow
@@ -187,28 +232,27 @@ export default function PaymentSuccessPage() {
 
         </div>
 
-        <div className="mt-8 rounded-xl border border-green-200 bg-green-50 p-5">
+        <div className="mt-8 rounded-2xl border border-green-500/30 bg-green-500/10 p-5">
 
-          <h3 className="font-semibold text-green-700">
-            What's next?
+          <h3 className="font-semibold text-green-400">
+            What's Next?
           </h3>
 
-          <ul className="mt-3 list-disc space-y-2 pl-5 text-sm text-gray-700">
+          <ul className="mt-3 list-disc space-y-2 pl-5 text-sm text-zinc-300">
 
             <li>
               Your order has been
-              received.
+              successfully placed.
             </li>
 
             <li>
-              We'll begin processing it
-              shortly.
+              Our team will begin
+              processing it shortly.
             </li>
 
             <li>
               You'll receive shipping
-              updates once your order
-              is dispatched.
+              updates by email.
             </li>
 
           </ul>
@@ -218,24 +262,23 @@ export default function PaymentSuccessPage() {
         <div className="mt-10 flex flex-wrap justify-center gap-4">
 
           <Link
-            href="/orders"
-            className="rounded-lg bg-black px-6 py-3 text-white transition hover:bg-zinc-800"
+            href="/products"
+            className="rounded-xl bg-pink-600 px-6 py-3 font-semibold text-white transition hover:bg-pink-500"
           >
-            View Orders
+            Continue Shopping
           </Link>
 
           <Link
-            href="/products"
-            className="rounded-lg border px-6 py-3 transition hover:bg-gray-100"
+            href="/"
+            className="rounded-xl border border-zinc-700 px-6 py-3 font-semibold text-white transition hover:bg-zinc-900"
           >
-            Continue Shopping
+            Back to Home
           </Link>
 
         </div>
 
       </div>
-
-    </div>
+    </main>
   );
 }
 
@@ -247,13 +290,13 @@ function InfoRow({
   value?: string | number;
 }) {
   return (
-    <div className="flex items-center justify-between border-b py-3 last:border-0">
+    <div className="flex items-center justify-between border-b border-zinc-800 py-4 last:border-0">
 
-      <span className="font-medium text-gray-600">
+      <span className="font-medium text-zinc-400">
         {label}
       </span>
 
-      <span className="font-semibold text-gray-900 break-all">
+      <span className="break-all font-semibold text-white">
         {value ?? "-"}
       </span>
 

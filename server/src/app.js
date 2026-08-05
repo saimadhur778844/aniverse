@@ -15,8 +15,8 @@ import couponRoutes from "./routes/couponRoutes.js";
 import invoiceRoutes from "./routes/invoiceRoutes.js";
 import reviewRoutes from "./routes/reviewRoutes.js";
 import helmet from "helmet";
-import mongoSanitize from "express-mongo-sanitize";
-import xss from "xss-clean";
+// import mongoSanitize from "express-mongo-sanitize";
+// import xss from "xss-clean";
 import compression from "compression";
 import { apiLimiter } from "./middleware/rateLimiter.js";
 
@@ -36,15 +36,22 @@ app.use(
   })
 );
 
-app.use(mongoSanitize());
+// app.use(mongoSanitize());
 
-app.use(xss());
+// app.use(xss());
 
 // Rate Limiting
 app.use("/api", apiLimiter);
 
 // Body Parser
-app.use(express.json());
+// app.use(express.json());
+app.use(
+  express.json({
+    verify: (req, res, buf) => {
+      req.rawBody = buf.toString();
+    },
+  })
+);
 
 // Routes
 app.use("/api/products", productRoutes);

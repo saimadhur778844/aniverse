@@ -2,28 +2,23 @@ import express from "express";
 
 import {
   createPaymentSession,
+  retryPaymentSession,
   verifyPaymentStatus,
   paymentWebhook,
 } from "../controllers/paymentController.js";
 
-const router = express.Router();
-
-/*
-|--------------------------------------------------------------------------
-| Payment Session
-|--------------------------------------------------------------------------
-*/
+const router =
+  express.Router();
 
 router.post(
   "/create-session",
   createPaymentSession
 );
 
-/*
-|--------------------------------------------------------------------------
-| Verify Payment
-|--------------------------------------------------------------------------
-*/
+router.post(
+  "/retry/:orderId",
+  retryPaymentSession
+);
 
 router.get(
   "/verify/:orderId",

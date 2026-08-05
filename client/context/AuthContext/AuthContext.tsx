@@ -18,7 +18,7 @@ export type User = {
   role: "user" | "admin";
 };
 
-type AuthContextType = {
+export type AuthContextType = {
   user: User | null;
   token: string | null;
   loading: boolean;

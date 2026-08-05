@@ -11,6 +11,7 @@
   "type": "module",
   "dependencies": {
     "@cashfreepayments/cashfree-js": "^1.0.7",
+    "axios": "^1.19.0",
     "bcrypt": "^6.0.0",
     "cashfree-pg": "^6.0.4",
     "cloudinary": "^1.41.3",
@@ -18,7 +19,6 @@
     "cors": "^2.8.6",
     "dotenv": "^17.4.2",
     "express": "^5.2.1",
-    "express-mongo-sanitize": "^2.2.0",
     "express-rate-limit": "^8.6.1",
     "helmet": "^8.3.0",
     "jsonwebtoken": "^9.0.3",
@@ -26,7 +26,6 @@
     "multer": "^2.2.0",
     "multer-storage-cloudinary": "^4.0.0",
     "slugify": "^1.6.9",
-    "xss-clean": "^0.1.4",
     "zod": "^4.4.3"
   },
   "devDependencies": {
@@ -42,6 +41,7 @@
     "express-mongo-sanitize@2.2.0": true,
     "xss-clean@0.1.4": true,
     "compression@1.8.1": true,
-    "express-rate-limit@8.6.1": true
+    "express-rate-limit@8.6.1": true,
+    "axios@1.19.0": true
   }
 }

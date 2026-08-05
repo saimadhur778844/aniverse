@@ -64,6 +64,9 @@
     "helmet@8.3.0": true,
     "express-rate-limit@8.6.1": true,
     "express-mongo-sanitize@2.2.0": true,
-    "xss-clean@0.1.4": true
+    "xss-clean@0.1.4": true,
+    "bcrypt@6.0.0": true,
+    "sharp@0.34.5": true,
+    "unrs-resolver@1.12.2": true
   }
 }
