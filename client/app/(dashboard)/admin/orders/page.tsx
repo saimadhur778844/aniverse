@@ -11,7 +11,9 @@ import adminOrderService from "@/services/adminOrderService";
 import type { Order } from "@/types/order";
 
 export default function AdminOrdersPage() {
-  const [orders, setOrders] = useState<Order[]>([]);
+  const [orders, setOrders] =
+    useState<Order[]>([]);
+
   const [selectedOrder, setSelectedOrder] =
     useState<Order | null>(null);
 
@@ -60,7 +62,7 @@ export default function AdminOrdersPage() {
 
   useEffect(() => {
     loadOrders();
-  }, [page, search, status, paymentStatus]);
+  }, [page, status, paymentStatus]);
 
   const handleViewOrder = async (
     id: string
@@ -94,9 +96,18 @@ export default function AdminOrdersPage() {
 
         <button
           onClick={loadOrders}
-          className="flex items-center gap-2 rounded-lg bg-pink-600 px-4 py-2 transition hover:bg-pink-500"
+          disabled={loading}
+          className="flex items-center gap-2 rounded-lg bg-pink-600 px-4 py-2 transition hover:bg-pink-500 disabled:cursor-not-allowed disabled:opacity-50"
         >
-          <RefreshCw size={18} />
+          <RefreshCw
+            size={18}
+            className={
+              loading
+                ? "animate-spin"
+                : ""
+            }
+          />
+
           Refresh
         </button>
 
@@ -116,9 +127,17 @@ export default function AdminOrdersPage() {
             <input
               value={search}
               onChange={(e) =>
-                setSearch(e.target.value)
+                setSearch(
+                  e.target.value
+                )
               }
-              placeholder="Search order..."
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  setPage(1);
+                  loadOrders();
+                }
+              }}
+              placeholder="Search order, customer..."
               className="w-full rounded-lg border border-zinc-700 bg-zinc-950 py-2 pl-10 pr-3 outline-none transition focus:border-pink-500"
             />
 
@@ -126,9 +145,13 @@ export default function AdminOrdersPage() {
 
           <select
             value={status}
-            onChange={(e) =>
-              setStatus(e.target.value)
-            }
+            onChange={(e) => {
+              setStatus(
+                e.target.value
+              );
+
+              setPage(1);
+            }}
             className="rounded-lg border border-zinc-700 bg-zinc-950 px-3 py-2"
           >
             <option value="">
@@ -139,8 +162,12 @@ export default function AdminOrdersPage() {
               Pending
             </option>
 
-            <option value="Processing">
-              Processing
+            <option value="Confirmed">
+              Confirmed
+            </option>
+
+            <option value="Packed">
+              Packed
             </option>
 
             <option value="Shipped">
@@ -159,11 +186,13 @@ export default function AdminOrdersPage() {
 
           <select
             value={paymentStatus}
-            onChange={(e) =>
+            onChange={(e) => {
               setPaymentStatus(
                 e.target.value
-              )
-            }
+              );
+
+              setPage(1);
+            }}
             className="rounded-lg border border-zinc-700 bg-zinc-950 px-3 py-2"
           >
             <option value="">
@@ -193,8 +222,19 @@ export default function AdminOrdersPage() {
       </div>
 
       {loading ? (
-        <div className="rounded-xl border border-zinc-800 bg-zinc-900 py-24 text-center text-zinc-400">
-          Loading orders...
+        <div className="rounded-xl border border-zinc-800 bg-zinc-900 py-24">
+
+          <div className="flex items-center justify-center gap-3 text-zinc-400">
+
+            <RefreshCw
+              size={22}
+              className="animate-spin"
+            />
+
+            Loading orders...
+
+          </div>
+
         </div>
       ) : (
         <OrderTable
@@ -234,11 +274,9 @@ export default function AdminOrdersPage() {
       <OrderDetailsDrawer
         order={selectedOrder}
         open={drawerOpen}
-        onClose={() =>
-          setDrawerOpen(false)
-        }
+        onClose={() => setDrawerOpen(false)}
+        onUpdated={loadOrders}
       />
-
     </div>
   );
 }

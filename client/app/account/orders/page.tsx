@@ -1,7 +1,14 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import {
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
+
 import { Package } from "lucide-react";
+
+import orderService from "@/services/orderService";
 
 import type { Order } from "@/types/order";
 
@@ -14,85 +21,88 @@ import OrderFilters, {
 
 import styles from "./Orders.module.css";
 
-const MOCK_ORDERS: Order[] = [
-  {
-    _id: "1",
-    orderNumber: "ANV-20260729-0001",
-    user: "1",
-    items: [
-      {
-        product: "1",
-        name: "Monkey D. Luffy Gear 5 Figure",
-        image: "https://placehold.co/200x200/png?text=Luffy",
-        quantity: 1,
-        price: 4299,
-      },
-    ],
-    shippingAddress: {
-      name: "Sai Madhu",
-      address: "Street 1",
-      city: "Hyderabad",
-      postalCode: "500001",
-      country: "India",
-    },
-    subtotal: 4299,
-    total: 4299,
-    status: "delivered",
-    paymentStatus: "paid",
-    createdAt: "2026-07-29",
-  },
-  {
-    _id: "2",
-    orderNumber: "ANV-20260729-0002",
-    user: "1",
-    items: [
-      {
-        product: "2",
-        name: "Roronoa Zoro - King of Hell Figure",
-        image: "https://placehold.co/200x200/png?text=Zoro",
-        quantity: 1,
-        price: 3599,
-      },
-    ],
-    shippingAddress: {
-      name: "Sai Madhu",
-      address: "Street 1",
-      city: "Hyderabad",
-      postalCode: "500001",
-      country: "India",
-    },
-    subtotal: 3599,
-    total: 3599,
-    status: "processing",
-    paymentStatus: "paid",
-    createdAt: "2026-07-28",
-  },
-];
-
 export default function OrdersPage() {
-  const [search, setSearch] = useState("");
+  const [orders, setOrders] =
+    useState<Order[]>([]);
+
+  const [loading, setLoading] =
+    useState(true);
+
+  const [search, setSearch] =
+    useState("");
+
   const [filter, setFilter] =
     useState<OrderFilter>("all");
 
-  const filteredOrders = useMemo(() => {
-    return MOCK_ORDERS.filter((order) => {
-      const matchesSearch =
-        order.orderNumber
-          ?.toLowerCase()
-          .includes(search.toLowerCase()) ||
-        order.items.some((item) =>
-          item.name
-            .toLowerCase()
-            .includes(search.toLowerCase())
-        );
+  useEffect(() => {
+    loadOrders();
+  }, []);
 
-      const matchesFilter =
-        filter === "all" ||
-        order.status === filter;
+  async function loadOrders() {
+    try {
+      const data =
+        await orderService.getMyOrders();
 
-      return matchesSearch && matchesFilter;
-    });
-  }, [search, filter]);
+      setOrders(data);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  const filteredOrders =
+    useMemo(() => {
+      return orders.filter(
+        (order) => {
+          const matchesSearch =
+            order.orderNumber
+              ?.toLowerCase()
+              .includes(
+                search.toLowerCase()
+              ) ||
+            order.items.some((item) =>
+              item.name
+                .toLowerCase()
+                .includes(
+                  search.toLowerCase()
+                )
+            );
+
+          const matchesFilter =
+            filter === "all" ||
+            order.orderStatus?.toLowerCase() ===
+              filter.toLowerCase();
+
+          return (
+            matchesSearch &&
+            matchesFilter
+          );
+        }
+      );
+    }, [
+      orders,
+      search,
+      filter,
+    ]);
+
+  if (loading) {
+    return (
+      <div className={styles.page}>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            padding: "80px",
+            color: "white",
+            fontSize: "20px",
+          }}
+        >
+          Loading Orders...
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className={styles.page}>
@@ -101,13 +111,17 @@ export default function OrdersPage() {
           <h1>My Orders</h1>
 
           <p>
-            Track your purchases, monitor deliveries,
-            and manage your orders.
+            Track your purchases,
+            monitor deliveries,
+            and manage your
+            orders.
           </p>
         </div>
       </div>
 
-      <OrderStats orders={MOCK_ORDERS} />
+      <OrderStats
+        orders={orders}
+      />
 
       <div className={styles.toolbar}>
         <OrderSearch
@@ -121,25 +135,47 @@ export default function OrdersPage() {
         />
       </div>
 
-      {filteredOrders.length === 0 ? (
-        <div className={styles.empty}>
-          <Package size={60} />
+      {filteredOrders.length ===
+      0 ? (
+        <div
+          className={
+            styles.empty
+          }
+        >
+          <Package
+            size={60}
+          />
 
-          <h2>No Orders Found</h2>
+          <h2>
+            No Orders Found
+          </h2>
 
           <p>
-            We couldn't find any orders matching your
-            search or selected filter.
+            We couldn't find
+            any orders
+            matching your
+            search or
+            selected filter.
           </p>
         </div>
       ) : (
-        <div className={styles.orders}>
-          {filteredOrders.map((order) => (
-            <OrderCard
-              key={order._id}
-              order={order}
-            />
-          ))}
+        <div
+          className={
+            styles.orders
+          }
+        >
+          {filteredOrders.map(
+            (order) => (
+              <OrderCard
+                key={
+                  order._id
+                }
+                order={
+                  order
+                }
+              />
+            )
+          )}
         </div>
       )}
     </div>

@@ -3,6 +3,7 @@ import { Product } from "@/types/product";
 const products: Product[] = [
   {
     _id: "1",
+    slug: "gear-5-luffy-figure",
     id: 1,
     name: "Gear 5 Luffy Figure",
     anime: "One Piece",
@@ -17,6 +18,7 @@ const products: Product[] = [
   },
   {
     _id: "2",
+    slug: "zoro-katana",
     id: 2,
     name: "Zoro Katana",
     anime: "One Piece",

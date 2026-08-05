@@ -48,15 +48,17 @@ export default function DashboardPage() {
     loadDashboard();
   }, []);
 
-  const loadDashboard = async () => {
-    try {
-      const data = await getDashboardStats();
+   const loadDashboard = async () => {
+     try {
+       const data = await getDashboardStats();
 
-      setStats(data);
-    } finally {
-      setLoading(false);
-    }
-  };
+       setStats(data);
+     } catch (error) {
+       console.error("Failed to load dashboard:", error);
+     } finally {
+       setLoading(false);
+     }
+   };
 
   if (loading) {
     return (

@@ -135,3 +135,19 @@
     grid-template-columns: 1fr;
   }
 }
+.placeholder {
+  width: 90px;
+  height: 90px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: var(--radius-md);
+
+  background: rgba(255,255,255,.05);
+
+  color: var(--color-muted);
+
+  font-size: .8rem;
+}

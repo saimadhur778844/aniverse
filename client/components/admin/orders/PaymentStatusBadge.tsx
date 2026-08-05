@@ -1,30 +1,24 @@
-import type { OrderStatus } from "@/types/order";
+import type { PaymentStatus } from "@/types/order";
 
 interface Props {
-  status: OrderStatus;
+  status: PaymentStatus;
 }
 
-const colors: Record<OrderStatus, string> = {
+const colors: Record<PaymentStatus, string> = {
   Pending:
     "bg-yellow-500/20 text-yellow-300 border border-yellow-500/30",
 
-  Confirmed:
-    "bg-sky-500/20 text-sky-300 border border-sky-500/30",
-
-  Packed:
-    "bg-blue-500/20 text-blue-300 border border-blue-500/30",
-
-  Shipped:
-    "bg-purple-500/20 text-purple-300 border border-purple-500/30",
-
-  Delivered:
+  Paid:
     "bg-green-500/20 text-green-300 border border-green-500/30",
 
-  Cancelled:
+  Failed:
     "bg-red-500/20 text-red-300 border border-red-500/30",
+
+  Refunded:
+    "bg-purple-500/20 text-purple-300 border border-purple-500/30",
 };
 
-export default function OrderStatusBadge({
+export default function PaymentStatusBadge({
   status,
 }: Props) {
   return (

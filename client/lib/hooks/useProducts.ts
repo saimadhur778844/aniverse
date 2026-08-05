@@ -1,10 +1,13 @@
 "use client";
 
 import { useEffect, useState } from "react";
+
 import productService from "@/services/productService";
 import categoryService from "@/services/categoryService";
-import { Product } from "@/types/product";
-import { Category } from "@/services/categoryService";
+
+import type { Product } from "@/types/product";
+import type { Category } from "@/types/category";
+import type { SortOption } from "@/components/store/SortDropdown";
 
 export default function useProducts() {
   const [products, setProducts] = useState<Product[]>([]);
@@ -15,7 +18,7 @@ export default function useProducts() {
 
   const [search, setSearch] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("");
-  const [sort, setSort] = useState("newest");
+  const [sort, setSort] = useState<SortOption>("newest");
 
   const [total, setTotal] = useState(0);
   const [page, setPage] = useState(1);

@@ -12,14 +12,22 @@ export default function AdminLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const { user } = useAuth();
+  const { user, loading } = useAuth();
   const router = useRouter();
 
   useEffect(() => {
-    if (!user) {
+    if (!loading && !user) {
       router.replace("/admin/login");
     }
-  }, [user, router]);
+  }, [loading, user, router]);
+
+  if (loading) {
+    return (
+      <div className="flex h-screen items-center justify-center bg-slate-100">
+        <div className="h-8 w-8 animate-spin rounded-full border-2 border-pink-500 border-t-transparent" />
+      </div>
+    );
+  }
 
   if (!user) {
     return null;

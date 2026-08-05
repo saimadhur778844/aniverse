@@ -41,12 +41,16 @@ api.interceptors.response.use(
       localStorage.removeItem("token");
       localStorage.removeItem("user");
 
+      const currentPath = window.location.pathname;
+      const isAdminRoute = currentPath.startsWith("/admin");
+
       if (
         !isRedirecting &&
-        !window.location.pathname.startsWith("/login")
+        !currentPath.startsWith("/login") &&
+        !currentPath.startsWith("/admin/login")
       ) {
         isRedirecting = true;
-        window.location.href = "/login";
+        window.location.href = isAdminRoute ? "/admin/login" : "/login";
       }
     }
 

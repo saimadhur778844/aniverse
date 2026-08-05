@@ -14,7 +14,6 @@ import Coupon from "../models/Coupon.js";
 | Verify Payment
 |--------------------------------------------------------------------------
 */
-console.log("VERIFY PAYMENT SERVICE");
 export const verifyPayment = async (
   gatewayOrderId
 ) => {
@@ -90,17 +89,12 @@ let gatewayPaymentId = "";
 let paymentMode = "";
 
 try {
-  const { data: payments } =
-  await cashfree.get(
-    `/pg/orders/${gatewayOrderId}/payments`
-  );
+   const { data: payments } =
+   await cashfree.get(
+     `/pg/orders/${gatewayOrderId}/payments`
+   );
 
-  console.log(
-  "PAYMENTS RESPONSE:",
-  payments
-);
-
-if (
+  if (
   Array.isArray(payments) &&
   payments.length
 ) {
@@ -217,17 +211,9 @@ await order.save({
 
 await session.commitTransaction();
 
-console.log("========== EMAIL START ==========");
-console.log("Email:", order.shippingAddress.email);
-console.log("Order:", order.orderNumber);
-
-try {
+  try {
   await sendOrderConfirmationEmail(order);
-
-  console.log("========== EMAIL SENT ==========");
-} catch (error) {
-  console.error("========== EMAIL FAILED ==========");
-  console.error(error);
+  } catch (error) {
 }
 
 return order;

@@ -4,6 +4,7 @@ import Order from "../models/Order.js";
 
 import cashfree from "../config/cashfree.js";
 import { verifyPayment } from "../services/paymentService.js";
+import verifyCashfreeWebhook from "../utils/verifyCashfreeWebhook.js";
 
 /*
 |--------------------------------------------------------------------------
@@ -160,7 +161,6 @@ export const createPaymentSession =
 | Verify Payment
 |--------------------------------------------------------------------------
 */
-console.log("VERIFY PAYMENT CONTROLLER");
 export const verifyPaymentStatus = async (
   req,
   res
@@ -258,11 +258,18 @@ export const paymentWebhook = async (
     |--------------------------------------------------------------------------
     */
 
-    cashfree.PGVerifyWebhookSignature(
-      req.headers["x-webhook-signature"],
+    const isValid = verifyCashfreeWebhook(
       req.rawBody,
+      req.headers["x-webhook-signature"],
       req.headers["x-webhook-timestamp"]
     );
+
+    if (!isValid) {
+      return res.status(401).json({
+        success: false,
+        message: "Invalid webhook signature.",
+      });
+    }
 
     /*
     |--------------------------------------------------------------------------
