@@ -11,6 +11,7 @@
   "type": "module",
   "dependencies": {
     "@cashfreepayments/cashfree-js": "^1.0.7",
+    "axios": "^1.19.0",
     "bcrypt": "^6.0.0",
     "cashfree-pg": "^6.0.4",
     "cloudinary": "^1.41.3",
@@ -40,6 +41,7 @@
     "express-mongo-sanitize@2.2.0": true,
     "xss-clean@0.1.4": true,
     "compression@1.8.1": true,
-    "express-rate-limit@8.6.1": true
+    "express-rate-limit@8.6.1": true,
+    "axios@1.19.0": true
   }
 }

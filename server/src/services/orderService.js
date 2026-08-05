@@ -107,20 +107,20 @@ export const createOrder = async (payload) => {
           item.quantity,
       });
 
-      bulkOperations.push({
-        updateOne: {
-          filter: {
-            _id: product._id,
-          },
+      // bulkOperations.push({
+      //   updateOne: {
+      //     filter: {
+      //       _id: product._id,
+      //     },
 
-          update: {
-            $inc: {
-              stock:
-                -item.quantity,
-            },
-          },
-        },
-      });
+      //     update: {
+      //       $inc: {
+      //         stock:
+      //           -item.quantity,
+      //       },
+      //     },
+      //   },
+      // });
     }
 
     if (couponCode) {
@@ -149,12 +149,12 @@ export const createOrder = async (payload) => {
     if (
       bulkOperations.length
     ) {
-      await Product.bulkWrite(
-        bulkOperations,
-        {
-          session,
-        }
-      );
+      // await Product.bulkWrite(
+      //   bulkOperations,
+      //   {
+      //     session,
+      //   }
+      // );
     }
 
     const total =

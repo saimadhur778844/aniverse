@@ -44,7 +44,14 @@ app.use(
 app.use("/api", apiLimiter);
 
 // Body Parser
-app.use(express.json());
+// app.use(express.json());
+app.use(
+  express.json({
+    verify: (req, res, buf) => {
+      req.rawBody = buf.toString();
+    },
+  })
+);
 
 // Routes
 app.use("/api/products", productRoutes);

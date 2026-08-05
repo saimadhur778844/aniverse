@@ -243,51 +243,80 @@ export default function CheckoutPage() {
         ----------------------------------
         */
 
-        const payment =
-          await createPaymentSession(
-            order.order._id
-          );
+/*
+----------------------------------
+Create Payment Session
+----------------------------------
+*/
 
-        /*
-        ----------------------------------
-        Load Cashfree
-        ----------------------------------
-        */
+const payment =
+  await createPaymentSession(
+    order.order._id
+  );
 
-        const cashfree =
-          await load({
-            mode:
-              process.env
-                .NEXT_PUBLIC_CASHFREE_ENV ===
-              "PRODUCTION"
-                ? "production"
-                : "sandbox",
-          });
+console.log(
+  "========== PAYMENT RESPONSE =========="
+);
 
-        if (!cashfree) {
-          throw new Error(
-            "Unable to initialize Cashfree."
-          );
-        }
+console.log(payment);
 
-        notify.dismiss(
-          loadingToast
-        );
+console.log(
+  "NEXT_PUBLIC_CASHFREE_ENV:",
+  process.env.NEXT_PUBLIC_CASHFREE_ENV
+);
 
-        /*
-        ----------------------------------
-        Open Cashfree Checkout
-        ----------------------------------
-        */
+/*
+----------------------------------
+Load Cashfree SDK
+----------------------------------
+*/
 
-        await cashfree.checkout({
-          paymentSessionId:
-            payment.payment_session_id,
+const cashfree =
+  await load({
+    mode:
+      process.env
+        .NEXT_PUBLIC_CASHFREE_ENV ===
+      "PRODUCTION"
+        ? "production"
+        : "sandbox",
+  });
 
-          redirectTarget:
-            "_self",
-        });
+console.log(
+  "========== CASHFREE SDK =========="
+);
 
+console.log(cashfree);
+
+if (!cashfree) {
+  throw new Error(
+    "Cashfree SDK failed to load."
+  );
+}
+
+/*
+----------------------------------
+Open Checkout
+----------------------------------
+*/
+
+console.log(
+  "========== STARTING CHECKOUT =========="
+);
+
+const result =
+  await cashfree.checkout({
+    paymentSessionId:
+      payment.payment_session_id,
+
+    redirectTarget:
+      "_self",
+  });
+
+console.log(
+  "========== CHECKOUT RESULT =========="
+);
+
+console.log(result);
         /*
         Browser will redirect.
         Nothing below this line
