@@ -3,6 +3,7 @@
 import { Order } from "@/types/order";
 import { User } from "@/types/user";
 import OrderStatusBadge from "./OrderStatusBadge";
+import PaymentStatusBadge from "./PaymentStatusBadge";
 
 interface Props {
   orders: Order[];
@@ -51,8 +52,8 @@ export default function OrderTable({
             {orders.map((order) => {
               const customer =
                 typeof order.user === "string"
-                  ? "-"
-                  : (order.user as User).name;
+                  ? null
+                  : (order.user as User);
 
               return (
                 <tr
@@ -64,7 +65,15 @@ export default function OrderTable({
                   </td>
 
                   <td className="px-6 py-4">
-                    {customer}
+                    <div className="flex flex-col">
+                      <span className="font-medium">
+                        {customer?.name ?? "-"}
+                      </span>
+
+                      <span className="text-xs text-zinc-500">
+                        {customer?.email}
+                      </span>
+                    </div>
                   </td>
 
                   <td className="px-6 py-4">
@@ -78,13 +87,19 @@ export default function OrderTable({
                   </td>
 
                   <td className="px-6 py-4">
-                    {order.payment.status}
+                    <PaymentStatusBadge
+                      status={order.payment.status}
+                    />
                   </td>
 
                   <td className="px-6 py-4">
                     {new Date(
-                      order.createdAt
-                    ).toLocaleString()}
+                        order.createdAt
+                      ).toLocaleDateString("en-IN", {
+                        day: "2-digit",
+                        month: "short",
+                        year: "numeric",
+                      })}
                   </td>
 
                   <td className="px-6 py-4">
@@ -92,8 +107,7 @@ export default function OrderTable({
                       onClick={() =>
                         onSelect(order._id)
                       }
-                      className="font-medium text-pink-400 transition hover:text-pink-300"
-                    >
+                    className="rounded-lg bg-pink-600 px-3 py-2 text-sm font-medium text-white transition hover:bg-pink-500"                    >
                       View
                     </button>
                   </td>

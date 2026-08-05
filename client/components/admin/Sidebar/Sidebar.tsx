@@ -6,6 +6,10 @@ import {
   HomeIcon,
   CubeIcon,
   TagIcon,
+  ShoppingBagIcon,
+  UserIcon,
+  ArchiveBoxIcon,
+  TicketIcon,
   ArrowLeftStartOnRectangleIcon,
 } from "@heroicons/react/24/outline";
 
@@ -30,6 +34,26 @@ export default function Sidebar() {
       name: "Categories",
       href: "/admin/categories",
       icon: TagIcon,
+    },
+    {
+      name: "Orders",
+      href: "/admin/orders",
+      icon: ShoppingBagIcon,
+    },
+    {
+      name: "Customers",
+      href: "/admin/customers",
+      icon: UserIcon,
+    },
+    {
+      name: "Inventory",
+      href: "/admin/inventory",
+      icon: ArchiveBoxIcon,
+    },
+    {
+      name: "Coupons",
+      href: "/admin/coupons",
+      icon: TicketIcon,
     },
   ];
 

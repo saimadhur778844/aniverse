@@ -20,19 +20,23 @@ export default function OrderStats({
 }: OrderStatsProps) {
   const totalOrders = orders.length;
 
-  const processingOrders = orders.filter(
-    (order) =>
-      order.status === "pending" ||
-      order.status === "processing"
-  ).length;
+  const processingOrders = orders.filter((order) => {
+    const status = order.orderStatus?.toLowerCase();
 
-  const shippedOrders = orders.filter(
-    (order) => order.status === "shipped"
-  ).length;
+    return (
+      status === "pending" ||
+      status === "confirmed" ||
+      status === "packed"
+    );
+  }).length;
 
-  const deliveredOrders = orders.filter(
-    (order) => order.status === "delivered"
-  ).length;
+  const shippedOrders = orders.filter((order) => {
+    return order.orderStatus?.toLowerCase() === "shipped";
+  }).length;
+
+  const deliveredOrders = orders.filter((order) => {
+    return order.orderStatus?.toLowerCase() === "delivered";
+  }).length;
 
   const stats = [
     {
