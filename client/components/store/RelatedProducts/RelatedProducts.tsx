@@ -27,11 +27,7 @@ export default function RelatedProducts({
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
 
-  const category = useMemo(() => {
-    return typeof currentProduct.category === "string"
-      ? currentProduct.category
-      : currentProduct.category._id;
-  }, [currentProduct.category]);
+  const category = currentProduct.category;
 
   const loadProducts = useCallback(async () => {
     setLoading(true);

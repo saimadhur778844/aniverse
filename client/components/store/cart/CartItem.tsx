@@ -5,6 +5,7 @@ import { Trash2, Minus, Plus } from "lucide-react";
 
 import useCart from "@/lib/hooks/useCart";
 import { CartItem as CartItemType } from "@/types/cart";
+import { getPrimaryImage, getSellingPrice } from "@/utils/product";
 
 import styles from "./CartItem.module.css";
 
@@ -27,7 +28,7 @@ export default function CartItem({
   return (
     <div className={styles.item}>
       <Image
-        src={product.image}
+        src={getPrimaryImage(product)}
         alt={product.name}
         width={90}
         height={90}
@@ -38,7 +39,7 @@ export default function CartItem({
         <h3>{product.name}</h3>
 
         <p className={styles.price}>
-          ₹{product.price.toLocaleString()}
+          {getSellingPrice(product)}
         </p>
 
         <div className={styles.controls}>

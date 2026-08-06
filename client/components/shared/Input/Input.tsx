@@ -1,37 +1,101 @@
+"use client";
+
 import {
   forwardRef,
-  InputHTMLAttributes,
 } from "react";
 
-import styles from "./Input.module.css";
+import clsx from "clsx";
+import { twMerge } from "tailwind-merge";
 
-interface InputProps
-  extends InputHTMLAttributes<HTMLInputElement> {
-  label?: string;
-  error?: string;
-}
+import {
+  InputProps,
+} from "./types";
 
-const Input = forwardRef<HTMLInputElement, InputProps>(
-  ({ label, error, className = "", ...props }, ref) => {
+import {
+  inputBaseClasses,
+} from "./inputVariants";
+
+const Input = forwardRef<
+  HTMLInputElement,
+  InputProps
+>(
+  (
+    {
+      label,
+
+      error,
+
+      helperText,
+
+      leftIcon,
+
+      rightIcon,
+
+      className,
+
+      ...props
+    },
+
+    ref
+  ) => {
     return (
-      <div className={styles.wrapper}>
+      <div className="space-y-2">
+
         {label && (
-          <label className={styles.label}>
+          <label className="text-sm font-medium text-zinc-300">
             {label}
           </label>
         )}
 
-        <input
-          ref={ref}
-          className={`${styles.input} ${className}`}
-          {...props}
-        />
+        <div className="relative">
 
-        {error && (
-          <span className={styles.error}>
+          {leftIcon && (
+            <div className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400">
+              {leftIcon}
+            </div>
+          )}
+
+          <input
+            ref={ref}
+            className={twMerge(
+              clsx(
+                inputBaseClasses,
+
+                leftIcon &&
+                  "pl-10",
+
+                rightIcon &&
+                  "pr-10",
+
+                error &&
+                  "border-red-500 focus:border-red-500",
+
+                className
+              )
+            )}
+            {...props}
+          />
+
+          {rightIcon && (
+            <div className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400">
+              {rightIcon}
+            </div>
+          )}
+
+        </div>
+
+        {error ? (
+          <p className="text-sm text-red-500">
             {error}
-          </span>
+          </p>
+        ) : (
+          helperText && (
+            <p className="text-sm text-zinc-500">
+              {helperText}
+            </p>
+          )
         )}
+
       </div>
     );
   }

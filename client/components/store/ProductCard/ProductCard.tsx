@@ -13,6 +13,11 @@ import { useCart } from "@/context/CartContext/CartContext";
 import { useWishlist } from "@/context/WishlistContext/WishlistContext";
 
 import { Product } from "@/types/product";
+import {
+  getPrimaryImage,
+  getSellingPrice,
+  getDiscount,
+} from "@/utils/product";
 
 import styles from "./ProductCard.module.css";
 
@@ -23,10 +28,7 @@ interface ProductCardProps {
 export default function ProductCard({
   product,
 }: ProductCardProps) {
-  const category =
-    typeof product.category === "string"
-      ? product.category
-      : product.category?.name ?? "Uncategorized";
+  const category = product.category;
 
   const { addToCart } = useCart();
 
@@ -51,7 +53,7 @@ export default function ProductCard({
       >
         <div className={styles.imageContainer}>
           <Image
-            src={product.image}
+            src={getPrimaryImage(product)}
             alt={product.name}
             fill
             priority={false}
@@ -102,30 +104,28 @@ export default function ProductCard({
           </h3>
 
           <Rating
-            rating={product.rating}
+            rating={product.averageRating ?? 0}
+            reviewCount={product.reviewCount}
           />
 
           <StockBadge
-            stock={product.stock}
+            stock={product.inventory.stock}
           />
 
           <div className={styles.footer}>
             <div className={styles.priceGroup}>
               <span className={styles.price}>
-                ₹
-                {product.price.toLocaleString(
-                  "en-IN"
-                )}
+                {getSellingPrice(product)}
               </span>
 
-              {product.originalPrice && (
+              {product.mrp > product.sellingPrice && getDiscount(product) > 0 && (
                 <span
                   className={
                     styles.originalPrice
                   }
                 >
                   ₹
-                  {product.originalPrice.toLocaleString(
+                  {product.mrp.toLocaleString(
                     "en-IN"
                   )}
                 </span>
@@ -135,7 +135,7 @@ export default function ProductCard({
             <Button
               variant="primary"
               disabled={
-                product.stock <= 0
+                product.inventory.stock <= 0
               }
               onClick={(e) => {
                 e.preventDefault();
@@ -144,7 +144,7 @@ export default function ProductCard({
                 addToCart(product, 1);
               }}
             >
-              {product.stock > 0
+              {product.inventory.stock > 0
                 ? "Add to Cart"
                 : "Sold Out"}
             </Button>

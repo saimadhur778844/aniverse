@@ -5,6 +5,7 @@ import Image from "next/image";
 import clsx from "clsx";
 
 import { Product } from "@/types/product";
+import { getPrimaryImage } from "@/utils/product";
 
 import styles from "./ProductGallery.module.css";
 
@@ -15,10 +16,12 @@ interface ProductGalleryProps {
 export default function ProductGallery({
   product,
 }: ProductGalleryProps) {
-  const images =
-    product.images?.length
-      ? product.images
-      : [product.image];
+  const images = (product.images?.length
+    ? product.images
+    : [getPrimaryImage(product)]
+  ).map((img) =>
+    typeof img === "string" ? img : img.url
+  );
 
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [imageLoaded, setImageLoaded] = useState(false);

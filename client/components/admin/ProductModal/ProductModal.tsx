@@ -5,12 +5,14 @@ import Image from "next/image";
 
 import categoryService from "@/services/categoryService";
 import { productService } from "@/services/productService";
-import { uploadImage } from "@/services/uploadService";
+import uploadImage from "@/services/uploadService";
 
 import LoadingButton from "@/components/auth/LoadingButton/LoadingButton";
 
 import { Product } from "@/types/product";
 import { notify } from "@/utils/toast";
+import { getPrimaryImage } from "@/utils/product";
+import uploadService from "@/services/uploadService";
 
 interface ProductModalProps {
   open: boolean;
@@ -56,7 +58,9 @@ export default function ProductModal({
       return URL.createObjectURL(image);
     }
 
-    return product?.image ?? "";
+    return product?.images?.find(
+      (img) => img.isPrimary
+    )?.url ?? product?.images?.[0]?.url ?? "";
   }, [image, product]);
 
   useEffect(() => {
@@ -99,16 +103,13 @@ export default function ProductModal({
         name: product.name,
         anime: product.anime,
         category:
-          typeof product.category ===
-          "string"
-            ? product.category
-            : product.category._id,
+          product.category,
         description:
           product.description,
         price:
-          product.price.toString(),
+          product.mrp.toString(),
         stock:
-          product.stock.toString(),
+          product.inventory?.stock.toString(),
         featured:
           product.featured,
       });
@@ -186,7 +187,7 @@ export default function ProductModal({
     try {
       setLoading(true);
 
-      let imageUrl = product?.image ?? "";
+      let imageUrl = getPrimaryImage(product ?? ({} as Product));
 
       /*
       |--------------------------------------------------------------------------
@@ -201,12 +202,12 @@ export default function ProductModal({
           notify.loading("Uploading image...");
 
         const uploadResponse =
-          await uploadImage(image);
+          await uploadService.uploadImage(image);
 
         notify.dismiss(uploadToast);
 
         imageUrl =
-          uploadResponse.imageUrl;
+          uploadResponse.url;
 
         notify.success(
           "Image uploaded successfully."
@@ -231,7 +232,9 @@ export default function ProductModal({
 
         image: imageUrl,
 
-        price: Number(form.price),
+        mrp: Number(form.price),
+
+        sellingPrice: Number(form.price),
 
         stock: Number(form.stock),
 

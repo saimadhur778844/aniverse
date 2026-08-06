@@ -42,18 +42,18 @@ export default function RootLayout({
             <CartProvider>
               <WishlistProvider>
                 {children}
+
+                <Toaster
+                  position="top-right"
+                  richColors
+                  closeButton
+                  duration={3000}
+                  theme="dark"
+                />
               </WishlistProvider>
             </CartProvider>
           </AuthProvider>
         </QueryProvider>
-
-        <Toaster
-          position="top-right"
-          richColors
-          closeButton
-          duration={3000}
-          theme="dark"
-        />
       </body>
     </html>
   );

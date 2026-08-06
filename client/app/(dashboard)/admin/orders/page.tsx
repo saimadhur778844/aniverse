@@ -1,27 +1,21 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { RefreshCw, Search } from "lucide-react";
 
 import OrderTable from "@/components/admin/orders/OrderTable";
 import OrderDetailsDrawer from "@/components/admin/orders/OrderDetailsDrawer";
 
-import adminOrderService from "@/services/adminOrderService";
+import { useOrders } from "@/hooks";
 
 import type { Order } from "@/types/order";
 
 export default function AdminOrdersPage() {
-  const [orders, setOrders] =
-    useState<Order[]>([]);
-
   const [selectedOrder, setSelectedOrder] =
     useState<Order | null>(null);
 
   const [drawerOpen, setDrawerOpen] =
     useState(false);
-
-  const [loading, setLoading] =
-    useState(true);
 
   const [search, setSearch] =
     useState("");
@@ -35,52 +29,41 @@ export default function AdminOrdersPage() {
   const [page, setPage] =
     useState(1);
 
-  const [pages, setPages] =
-    useState(1);
+  const {
+    data,
+    isLoading,
+    refetch,
+  } = useOrders({
+    page,
+    limit: 10,
+    search,
+    status,
+    paymentStatus,
+  });
 
-  const loadOrders = async () => {
-    try {
-      setLoading(true);
+  const orders =
+    data?.orders ?? [];
 
-      const data =
-        await adminOrderService.getOrders({
-          page,
-          limit: 10,
-          search,
-          status,
-          paymentStatus,
-        });
+  const pages =
+    data?.pages ?? 1;
 
-      setOrders(data.orders);
-      setPages(data.pages);
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    loadOrders();
-  }, [page, status, paymentStatus]);
-
-  const handleViewOrder = async (
+  const handleViewOrder = (
     id: string
   ) => {
-    try {
-      const order =
-        await adminOrderService.getOrder(id);
+    const order = orders.find(
+      (o) => o._id === id
+    );
 
-      setSelectedOrder(order);
+    if (!order) return;
 
-      setDrawerOpen(true);
-    } catch (err) {
-      console.error(err);
-    }
+    setSelectedOrder(order);
+    setDrawerOpen(true);
   };
 
   return (
     <div className="space-y-6">
+
+      {/* Header */}
 
       <div className="flex items-center justify-between">
 
@@ -95,14 +78,14 @@ export default function AdminOrdersPage() {
         </div>
 
         <button
-          onClick={loadOrders}
-          disabled={loading}
+          onClick={() => refetch()}
+          disabled={isLoading}
           className="flex items-center gap-2 rounded-lg bg-pink-600 px-4 py-2 transition hover:bg-pink-500 disabled:cursor-not-allowed disabled:opacity-50"
         >
           <RefreshCw
             size={18}
             className={
-              loading
+              isLoading
                 ? "animate-spin"
                 : ""
             }
@@ -112,6 +95,8 @@ export default function AdminOrdersPage() {
         </button>
 
       </div>
+
+      {/* Filters */}
 
       <div className="rounded-xl border border-zinc-800 bg-zinc-900 p-5">
 
@@ -134,7 +119,7 @@ export default function AdminOrdersPage() {
               onKeyDown={(e) => {
                 if (e.key === "Enter") {
                   setPage(1);
-                  loadOrders();
+                  refetch();
                 }
               }}
               placeholder="Search order, customer..."
@@ -221,7 +206,9 @@ export default function AdminOrdersPage() {
 
       </div>
 
-      {loading ? (
+      {/* Table */}
+
+      {isLoading ? (
         <div className="rounded-xl border border-zinc-800 bg-zinc-900 py-24">
 
           <div className="flex items-center justify-center gap-3 text-zinc-400">
@@ -242,6 +229,8 @@ export default function AdminOrdersPage() {
           onSelect={handleViewOrder}
         />
       )}
+
+      {/* Pagination */}
 
       <div className="flex items-center justify-between">
 
@@ -274,9 +263,12 @@ export default function AdminOrdersPage() {
       <OrderDetailsDrawer
         order={selectedOrder}
         open={drawerOpen}
-        onClose={() => setDrawerOpen(false)}
-        onUpdated={loadOrders}
+        onClose={() =>
+          setDrawerOpen(false)
+        }
+        onUpdated={refetch}
       />
+
     </div>
   );
 }

@@ -7,6 +7,8 @@ import {
 } from "@heroicons/react/24/outline";
 
 import { Product } from "@/types/product";
+import { getPrimaryImage } from "@/utils/product";
+import { getStock, getSellingPrice, getDiscount } from "@/utils/product";
 
 interface ProductTableProps {
   products: Product[];
@@ -115,7 +117,7 @@ export default function ProductTable({
               <td className="px-6 py-4">
 
                 <Image
-                  src={product.image}
+                  src={getPrimaryImage(product)}
                   alt={product.name}
                   width={70}
                   height={70}
@@ -143,32 +145,29 @@ export default function ProductTable({
               </td>
 
               <td className="px-6 py-4">
-                {typeof product.category ===
-                "string"
-                  ? product.category
-                  : product.category.name}
+                {product.category}
               </td>
 
               <td className="px-6 py-4">
-                ₹{product.price.toLocaleString()}
+                ₹{product.sellingPrice.toLocaleString()}
               </td>
 
               <td className="px-6 py-4">
 
                 <span
                     className={`rounded-full px-3 py-1 text-xs font-semibold ${
-                      product.stock === 0
+                      product.inventory.stock === 0
                         ? "bg-red-100 text-red-700"
-                        : product.stock <= 5
+                        : product.inventory.stock <= 5
                         ? "bg-yellow-100 text-yellow-700"
                         : "bg-green-100 text-green-700"
                     }`}
                   >
-                    {product.stock === 0
+                    {product.inventory.stock === 0
                       ? "Out of Stock"
-                      : product.stock <= 5
-                      ? `Low Stock (${product.stock})`
-                      : `In Stock (${product.stock})`}
+                      : product.inventory.stock <= 5
+                      ? `Low Stock (${product.inventory.stock})`
+                      : `In Stock (${product.inventory.stock})`}
                   </span>
 
               </td>

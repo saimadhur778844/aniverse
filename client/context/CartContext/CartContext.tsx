@@ -14,6 +14,7 @@ import {
   CartContextType,
   CartItem,
 } from "@/types/cart";
+import { getStock } from "@/utils/product";
 
 const CART_STORAGE_KEY = "aniverse-cart";
 
@@ -67,7 +68,7 @@ export function CartProvider({
                 ...item,
                 quantity: Math.min(
                   item.quantity + quantity,
-                  product.stock
+                  getStock(product)
                 ),
               }
             : item
@@ -80,7 +81,7 @@ export function CartProvider({
           product,
           quantity: Math.min(
             quantity,
-            product.stock
+            getStock(product)
           ),
         },
       ];
@@ -119,7 +120,7 @@ export function CartProvider({
           ...item,
           quantity: Math.min(
             quantity,
-            item.product.stock
+            getStock(item.product)
           ),
         };
       })
@@ -143,9 +144,9 @@ export function CartProvider({
   const subtotal = useMemo(() => {
     return items.reduce(
       (sum, item) =>
-        sum +
-        item.product.price *
-          item.quantity,
+         sum +
+         item.product.sellingPrice *
+           item.quantity,
       0
     );
   }, [items]);
