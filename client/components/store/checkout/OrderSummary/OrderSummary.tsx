@@ -4,6 +4,7 @@ import Image from "next/image";
 
 import SectionCard from "@/components/shared/SectionCard";
 import LoadingButton from "@/components/auth/LoadingButton/LoadingButton";
+import { getPrimaryImage } from "@/utils/product";
 
 import { CartItem } from "@/types/cart";
 
@@ -160,9 +161,9 @@ export default function OrderSummary({
 
                 <div className="relative h-16 w-16 overflow-hidden rounded-xl">
 
-                  <Image
-                    src={item.product.image}
-                    alt={item.product.name}
+                   <Image
+                     src={getPrimaryImage(item.product)}
+                     alt={item.product.name}
                     fill
                     sizes="64px"
                     className="object-cover"
@@ -184,13 +185,13 @@ export default function OrderSummary({
 
                 <div className="text-right">
 
-                  <p className="font-bold text-pink-400">
-                    ₹
-                    {(
-                      item.product.price *
-                      item.quantity
-                    ).toLocaleString()}
-                  </p>
+                     <p className="font-bold text-pink-400">
+                       ₹
+                       {(
+                         item.product.sellingPrice *
+                         item.quantity
+                       ).toLocaleString()}
+                     </p>
 
                 </div>
 

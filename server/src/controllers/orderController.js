@@ -104,9 +104,10 @@ export const getOrderById = async (
     }
 
     const order =
-      await getOrderByIdService(
-        req.params.id
-      );
+    await getOrderByIdService(
+      req.params.id,
+      req.user
+    );
 
     if (!order) {
       return res.status(404).json({

@@ -1,49 +1,31 @@
 "use client";
 
-import { useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { ReactNode } from "react";
 
 import Sidebar from "@/components/admin/Sidebar/Sidebar";
 import Topbar from "@/components/admin/Topbar/Topbar";
-import { useAuth } from "@/context/AuthContext/AuthContext";
+import AdminGuard from "@/components/admin/AdminGuard/AdminGuard";
+
+interface AdminLayoutProps {
+  children: ReactNode;
+}
 
 export default function AdminLayout({
   children,
-}: {
-  children: React.ReactNode;
-}) {
-  const { user, loading } = useAuth();
-  const router = useRouter();
-
-  useEffect(() => {
-    if (!loading && !user) {
-      router.replace("/admin/login");
-    }
-  }, [loading, user, router]);
-
-  if (loading) {
-    return (
-      <div className="flex h-screen items-center justify-center bg-slate-100">
-        <div className="h-8 w-8 animate-spin rounded-full border-2 border-pink-500 border-t-transparent" />
-      </div>
-    );
-  }
-
-  if (!user) {
-    return null;
-  }
-
+}: AdminLayoutProps) {
   return (
-    <div className="flex h-screen bg-slate-100 text-slate-900">
-      <Sidebar />
+    <AdminGuard>
+      <div className="flex h-screen bg-slate-100 text-slate-900">
+        <Sidebar />
 
-      <div className="flex flex-1 flex-col">
-        <Topbar />
+        <div className="flex flex-1 flex-col overflow-hidden">
+          <Topbar />
 
-        <main className="flex-1 overflow-y-auto bg-slate-100 p-8 text-slate-900">
-          {children}
-        </main>
+          <main className="flex-1 overflow-y-auto bg-slate-100 p-8 text-slate-900">
+            {children}
+          </main>
+        </div>
       </div>
-    </div>
+    </AdminGuard>
   );
 }

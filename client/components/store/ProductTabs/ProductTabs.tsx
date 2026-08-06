@@ -25,13 +25,7 @@ export default function ProductTabs({
   const [activeTab, setActiveTab] =
     useState<Tab>("description");
 
-  const category = useMemo(() => {
-    return typeof product.category === "string"
-      ? product.category
-      : product.category.name;
-  }, [product.category]);
-
-  return (
+  const category = product.category;  return (
     <section className={styles.container}>
       <div
         className={styles.tabs}
@@ -164,13 +158,13 @@ export default function ProductTabs({
                     Stock
                   </span>
 
-                  <span
-                    className={
-                      styles.specValue
-                    }
-                  >
-                    {product.stock}
-                  </span>
+                   <span
+                     className={
+                       styles.specValue
+                     }
+                   >
+                     {product.inventory.stock}
+                   </span>
                 </div>
               </div>
             )}

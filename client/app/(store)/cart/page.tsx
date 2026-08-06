@@ -8,6 +8,9 @@ import Button from "@/components/shared/Button";
 
 import { useCart } from "@/context/CartContext";
 
+import { getPrimaryImage, getSellingPrice } from "@/utils/product";
+
+
 export default function CartPage() {
   const {
     items,
@@ -99,8 +102,8 @@ export default function CartPage() {
 
                   <div className="relative h-40 w-full overflow-hidden rounded-2xl bg-[#202033] md:w-40">
 
-                    <Image
-                      src={item.product.image}
+                     <Image
+                      src={getPrimaryImage(item.product)}
                       alt={item.product.name}
                       fill
                       className="object-cover transition duration-500 hover:scale-110"
@@ -185,7 +188,7 @@ export default function CartPage() {
                         <p className="mt-2 bg-gradient-to-r from-pink-400 to-purple-400 bg-clip-text text-3xl font-extrabold text-transparent">
                           ₹
                           {(
-                            item.product.price *
+                            item.product.sellingPrice *
                             item.quantity
                           ).toLocaleString()}
                         </p>

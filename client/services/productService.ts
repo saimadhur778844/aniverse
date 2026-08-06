@@ -30,7 +30,8 @@ export interface ProductPayload {
   category: string;
   description: string;
   image: string;
-  price: number;
+  mrp: number;
+  sellingPrice: number;
   stock: number;
   featured: boolean;
 }

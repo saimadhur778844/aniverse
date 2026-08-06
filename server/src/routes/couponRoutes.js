@@ -11,8 +11,7 @@ import {
 } from "../controllers/couponController.js";
 
 import protect from "../middleware/protect.js";
-import admin from "../middleware/admin.js";
-
+import authorize from "../middleware/authorize.js";
 import { validate } from "../middleware/validate.js";
 import { couponSchema } from "../validators/couponValidator.js";
 
@@ -38,21 +37,21 @@ router.post(
 router.get(
   "/",
   protect,
-  admin,
+authorize("admin", "superadmin"),
   getCoupons
 );
 
 router.get(
   "/:id",
   protect,
-  admin,
+authorize("admin", "superadmin"),
   getCouponById
 );
 
 router.post(
   "/",
   protect,
-  admin,
+authorize("admin", "superadmin"),
   validate(couponSchema),
   createCoupon
 );
@@ -60,7 +59,7 @@ router.post(
 router.put(
   "/:id",
   protect,
-  admin,
+authorize("admin", "superadmin"),
   validate(couponSchema),
   updateCoupon
 );
@@ -68,7 +67,7 @@ router.put(
 router.patch(
   "/:id",
   protect,
-  admin,
+authorize("admin", "superadmin"),
   validate(couponSchema),
   updateCoupon
 );
@@ -76,14 +75,14 @@ router.patch(
 router.patch(
   "/:id/toggle",
   protect,
-  admin,
+authorize("admin", "superadmin"),
   toggleCouponStatus
 );
 
 router.delete(
   "/:id",
   protect,
-  admin,
+authorize("admin", "superadmin"),
   deleteCoupon
 );
 

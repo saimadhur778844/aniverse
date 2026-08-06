@@ -7,8 +7,7 @@ import {
 } from "../controllers/inventoryController.js";
 
 import protect from "../middleware/protect.js";
-import admin from "../middleware/admin.js";
-
+import authorize from "../middleware/authorize.js";
 import { validate } from "../middleware/validate.js";
 import { inventoryAdjustmentSchema } from "../validators/inventoryValidator.js";
 
@@ -23,21 +22,21 @@ const router = express.Router();
 router.get(
   "/",
   protect,
-  admin,
+authorize("admin", "superadmin"),
   getInventoryList
 );
 
 router.get(
   "/analytics",
   protect,
-  admin,
+authorize("admin", "superadmin"),
   getAnalytics
 );
 
 router.patch(
   "/:id/adjust",
   protect,
-  admin,
+authorize("admin", "superadmin"),
   validate(inventoryAdjustmentSchema),
   updateStock
 );

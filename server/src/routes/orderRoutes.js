@@ -12,7 +12,7 @@ import {
 } from "../controllers/orderController.js";
 
 import protect from "../middleware/protect.js";
-import admin from "../middleware/admin.js";
+import authorize from "../middleware/authorize.js";
 
 const router = express.Router();
 
@@ -61,14 +61,14 @@ router.get(
 router.get(
   "/",
   protect,
-  admin,
+  authorize("admin", "superadmin"),
   getOrders
 );
 
 router.patch(
   "/:id/status",
   protect,
-  admin,
+  authorize("admin", "superadmin"),
   updateOrderStatus
 );
 

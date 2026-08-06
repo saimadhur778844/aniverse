@@ -229,8 +229,16 @@ export const getOrderById = async (
     );
   }
 
-  if (
-    user.role !== "admin" &&
+if (
+  !user
+) {
+  throw new Error(
+    "Unauthorized access."
+  );
+}
+
+if (
+  user.role !== "admin" &&
     order.user &&
     order.user._id.toString() !==
       user._id.toString()

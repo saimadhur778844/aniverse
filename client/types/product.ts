@@ -1,6 +1,33 @@
-export interface ProductCategory {
-  _id: string;
-  name: string;
+export interface ProductImage {
+  _id?: string;
+
+  url: string;
+
+  filename: string;
+
+  alt?: string;
+
+  order: number;
+
+  isPrimary: boolean;
+}
+
+export interface ProductSEO {
+  metaTitle: string;
+
+  metaDescription: string;
+
+  keywords: string;
+}
+
+export interface ProductInventory {
+  stock: number;
+
+  minimumStock: number;
+
+  trackInventory: boolean;
+
+  continueSelling: boolean;
 }
 
 export interface ProductSpecification {
@@ -8,67 +35,103 @@ export interface ProductSpecification {
   value: string;
 }
 
+export interface ProductShipping {
+  dispatchTime: string;
+  courier?: string;
+  packaging?: string;
+}
+
+export type ProductStatus =
+  | "draft"
+  | "published"
+  | "archived";
+
 export interface Product {
   _id: string;
-  slug: string;
-
-  id?: number;
 
   name: string;
-  anime: string;
+
+  slug: string;
+
+  shortDescription: string;
+
   description: string;
 
-  /**
-   * Primary display image.
-   */
-  image: string;
+  category: string;
 
-  /**
-   * Additional gallery images.
-   * If omitted or empty, fall back to `image`.
-   */
-  images?: string[];
+  anime: string;
 
-  price: number;
+  brand: string;
 
-  /**
-   * Original price before discount.
-   * Optional because not every product will be discounted.
-   */
-  originalPrice?: number;
+  sku: string;
 
-  averageRating?: number;
+  mrp: number;
 
-  stock: number;
+  sellingPrice: number;
+
+  costPrice: number;
+
+  discount: number;
+
+  tax: number;
 
   featured: boolean;
 
-  rating?: number;
+  trending: boolean;
 
-  /**
-   * Number of customer reviews.
-   */
+  newArrival: boolean;
+
+  status: ProductStatus;
+
+  inventory: ProductInventory;
+
+  images: ProductImage[];
+
+  seo: ProductSEO;
+
+  averageRating?: number;
+
   reviewCount?: number;
 
-  /**
-   * Can be derived from stock > 0,
-   * kept optional for future backend compatibility.
-   */
-  inStock?: boolean;
-
-  category: string | ProductCategory;
-
-  /**
-   * Product specifications shown in the Specifications tab.
-   */
   specifications?: ProductSpecification[];
 
-  /**
-   * Shipping information shown in the Shipping tab.
-   */
-  shipping?: {
-    dispatchTime: string;
-    courier?: string;
-    packaging?: string;
-  };
+  shipping?: ProductShipping;
+
+  createdAt: string;
+
+  updatedAt: string;
+}
+
+export interface ProductFilters {
+  page?: number;
+
+  limit?: number;
+
+  search?: string;
+
+  category?: string;
+
+  anime?: string;
+
+  status?: ProductStatus;
+
+  featured?: boolean;
+}
+
+export interface ProductsResponse {
+  success: boolean;
+
+  products: Product[];
+
+  total: number;
+
+  page: number;
+
+  pages: number;
+}
+
+export interface ProductResponse {
+  success: boolean;
+
+  product: Product;
 }

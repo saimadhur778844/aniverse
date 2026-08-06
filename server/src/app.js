@@ -19,6 +19,7 @@ import helmet from "helmet";
 // import xss from "xss-clean";
 import compression from "compression";
 import { apiLimiter } from "./middleware/rateLimiter.js";
+import employeeRoutes from "./routes/employeeRoutes.js";
 
 
 // import * as CF from "cashfree-pg";
@@ -66,6 +67,8 @@ app.use("/api/customers", customerRoutes);
 app.use("/api/coupons", couponRoutes);
 app.use("/api/invoices", invoiceRoutes);
 app.use("/api/reviews", reviewRoutes);
+app.use("/api/employees",employeeRoutes);
+
 
 // Error Handler
 app.use(errorHandler);

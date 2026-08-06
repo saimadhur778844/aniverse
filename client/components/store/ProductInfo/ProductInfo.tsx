@@ -3,6 +3,12 @@
 import { useCallback, useMemo, useState } from "react";
 
 import { Product } from "@/types/product";
+import {
+  getStock,
+  getSellingPrice,
+  getMRP,
+  getDiscount,
+} from "@/utils/product";
 
 import Rating from "../Rating";
 import ProductMeta from "../ProductMeta";
@@ -26,25 +32,12 @@ export default function ProductInfo({
 
   const { addToCart } = useCart();
 
-  const isOutOfStock = product.stock <= 0;
+  const isOutOfStock = product.inventory.stock <= 0;
 
   const discountPercentage = useMemo(() => {
-    if (
-      !product.originalPrice ||
-      product.originalPrice <= product.price
-    ) {
-      return null;
-    }
-
-    return Math.round(
-      ((product.originalPrice - product.price) /
-        product.originalPrice) *
-        100
-    );
-  }, [
-    product.originalPrice,
-    product.price,
-  ]);
+    const discount = getDiscount(product);
+    return discount > 0 ? discount : null;
+  }, [product]);
 
   const handleAddToCart =
     useCallback(() => {
@@ -65,9 +58,9 @@ export default function ProductInfo({
         {product.name}
       </h1>
 
-      {product.rating !== undefined && (
+      {product.averageRating !== undefined && (
         <Rating
-          rating={product.rating}
+          rating={product.averageRating}
           reviewCount={
             product.reviewCount
           }
@@ -76,22 +69,16 @@ export default function ProductInfo({
 
       <div className={styles.priceSection}>
         <h2 className={styles.price}>
-          ₹
-          {product.price.toLocaleString(
-            "en-IN"
-          )}
+          {getSellingPrice(product)}
         </h2>
 
-        {product.originalPrice && (
+        {product.mrp > product.sellingPrice && getDiscount(product) > 0 && (
           <span
             className={
               styles.originalPrice
             }
           >
-            ₹
-            {product.originalPrice.toLocaleString(
-              "en-IN"
-            )}
+            {getMRP(product)}
           </span>
         )}
 
@@ -107,7 +94,7 @@ export default function ProductInfo({
       </div>
 
       <StockBadge
-        stock={product.stock}
+        stock={product.inventory.stock}
       />
 
       <ProductMeta product={product} />
@@ -123,7 +110,7 @@ export default function ProductInfo({
       <QuantitySelector
         quantity={quantity}
         onChange={setQuantity}
-        max={product.stock}
+        max={product.inventory.stock}
       />
 
       <div className={styles.actions}>

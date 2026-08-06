@@ -10,8 +10,7 @@ import {
 } from "../controllers/reviewController.js";
 
 import protect from "../middleware/protect.js";
-import admin from "../middleware/admin.js";
-
+import authorize from "../middleware/authorize.js";
 import { validate } from "../middleware/validate.js";
 import { reviewSchema } from "../validators/reviewValidator.js";
 
@@ -63,14 +62,14 @@ router.delete(
 router.get(
   "/",
   protect,
-  admin,
+authorize("admin", "superadmin"),
   getAllReviews
 );
 
 router.patch(
   "/:id/toggle",
   protect,
-  admin,
+authorize("admin", "superadmin"),
   toggleVisibility
 );
 

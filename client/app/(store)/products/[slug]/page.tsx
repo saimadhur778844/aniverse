@@ -111,13 +111,9 @@ export default function ProductDetailsPage() {
     };
   }, [params.slug]);
 
-  const category =
-    !product
-      ? ""
-      : typeof product.category ===
-        "string"
-      ? product.category
-      : product.category?.name ?? "";
+  const category = product
+    ? product.category
+    : "";
 
   if (loading) {
     return (

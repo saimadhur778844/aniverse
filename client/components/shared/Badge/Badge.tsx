@@ -1,20 +1,42 @@
-import { HTMLAttributes } from "react";
-import styles from "./Badge.module.css";
+"use client";
 
-interface BadgeProps extends HTMLAttributes<HTMLSpanElement> {
-  variant?: "primary" | "success" | "warning" | "danger";
-}
+import clsx from "clsx";
+import { twMerge } from "tailwind-merge";
+
+import {
+  BadgeProps,
+} from "./types";
+
+import {
+  badgeVariants,
+} from "./badgeVariants";
 
 export default function Badge({
   children,
+
   variant = "primary",
-  className = "",
-  ...props
+
+  rounded = true,
+
+  className,
 }: BadgeProps) {
   return (
     <span
-      className={`${styles.badge} ${styles[variant]} ${className}`}
-      {...props}
+      className={twMerge(
+        clsx(
+          "inline-flex items-center justify-center px-3 py-1 text-xs font-medium",
+
+          rounded
+            ? "rounded-full"
+            : "rounded-md",
+
+          badgeVariants[
+            variant
+          ],
+
+          className
+        )
+      )}
     >
       {children}
     </span>

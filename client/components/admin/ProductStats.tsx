@@ -25,12 +25,12 @@ export default function ProductStats({
 
   const lowStockProducts = products.filter(
     (product) =>
-      product.stock > 0 &&
-      product.stock <= 5
+      product.inventory.stock > 0 &&
+      product.inventory.stock <= 5
   ).length;
 
   const outOfStockProducts = products.filter(
-    (product) => product.stock === 0
+    (product) => product.inventory.stock === 0
   ).length;
 
   return (

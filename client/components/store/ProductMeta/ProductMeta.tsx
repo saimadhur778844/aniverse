@@ -3,6 +3,7 @@
 import { useMemo } from "react";
 
 import { Product } from "@/types/product";
+import { getStock } from "@/utils/product";
 
 import StockBadge from "../StockBadge";
 
@@ -15,11 +16,7 @@ interface ProductMetaProps {
 export default function ProductMeta({
   product,
 }: ProductMetaProps) {
-  const category = useMemo(() => {
-    return typeof product.category === "string"
-      ? product.category
-      : product.category.name;
-  }, [product.category]);
+  const category = product.category;
 
   return (
     <dl className={styles.meta}>
@@ -43,7 +40,7 @@ export default function ProductMeta({
         </dt>
 
         <dd className={styles.value}>
-          <StockBadge stock={product.stock} />
+          <StockBadge stock={getStock(product)} />
         </dd>
       </div>
     </dl>

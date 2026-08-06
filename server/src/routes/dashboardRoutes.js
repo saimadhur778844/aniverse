@@ -3,8 +3,7 @@ import express from "express";
 import { getDashboardStats } from "../controllers/dashboardController.js";
 
 import protect from "../middleware/protect.js";
-import admin from "../middleware/admin.js";
-
+import authorize from "../middleware/authorize.js";
 const router = express.Router();
 
 /*
@@ -15,8 +14,8 @@ const router = express.Router();
 
 router.get(
   "/",
-  protect,
-  admin,
+ protect,
+authorize("admin", "superadmin"),
   getDashboardStats
 );
 
