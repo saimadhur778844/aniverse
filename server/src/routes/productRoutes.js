@@ -9,7 +9,7 @@ import {
 } from "../controllers/productController.js";
 
 import protect from "../middleware/protect.js";
-import admin from "../middleware/admin.js";
+import authorize from "../middleware/authorize.js";
 import { validate } from "../middleware/validate.js";
 import { productSchema } from "../validators/productValidator.js";
 
@@ -34,15 +34,15 @@ router.get("/:slug", getProduct);
 router.post(
   "/",
   protect,
-  admin,
+authorize("admin", "superadmin"),
   validate(productSchema),
   createProduct
 );
 
 router.put(
   "/:id",
-  protect,
-  admin,
+ protect,
+authorize("admin", "superadmin"),
   validate(productSchema),
   updateProduct
 );
@@ -50,7 +50,7 @@ router.put(
 router.patch(
   "/:id",
   protect,
-  admin,
+authorize("admin", "superadmin"),
   validate(productSchema),
   updateProduct
 );
@@ -58,7 +58,7 @@ router.patch(
 router.delete(
   "/:id",
   protect,
-  admin,
+authorize("admin", "superadmin"),
   deleteProduct
 );
 

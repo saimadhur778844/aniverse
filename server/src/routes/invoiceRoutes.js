@@ -5,7 +5,7 @@ import {
 } from "../controllers/invoiceController.js";
 
 import protect from "../middleware/protect.js";
-
+import authorize from "../middleware/authorize.js";
 const router = express.Router();
 
 /*
@@ -19,5 +19,4 @@ router.get(
   protect,
   downloadInvoice
 );
-
 export default router;

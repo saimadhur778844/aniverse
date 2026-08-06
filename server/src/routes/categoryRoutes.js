@@ -8,8 +8,7 @@ import {
 } from "../controllers/categoryController.js";
 
 import protect from "../middleware/protect.js";
-import admin from "../middleware/admin.js";
-
+import authorize from "../middleware/authorize.js";
 import { validate } from "../middleware/validate.js";
 import { categorySchema } from "../validators/categoryValidator.js";
 
@@ -32,7 +31,7 @@ router.get("/", getCategories);
 router.post(
   "/",
   protect,
-  admin,
+authorize("admin", "superadmin"),
   validate(categorySchema),
   createCategory
 );
@@ -40,7 +39,7 @@ router.post(
 router.put(
   "/:id",
   protect,
-  admin,
+authorize("admin", "superadmin"),
   validate(categorySchema),
   updateCategory
 );
@@ -48,7 +47,7 @@ router.put(
 router.patch(
   "/:id",
   protect,
-  admin,
+authorize("admin", "superadmin"),
   validate(categorySchema),
   updateCategory
 );
@@ -56,7 +55,7 @@ router.patch(
 router.delete(
   "/:id",
   protect,
-  admin,
+authorize("admin", "superadmin"),
   deleteCategory
 );
 

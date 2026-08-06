@@ -4,10 +4,10 @@ import Order from "../models/Order.js";
 
 export const generateInvoice = async (
   orderId,
+  user,
   stream
-) => {
-  const order =
-    await Order.findById(orderId)
+) => {  
+  const order = await Order.findById(orderId)
       .populate(
         "user",
         "name email"
@@ -21,6 +21,27 @@ export const generateInvoice = async (
       "Order not found."
     );
   }
+
+  /*
+|--------------------------------------------------------------------------
+| Authorization
+|--------------------------------------------------------------------------
+*/
+
+const isAdmin =
+  user.role === "admin" ||
+  user.role === "superadmin";
+
+if (
+  !isAdmin &&
+  order.user &&
+  order.user._id.toString() !==
+    user.id.toString()
+) {
+  throw new Error(
+    "Unauthorized access."
+  );
+}
 
   const doc = new PDFDocument({
     margin: 50,

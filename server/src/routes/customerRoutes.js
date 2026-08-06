@@ -6,8 +6,7 @@ import {
 } from "../controllers/customerController.js";
 
 import protect from "../middleware/protect.js";
-import admin from "../middleware/admin.js";
-
+import authorize from "../middleware/authorize.js";
 const router = express.Router();
 
 /*
@@ -19,14 +18,14 @@ const router = express.Router();
 router.get(
   "/",
   protect,
-  admin,
+authorize("admin", "superadmin"),
   getCustomers
 );
 
 router.get(
   "/:id",
   protect,
-  admin,
+authorize("admin", "superadmin"),
   getCustomerById
 );
 
