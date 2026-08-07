@@ -11,58 +11,55 @@ class ProductsApi {
   async getProducts(
     filters: ProductFilters = {}
   ): Promise<ProductsResponse> {
-    const { data } = await api.get(
+    const response = await api.get(
       "/products",
       {
         params: filters,
       }
     );
 
-    return data;
+    return response.data.data;
   }
 
   async getProduct(
     slug: string
   ): Promise<ProductResponse> {
-    const { data } = await api.get(
+    const response = await api.get(
       `/products/${slug}`
     );
 
-    return data;
+    return response.data.data;
   }
 
   async createProduct(
     product: Partial<Product>
   ): Promise<ProductResponse> {
-    const { data } = await api.post(
+    const response = await api.post(
       "/products",
       product
     );
 
-    return data;
+    return response.data.data;
   }
 
   async updateProduct(
     id: string,
     product: Partial<Product>
   ): Promise<ProductResponse> {
-    const { data } = await api.patch(
+    const response = await api.patch(
       `/products/${id}`,
       product
     );
 
-    return data;
+    return response.data.data;
   }
 
   async deleteProduct(
     id: string
-  ) {
-    const { data } =
-      await api.delete(
-        `/products/${id}`
-      );
-
-    return data;
+  ): Promise<void> {
+    await api.delete(
+      `/products/${id}`
+    );
   }
 }
 
