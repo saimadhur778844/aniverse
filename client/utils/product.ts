@@ -147,3 +147,16 @@ export function getProfitMargin(
     ).toFixed(1)
   );
 }
+
+export function getCategoryName(
+  product: Product
+) {
+  if (
+    typeof product.category ===
+    "string"
+  ) {
+    return product.category;
+  }
+
+  return product.category.name;
+}

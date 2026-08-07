@@ -1,152 +1,223 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 
-import productService from "@/services/productService";
-
-import { Product } from "@/types/product";
-
-import ProductModal from "@/components/admin/ProductModal/ProductModal";
-import ProductSearch from "@/components/admin/ProductSearch";
 import ProductStats from "@/components/admin/ProductStats";
 import ProductTable from "@/components/admin/ProductTable";
-import { notify } from "@/utils/toast";
+import ProductFilters from "@/components/admin/ProductFilters";
+
+import Button from "@/components/shared/Button";
+import ConfirmDialog from "@/components/shared/ConfirmDialog";
+import Pagination from "@/components/shared/Pagination";
+
+import {
+  useDeleteProduct,
+  useProducts,
+} from "@/hooks/products";
+
+import type {
+  Product,
+  ProductFilters as ProductFiltersType,
+} from "@/types/product";
 
 export default function ProductsPage() {
-  const [products, setProducts] = useState<Product[]>([]);
+  const router = useRouter();
 
-  const [loading, setLoading] = useState(true);
-
-  const [showModal, setShowModal] = useState(false);
-
-  const [selectedProduct, setSelectedProduct] =
-    useState<Product | null>(null);
-
-  const [search, setSearch] = useState("");
+  const [filters, setFilters] =
+    useState<ProductFiltersType>({
+      search: "",
+      category: "",
+      anime: "",
+      status: "",
+      featured: "",
+      page: 1,
+      limit: 20,
+    });
 
   const [debouncedSearch, setDebouncedSearch] =
     useState("");
 
+  const [productToDelete, setProductToDelete] =
+    useState<Product | null>(null);
+
   useEffect(() => {
     const timer = setTimeout(() => {
-      setDebouncedSearch(search);
+      setDebouncedSearch(
+        filters.search ?? ""
+      );
     }, 500);
 
     return () => clearTimeout(timer);
-  }, [search]);
+  }, [filters.search]);
 
-  const loadProducts = useCallback(async () => {
-    try {
-      setLoading(true);
-
-      const response =
-        await productService.getProducts({
-          search:
-            debouncedSearch || undefined,
-          page: 1,
-          limit: 100,
-        });
-
-      setProducts(response.products);
-    } catch (error) {
-      console.error(
-        "Failed to load products",
-        error
-      );
-
-      setProducts([]);
-    } finally {
-      setLoading(false);
-    }
-  }, [debouncedSearch]);
-
-  useEffect(() => {
-    loadProducts();
-  }, [loadProducts]);
-
-  const handleDelete = async (id: string) => {
-    const confirmed = window.confirm(
-      "Delete this product?"
-    );
-
-    if (!confirmed) return;
-
-    try {
-      await productService.deleteProduct(id);
-
-      await loadProducts();
-
-      notify.success("Product deleted.");
-    } catch (error) {
-      console.error(error);
-
-      notify.error("Failed to delete product.");
-    }
+  const queryFilters: ProductFiltersType = {
+    ...filters,
+    search:
+      debouncedSearch || undefined,
   };
 
+  const {
+    data,
+    isLoading,
+  } = useProducts(queryFilters);
+
+  const deleteMutation =
+    useDeleteProduct();
+
+  const products =
+    data?.products ?? [];
+
+  function updateFilter(
+    key: keyof ProductFiltersType,
+    value: string | number
+  ) {
+    setFilters((prev) => ({
+      ...prev,
+      [key]: value,
+      page: 1,
+    }));
+  }
+
   return (
-    <>
-      <div className="space-y-6">
+    <div className="space-y-6">
 
-        <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between">
 
-          <div>
+        <div>
+          <h1 className="text-3xl font-bold">
+            Products
+          </h1>
 
-            <h1 className="text-3xl font-bold">
-              Products
-            </h1>
-
-            <p className="text-gray-500">
-              Manage your product catalogue
-            </p>
-
-          </div>
-
-          <button
-            onClick={() => {
-              setSelectedProduct(null);
-              setShowModal(true);
-            }}
-            className="rounded-lg bg-blue-600 px-5 py-3 text-white transition hover:bg-blue-700"
-          >
-            Add Product
-          </button>
-
+          <p className="text-gray-500">
+            Manage your product catalogue
+          </p>
         </div>
 
-        <ProductStats
-          products={products}
-        />
+        <Button
+          onClick={() =>
+            router.push(
+              "/admin/products/new"
+            )
+          }
+        >
+          Add Product
+        </Button>
 
-        <ProductSearch
-          value={search}
-          onChange={setSearch}
-        />
-
-        <ProductTable
-          products={products}
-          loading={loading}
-          onEdit={(product) => {
-            setSelectedProduct(product);
-            setShowModal(true);
-          }}
-          onDelete={handleDelete}
-        />
-                <ProductModal
-          open={showModal}
-          product={selectedProduct}
-          onClose={() => {
-            setShowModal(false);
-            setSelectedProduct(null);
-          }}
-          onSuccess={async () => {
-            await loadProducts();
-
-            setShowModal(false);
-            setSelectedProduct(null);
-          }}
-        />
       </div>
-    </>
+
+      <ProductStats
+        products={products}
+      />
+
+      <ProductFilters
+        search={filters.search ?? ""}
+        category={
+          filters.category ?? ""
+        }
+        anime={filters.anime ?? ""}
+        status={filters.status ?? ""}
+        featured={
+          filters.featured ?? ""
+        }
+        onSearchChange={(v) =>
+          updateFilter(
+            "search",
+            v
+          )
+        }
+        onCategoryChange={(v) =>
+          updateFilter(
+            "category",
+            v
+          )
+        }
+        onAnimeChange={(v) =>
+          updateFilter(
+            "anime",
+            v
+          )
+        }
+        onStatusChange={(v) =>
+          updateFilter(
+            "status",
+            v
+          )
+        }
+        onFeaturedChange={(v) =>
+          updateFilter(
+            "featured",
+            v
+          )
+        }
+      />
+
+      <ProductTable
+        products={products}
+        loading={isLoading}
+        onEdit={(product) =>
+          router.push(
+            `/admin/products/${product._id}/edit`
+          )
+        }
+        onDelete={(id) => {
+          const product =
+            products.find(
+              (p) => p._id === id
+            ) ?? null;
+
+          setProductToDelete(
+            product
+          );
+        }}
+      />
+
+      <Pagination
+        page={
+          data?.page ??
+          filters.page ??
+          1
+        }
+        pages={data?.pages ?? 1}
+        onPageChange={(page) =>
+          setFilters((prev) => ({
+            ...prev,
+            page,
+          }))
+        }
+      />
+
+      <ConfirmDialog
+        open={!!productToDelete}
+        title="Delete Product"
+        message={
+          productToDelete
+            ? `Are you sure you want to delete "${productToDelete.name}"?`
+            : ""
+        }
+        confirmText="Delete"
+        loading={
+          deleteMutation.isPending
+        }
+        onCancel={() =>
+          setProductToDelete(
+            null
+          )
+        }
+        onConfirm={async () => {
+          if (!productToDelete)
+            return;
+
+          await deleteMutation.mutateAsync(
+            productToDelete._id
+          );
+
+          setProductToDelete(
+            null
+          );
+        }}
+      />
+
+    </div>
   );
 }

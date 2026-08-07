@@ -1,3 +1,17 @@
+/* ===========================
+   Category
+=========================== */
+
+export interface Category {
+  _id: string;
+  name: string;
+  slug: string;
+}
+
+/* ===========================
+   Images
+=========================== */
+
 export interface ProductImage {
   _id?: string;
 
@@ -12,13 +26,9 @@ export interface ProductImage {
   isPrimary: boolean;
 }
 
-export interface ProductSEO {
-  metaTitle: string;
-
-  metaDescription: string;
-
-  keywords: string;
-}
+/* ===========================
+   Inventory
+=========================== */
 
 export interface ProductInventory {
   stock: number;
@@ -30,21 +40,52 @@ export interface ProductInventory {
   continueSelling: boolean;
 }
 
+/* ===========================
+   SEO
+=========================== */
+
+export interface ProductSEO {
+  metaTitle: string;
+
+  metaDescription: string;
+
+  keywords: string;
+}
+
+/* ===========================
+   Specifications
+=========================== */
+
 export interface ProductSpecification {
   label: string;
+
   value: string;
 }
 
+/* ===========================
+   Shipping
+=========================== */
+
 export interface ProductShipping {
   dispatchTime: string;
+
   courier?: string;
+
   packaging?: string;
 }
+
+/* ===========================
+   Status
+=========================== */
 
 export type ProductStatus =
   | "draft"
   | "published"
   | "archived";
+
+/* ===========================
+   Product
+=========================== */
 
 export interface Product {
   _id: string;
@@ -53,27 +94,35 @@ export interface Product {
 
   slug: string;
 
-  shortDescription: string;
+  shortDescription?: string;
 
   description: string;
 
-  category: string;
-
   anime: string;
 
-  brand: string;
+  category: string | Category;
+
+  brand?: string;
 
   sku: string;
+
+  barcode?: string;
+
+  supplier?: string;
+
+  warehouse?: string;
+
+  purchasePrice?: number;
+
+  costPrice: number;
 
   mrp: number;
 
   sellingPrice: number;
 
-  costPrice: number;
+  discount?: number;
 
-  discount: number;
-
-  tax: number;
+  tax?: number;
 
   featured: boolean;
 
@@ -84,6 +133,8 @@ export interface Product {
   status: ProductStatus;
 
   inventory: ProductInventory;
+
+  image?: string;
 
   images: ProductImage[];
 
@@ -102,11 +153,11 @@ export interface Product {
   updatedAt: string;
 }
 
+/* ===========================
+   Filters
+=========================== */
+
 export interface ProductFilters {
-  page?: number;
-
-  limit?: number;
-
   search?: string;
 
   category?: string;
@@ -115,23 +166,41 @@ export interface ProductFilters {
 
   status?: ProductStatus;
 
-  featured?: boolean;
+  featured?: string;
+
+  sort?: string;
+
+  page?: number;
+
+  limit?: number;
 }
 
-export interface ProductsResponse {
-  success: boolean;
+/* ===========================
+   Pagination
+=========================== */
 
-  products: Product[];
+export interface Pagination {
+  page: number;
+
+  pages: number;
 
   total: number;
+}
+
+/* ===========================
+   API Responses
+=========================== */
+
+export interface ProductsResponse {
+  products: Product[];
 
   page: number;
 
   pages: number;
+
+  total: number;
 }
 
 export interface ProductResponse {
-  success: boolean;
-
   product: Product;
 }
