@@ -7,11 +7,13 @@ import styles from "./ProductGrid.module.css";
 interface ProductGridProps {
   products: Product[];
   className?: string;
+  horizontalMobile?: boolean;
 }
 
 export default function ProductGrid({
   products,
   className,
+  horizontalMobile = false,
 }: ProductGridProps) {
   if (!products.length) {
     return null;
@@ -19,7 +21,7 @@ export default function ProductGrid({
 
   return (
     <section
-      className={`${styles.grid} ${className ?? ""}`}
+      className={`${styles.grid} ${horizontalMobile ? styles.horizontalMobile : ""} ${className ?? ""}`}
       aria-label="Products"
     >
       {products.map((product) => (

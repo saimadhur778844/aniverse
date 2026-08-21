@@ -1,25 +1,2 @@
-import featuredAnime from "@/data/featuredAnime";
-import AnimeCard from "@/components/shared/AnimeCard";
-import styles from "./AnimeCollections.module.css";
-import SectionTitle from "@/components/shared/SectionTitle";
-
-export default function AnimeCollections() {
-  return (
-    <section className={styles.section}>
-      {/* <h2 className={styles.title}>Featured Collections</h2> */}
-        <SectionTitle
-        title="Featured Anime"
-        subtitle="Explore collections from the world's most popular anime."
-        />
-      <p className={styles.subtitle}>
-        Explore merchandise from the world's most loved anime.
-      </p>
-
-      <div className={styles.grid}>
-        {featuredAnime.map((anime) => (
-          <AnimeCard key={anime.id} anime={anime} />
-        ))}
-      </div>
-    </section>
-  );
-}
+import Link from "next/link";import Image from "next/image";import featuredAnime from "@/data/featuredAnime";import styles from "./AnimeCollections.module.css";
+export default function AnimeCollections(){return <div className={styles.grid}>{featuredAnime.map(a=><Link key={a.id} href={`/products?anime=${encodeURIComponent(a.slug)}`} className={styles.card}><Image src={a.image} alt={a.name} fill sizes="(max-width:640px) 78vw,(max-width:1000px) 45vw,25vw" className={styles.image}/><div className={styles.overlay}/><div className={styles.content}><span>SHOP BY ANIME</span><h3>{a.name}</h3><p>{a.description}</p><strong>Explore Collection →</strong></div></Link>)}</div>}

@@ -100,9 +100,48 @@ const paymentSchema = new mongoose.Schema(
       type: Date,
     },
 
-    gatewayOrderId: String,
-    gatewayPaymentId: String,
-    paidAt: Date,
+    gatewayOrderId: {
+      type: String,
+      index: true,
+    },
+
+    gatewayPaymentId: {
+      type: String,
+    },
+
+    paidAt: {
+      type: Date,
+    },
+
+    /*
+    |--------------------------------------------------------------------------
+    | Prevent duplicate inventory deduction
+    |--------------------------------------------------------------------------
+    */
+    inventoryProcessed: {
+      type: Boolean,
+      default: false,
+    },
+
+    /*
+    |--------------------------------------------------------------------------
+    | Prevent duplicate coupon consumption
+    |--------------------------------------------------------------------------
+    */
+    couponProcessed: {
+      type: Boolean,
+      default: false,
+    },
+
+    /*
+    |--------------------------------------------------------------------------
+    | Prevent duplicate confirmation emails
+    |--------------------------------------------------------------------------
+    */
+    confirmationEmailSent: {
+      type: Boolean,
+      default: false,
+    },
   },
   { _id: false }
 );
@@ -157,18 +196,18 @@ const orderSchema = new mongoose.Schema(
     },
 
     coupon: {
-  code: {
-    type: String,
-  },
+      code: {
+        type: String,
+      },
 
-  type: {
-    type: String,
-  },
+      type: {
+        type: String,
+      },
 
-  value: {
-    type: Number,
-  },
-},
+      value: {
+        type: Number,
+      },
+    },
 
     total: {
       type: Number,
@@ -187,6 +226,21 @@ const orderSchema = new mongoose.Schema(
       ],
       default: "Pending",
     },
+    /*
+|--------------------------------------------------------------------------
+| Inventory Reservation
+|--------------------------------------------------------------------------
+*/
+
+inventoryReservationActive: {
+  type: Boolean,
+  default: false,
+},
+
+reservationExpiresAt: {
+  type: Date,
+  default: null,
+},
   },
   {
     timestamps: true,
@@ -195,13 +249,9 @@ const orderSchema = new mongoose.Schema(
 
 /**
  * Generate Order Number
+ *
  * Example:
- * ANI-20260731-000001
- */
-/**
- * Generate Order Number
- * Example:
- * ANI-20260802-000001
+ * ANI-20260820-000001
  */
 orderSchema.pre("save", async function () {
   if (this.orderNumber) {
@@ -246,6 +296,10 @@ orderSchema.index({
 
 orderSchema.index({
   "payment.status": 1,
+});
+
+orderSchema.index({
+  "payment.gatewayOrderId": 1,
 });
 
 export default mongoose.model("Order", orderSchema);

@@ -28,8 +28,6 @@ interface ProductCardProps {
 export default function ProductCard({
   product,
 }: ProductCardProps) {
-  const category = product.category;
-
   const { addToCart } = useCart();
 
   const {
@@ -37,9 +35,15 @@ export default function ProductCard({
     isInWishlist,
   } = useWishlist();
 
-  const inWishlist = isInWishlist(
-    product._id
-  );
+  const inWishlist = isInWishlist(product._id);
+
+  const category =
+    typeof product.category === "object" &&
+    product.category !== null
+      ? product.category.name
+      : product.category;
+
+const stock = product.inventory?.stock ?? 0;
 
   return (
     <Link
@@ -95,9 +99,11 @@ export default function ProductCard({
         </div>
 
         <div className={styles.content}>
-          <p className={styles.category}>
-            {category}
-          </p>
+          {category && (
+            <p className={styles.category}>
+              {category}
+            </p>
+          )}
 
           <h3 className={styles.name}>
             {product.name}
@@ -105,12 +111,10 @@ export default function ProductCard({
 
           <Rating
             rating={product.averageRating ?? 0}
-            reviewCount={product.reviewCount}
+            reviewCount={product.reviewCount ?? 0}
           />
 
-          <StockBadge
-            stock={product.inventory.stock}
-          />
+          <StockBadge stock={stock} />
 
           <div className={styles.footer}>
             <div className={styles.priceGroup}>
@@ -118,33 +122,32 @@ export default function ProductCard({
                 {getSellingPrice(product)}
               </span>
 
-              {product.mrp > product.sellingPrice && getDiscount(product) > 0 && (
-                <span
-                  className={
-                    styles.originalPrice
-                  }
-                >
-                  ₹
-                  {product.mrp.toLocaleString(
-                    "en-IN"
-                  )}
-                </span>
-              )}
+              {product.mrp > product.sellingPrice &&
+                getDiscount(product) > 0 && (
+                  <span
+                    className={styles.originalPrice}
+                  >
+                    ₹
+                    {product.mrp.toLocaleString(
+                      "en-IN"
+                    )}
+                  </span>
+                )}
             </div>
 
             <Button
               variant="primary"
-              disabled={
-                product.inventory.stock <= 0
-              }
+              disabled={stock <= 0}
               onClick={(e) => {
                 e.preventDefault();
                 e.stopPropagation();
 
-                addToCart(product, 1);
+                if (stock > 0) {
+                  addToCart(product, 1);
+                }
               }}
             >
-              {product.inventory.stock > 0
+              {stock > 0
                 ? "Add to Cart"
                 : "Sold Out"}
             </Button>

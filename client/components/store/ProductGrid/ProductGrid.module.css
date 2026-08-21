@@ -31,3 +31,4 @@
     gap: 1rem;
   }
 }
+@media (max-width:640px){.horizontalMobile{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(78vw,78vw);grid-template-columns:none;overflow-x:auto;overscroll-behavior-x:contain;scroll-snap-type:x proximity;padding:.25rem .15rem 1rem;margin-inline:-.15rem;-webkit-overflow-scrolling:touch;scrollbar-width:none;touch-action:pan-x}.horizontalMobile::-webkit-scrollbar{display:none}.horizontalMobile>*{min-width:0;scroll-snap-align:start}}
