@@ -2,16 +2,16 @@
 
 import { useEffect, useState } from "react";
 
-import ProductGrid from "../ProductGrid";
-import Section from "../Section";
-import SectionHeader from "../SectionHeader";
+import ProductGrid from "./ProductGrid";
+import Section from "./Section";
+import SectionHeader from "./SectionHeader";
 import Button from "@/components/shared/Button";
 
 import productService from "@/services/productService";
 
 import type { Product } from "@/types/product";
 
-export default function FeaturedSection() {
+export default function NewArrivals() {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
@@ -23,8 +23,8 @@ export default function FeaturedSection() {
         setError(false);
 
         const response = await productService.getProducts({
-          featured: true,
           limit: 8,
+          sort: "newest",
         });
 
         setProducts(
@@ -33,7 +33,7 @@ export default function FeaturedSection() {
             : []
         );
       } catch (err) {
-        console.error("Failed to load featured products:", err);
+        console.error("Failed to load new arrivals:", err);
         setProducts([]);
         setError(true);
       } finally {
@@ -47,14 +47,14 @@ export default function FeaturedSection() {
   return (
     <Section>
       <SectionHeader
-        title="Featured Figures"
-        subtitle="Handpicked collectibles for every anime fan."
+        title="New Arrivals"
+        subtitle="Freshly added collectibles."
       />
 
       {loading && (
         <div className="flex min-h-[220px] items-center justify-center">
           <p className="text-sm text-white/60">
-            Loading featured products...
+            Loading new arrivals...
           </p>
         </div>
       )}
@@ -62,7 +62,7 @@ export default function FeaturedSection() {
       {!loading && error && (
         <div className="flex min-h-[220px] flex-col items-center justify-center gap-4">
           <p className="text-sm text-white/60">
-            Unable to load featured products.
+            Unable to load new arrivals.
           </p>
 
           <Button
@@ -76,15 +76,15 @@ export default function FeaturedSection() {
 
       {!loading && !error && products.length > 0 && (
         <ProductGrid
-          products={products}
-          horizontalMobile
+        products={products}
+        horizontalMobile
         />
       )}
 
       {!loading && !error && products.length === 0 && (
         <div className="flex min-h-[180px] items-center justify-center">
           <p className="text-sm text-white/50">
-            Featured products will appear here soon.
+            New arrivals will appear here soon.
           </p>
         </div>
       )}

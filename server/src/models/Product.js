@@ -117,6 +117,12 @@ const productSchema = new mongoose.Schema(
       required: true,
     },
 
+    mrp: { type: Number, default: 0 },
+    sellingPrice: { type: Number, default: 0 },
+    costPrice: { type: Number, default: 0 },
+    discount: { type: Number, default: 0 },
+    tax: { type: Number, default: 0 },
+
     stock: {
       type: Number,
       default: 0,
@@ -158,6 +164,10 @@ const productSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+
+    trending: { type: Boolean, default: false },
+    newArrival: { type: Boolean, default: false },
+    status: { type: String, enum: ["draft", "published", "archived"], default: "published" },
 
     averageRating: {
   type: Number,
@@ -214,6 +224,8 @@ productSchema.index({ anime: 1 });
 productSchema.index({ category: 1 });
 
 productSchema.index({ featured: 1 });
+productSchema.index({ trending: 1 });
+productSchema.index({ newArrival: 1 });
 
 productSchema.index({ stock: 1 });
 

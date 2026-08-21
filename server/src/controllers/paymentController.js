@@ -1,9 +1,11 @@
 import Order from "../models/Order.js";
-// import Coupon from "../models/Coupon.js";
-// import Product from "../models/Product.js";
 
 import cashfree from "../config/cashfree.js";
-import { verifyPayment } from "../services/paymentService.js";
+
+import {
+  verifyPayment,
+} from "../services/paymentService.js";
+
 import verifyCashfreeWebhook from "../utils/verifyCashfreeWebhook.js";
 
 /*
@@ -12,60 +14,63 @@ import verifyCashfreeWebhook from "../utils/verifyCashfreeWebhook.js";
 |--------------------------------------------------------------------------
 */
 
-const createCashfreeOrder = async (order) => {
+const createCashfreeOrder = async (
+  order
+) => {
   const payload = {
-  order_id: `ANV_${order._id}`,
+    order_id: `ANV_${order._id}`,
 
-  order_amount: Number(order.total),
+    order_amount: Number(
+      order.total
+    ),
 
-  order_currency: "INR",
+    order_currency: "INR",
 
-  customer_details: {
-    customer_id: order.user
-      ? order.user.toString()
-      : "guest",
+    customer_details: {
+      customer_id: order.user
+        ? order.user.toString()
+        : "guest",
 
-    customer_name:
-      order.shippingAddress.fullName,
+      customer_name:
+        order.shippingAddress.fullName,
 
-    customer_email:
-      order.shippingAddress.email,
+      customer_email:
+        order.shippingAddress.email,
 
-    customer_phone:
-      order.shippingAddress.phone
-        .replace(/\D/g, "")
-        .replace(/^0+/, ""),
-  },
+      customer_phone:
+        order.shippingAddress.phone
+          .replace(/\D/g, "")
+          .replace(/^0+/, ""),
+    },
 
- order_meta: {
-  return_url: `${process.env.CLIENT_URL}/payment-success?order_id={order_id}`,
-},
+    order_meta: {
+      return_url:
+        `${process.env.CLIENT_URL}/payment-success?order_id={order_id}`,
+    },
 
-  order_note: order.orderNumber,
-};
-
+    order_note:
+      order.orderNumber,
+  };
 
   try {
-    const { data } = await cashfree.post(
-      "/pg/orders",
-      payload,
-      {
-        headers: {
-          "Content-Type":
-            "application/json",
+    const { data } =
+      await cashfree.post(
+        "/pg/orders",
+        payload,
+        {
+          headers: {
+            "Content-Type":
+              "application/json",
 
-          Accept:
-            "application/json",
+            Accept:
+              "application/json",
 
-          "x-api-version":
-            "2025-01-01",
-        },
-      }
-    );
+            "x-api-version":
+              "2025-01-01",
+          },
+        }
+      );
 
-
-
-  
     order.payment.gatewayOrderId =
       data.order_id;
 
@@ -73,24 +78,15 @@ const createCashfreeOrder = async (order) => {
 
     return data;
   } catch (error) {
-
-
-    console.log(
-      "Status:",
-      error.response?.status
-    );
-
-    console.dir(
-      error.response?.data,
-      {
-        depth: null,
-      }
+    console.error(
+      "Cashfree order creation failed:",
+      error.response?.data ??
+        error.message
     );
 
     throw error;
   }
 };
-
 
 /*
 |--------------------------------------------------------------------------
@@ -101,8 +97,17 @@ const createCashfreeOrder = async (order) => {
 export const createPaymentSession =
   async (req, res) => {
     try {
-      const { orderId } =
-        req.body;
+      const {
+        orderId,
+      } = req.body;
+
+      if (!orderId) {
+        return res.status(400).json({
+          success: false,
+          message:
+            "Order ID is required.",
+        });
+      }
 
       const order =
         await Order.findById(
@@ -114,6 +119,25 @@ export const createPaymentSession =
           success: false,
           message:
             "Order not found.",
+        });
+      }
+
+      /*
+      |--------------------------------------------------------------------------
+      | Security: customer can only create payment for their own order
+      |--------------------------------------------------------------------------
+      */
+
+      if (
+        req.user &&
+        order.user &&
+        order.user.toString() !==
+          req.user._id.toString()
+      ) {
+        return res.status(403).json({
+          success: false,
+          message:
+            "You are not allowed to pay for this order.",
         });
       }
 
@@ -161,35 +185,85 @@ export const createPaymentSession =
 | Verify Payment
 |--------------------------------------------------------------------------
 */
-export const verifyPaymentStatus = async (
-  req,
-  res
-) => {
-  try {
-    const { orderId } =
-      req.params;
 
-    const order =
-      await verifyPayment(
-        orderId
+export const verifyPaymentStatus =
+  async (req, res) => {
+    try {
+      const {
+        orderId,
+      } = req.params;
+
+      if (!orderId) {
+        return res.status(400).json({
+          success: false,
+          message:
+            "Cashfree order ID is required.",
+        });
+      }
+
+      /*
+      |--------------------------------------------------------------------------
+      | Find Aniverse order first
+      |--------------------------------------------------------------------------
+      */
+
+      const order =
+        await Order.findOne({
+          "payment.gatewayOrderId":
+            orderId,
+        });
+
+      if (!order) {
+        return res.status(404).json({
+          success: false,
+          message:
+            "Order not found.",
+        });
+      }
+
+      /*
+      |--------------------------------------------------------------------------
+      | Ownership check
+      |--------------------------------------------------------------------------
+      */
+
+      if (
+        req.user &&
+        order.user &&
+        order.user.toString() !==
+          req.user._id.toString()
+      ) {
+        return res.status(403).json({
+          success: false,
+          message:
+            "You are not allowed to verify this order.",
+        });
+      }
+
+      const verifiedOrder =
+        await verifyPayment(
+          orderId
+        );
+
+      return res.json({
+        success: true,
+        order: verifiedOrder,
+      });
+    } catch (error) {
+      console.error(
+        "Payment verification failed:",
+        error
       );
 
-    return res.json({
-      success: true,
-      order,
-    });
-  } catch (error) {
-    console.error(error);
+      return res.status(500).json({
+        success: false,
+        message:
+          error.message,
+      });
+    }
+  };
 
-    return res.status(500).json({
-      success: false,
-      message:
-        error.message,
-    });
-  }
-};
-
-  /*
+/*
 |--------------------------------------------------------------------------
 | Retry Payment
 |--------------------------------------------------------------------------
@@ -198,8 +272,9 @@ export const verifyPaymentStatus = async (
 export const retryPaymentSession =
   async (req, res) => {
     try {
-      const { orderId } =
-        req.params;
+      const {
+        orderId,
+      } = req.params;
 
       const order =
         await Order.findById(
@@ -211,6 +286,30 @@ export const retryPaymentSession =
           success: false,
           message:
             "Order not found.",
+        });
+      }
+
+      if (
+        req.user &&
+        order.user &&
+        order.user.toString() !==
+          req.user._id.toString()
+      ) {
+        return res.status(403).json({
+          success: false,
+          message:
+            "You are not allowed to pay for this order.",
+        });
+      }
+
+      if (
+        order.payment.status ===
+        "Paid"
+      ) {
+        return res.status(400).json({
+          success: false,
+          message:
+            "Order already paid.",
         });
       }
 
@@ -233,6 +332,7 @@ export const retryPaymentSession =
 
       return res.status(500).json({
         success: false,
+
         message:
           error.response?.data
             ?.message ??
@@ -247,112 +347,101 @@ export const retryPaymentSession =
 |--------------------------------------------------------------------------
 */
 
-export const paymentWebhook = async (
-  req,
-  res
-) => {
-  try {
-    /*
-    |--------------------------------------------------------------------------
-    | Verify Signature
-    |--------------------------------------------------------------------------
-    */
+export const paymentWebhook =
+  async (req, res) => {
+    try {
+      /*
+      |--------------------------------------------------------------------------
+      | Verify Cashfree signature
+      |--------------------------------------------------------------------------
+      */
 
-    const isValid = verifyCashfreeWebhook(
-      req.rawBody,
-      req.headers["x-webhook-signature"],
-      req.headers["x-webhook-timestamp"]
-    );
+      const isValid =
+        verifyCashfreeWebhook(
+          req.rawBody,
+          req.headers[
+            "x-webhook-signature"
+          ],
+          req.headers[
+            "x-webhook-timestamp"
+          ]
+        );
 
-    if (!isValid) {
-      return res.status(401).json({
-        success: false,
-        message: "Invalid webhook signature.",
-      });
-    }
+      if (!isValid) {
+        return res.status(401).json({
+          success: false,
+          message:
+            "Invalid webhook signature.",
+        });
+      }
 
-    /*
-    |--------------------------------------------------------------------------
-    | Event
-    |--------------------------------------------------------------------------
-    */
+      const event =
+        req.body?.type;
 
-    const event =
-      req.body.type;
+      const data =
+        req.body?.data;
 
-    const data =
-      req.body.data;
+      const gatewayOrderId =
+        data?.order?.order_id;
 
-    if (!data?.order?.order_id) {
+      if (!gatewayOrderId) {
+        return res.json({
+          success: true,
+        });
+      }
+
+      /*
+      |--------------------------------------------------------------------------
+      | Successful payment
+      |--------------------------------------------------------------------------
+      |
+      | IMPORTANT:
+      | We don't update the order directly here.
+      |
+      | We use the same verification/finalization
+      | service used by the success page.
+      |
+      */
+
+      if (
+        event ===
+        "PAYMENT_SUCCESS_WEBHOOK"
+      ) {
+        await verifyPayment(
+          gatewayOrderId
+        );
+      }
+
+      /*
+      |--------------------------------------------------------------------------
+      | Failed / dropped payment
+      |--------------------------------------------------------------------------
+      */
+
+      if (
+        event ===
+          "PAYMENT_FAILED_WEBHOOK" ||
+        event ===
+          "PAYMENT_USER_DROPPED_WEBHOOK"
+      ) {
+        console.log(
+          `Payment not completed for ${gatewayOrderId}`
+        );
+      }
+
       return res.json({
         success: true,
       });
-    }
-
-    const gatewayOrderId =
-      data.order.order_id;
-
-    /*
-    |--------------------------------------------------------------------------
-    | Payment Success
-    |--------------------------------------------------------------------------
-    */
-
-    if (
-      event ===
-      "PAYMENT_SUCCESS_WEBHOOK"
-    ) {
-      const order =
-        await Order.findOne({
-          "payment.gatewayOrderId":
-            gatewayOrderId,
-        });
-
-      if (
-        order &&
-        order.payment.status !==
-          "Paid"
-      ) {
-        order.payment.status =
-          "Paid";
-
-        order.payment.paidAt =
-          new Date();
-
-        order.orderStatus =
-          "Confirmed";
-
-        await order.save();
-      }
-    }
-
-    /*
-    |--------------------------------------------------------------------------
-    | Payment Failed
-    |--------------------------------------------------------------------------
-    */
-
-    if (
-      event ===
-        "PAYMENT_FAILED_WEBHOOK" ||
-      event ===
-        "PAYMENT_USER_DROPPED_WEBHOOK"
-    ) {
-      console.log(
-        `Payment not completed for ${gatewayOrderId}`
+    } catch (error) {
+      console.error(
+        "Cashfree webhook error:",
+        error
       );
+
+      return res.status(500).json({
+        success: false,
+        message:
+          error.message,
+      });
     }
-
-    return res.json({
-      success: true,
-    });
-  } catch (error) {
-    console.error(error);
-
-    return res.status(500).json({
-      success: false,
-      message:
-        error.message,
-    });
-  }
-};
+  };

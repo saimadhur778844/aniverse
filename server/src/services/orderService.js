@@ -29,7 +29,6 @@ export const createOrder = async (payload) => {
     } = payload;
 
     let discount = 0;
-
     let coupon = null;
 
     if (!items?.length) {
@@ -37,6 +36,51 @@ export const createOrder = async (payload) => {
         "Order must contain at least one item."
       );
     }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Clean up expired reservations
+    |--------------------------------------------------------------------------
+    */
+
+    const expiredOrders =
+      await Order.find({
+        inventoryReservationActive: true,
+        reservationExpiresAt: {
+          $lte: new Date(),
+        },
+        orderStatus: "Pending",
+      }).session(session);
+
+    for (const expiredOrder of expiredOrders) {
+      for (const item of expiredOrder.items) {
+        await Product.findByIdAndUpdate(
+          item.product,
+          {
+            $inc: {
+              reservedStock:
+                -item.quantity,
+            },
+          },
+          {
+            session,
+          }
+        );
+      }
+
+      expiredOrder.inventoryReservationActive =
+        false;
+
+      await expiredOrder.save({
+        session,
+      });
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Load products
+    |--------------------------------------------------------------------------
+    */
 
     const productIds = items.map(
       (item) => item.product
@@ -52,18 +96,24 @@ export const createOrder = async (payload) => {
     const productMap =
       new Map();
 
-    products.forEach((product) => {
-      productMap.set(
-        product._id.toString(),
-        product
-      );
-    });
+    products.forEach(
+      (product) => {
+        productMap.set(
+          product._id.toString(),
+          product
+        );
+      }
+    );
 
     const orderItems = [];
 
-    const bulkOperations = [];
-
     let subtotal = 0;
+
+    /*
+    |--------------------------------------------------------------------------
+    | Reserve inventory
+    |--------------------------------------------------------------------------
+    */
 
     for (const item of items) {
       const product =
@@ -77,18 +127,78 @@ export const createOrder = async (payload) => {
         );
       }
 
+      const quantity =
+        Number(item.quantity);
+
       if (
-        product.stock <
-        item.quantity
+        !Number.isInteger(quantity) ||
+        quantity < 1
       ) {
         throw new Error(
-          `${product.name} has only ${product.stock} item(s) left`
+          `Invalid quantity for ${product.name}`
         );
       }
 
-      subtotal +=
-        product.price *
-        item.quantity;
+      /*
+      |--------------------------------------------------------------------------
+      | Atomic reservation
+      |--------------------------------------------------------------------------
+      |
+      | availableStock =
+      | stock - reservedStock
+      |
+      */
+
+      const reservedProduct =
+        await Product.findOneAndUpdate(
+          {
+            _id: product._id,
+
+            $expr: {
+              $gte: [
+                {
+                  $subtract: [
+                    "$stock",
+                    "$reservedStock",
+                  ],
+                },
+                quantity,
+              ],
+            },
+          },
+          {
+            $inc: {
+              reservedStock:
+                quantity,
+            },
+
+            $push: {
+              stockHistory: {
+                quantity: quantity,
+                type: "ORDER",
+                reason:
+                  "Inventory reserved for order",
+                user: user ?? null,
+              },
+            },
+          },
+          {
+            session,
+            new: true,
+          }
+        );
+
+      if (!reservedProduct) {
+        throw new Error(
+          `${product.name} is out of stock or does not have enough available quantity.`
+        );
+      }
+
+      /*
+      |--------------------------------------------------------------------------
+      | Snapshot order item
+      |--------------------------------------------------------------------------
+      */
 
       orderItems.push({
         product:
@@ -103,25 +213,19 @@ export const createOrder = async (payload) => {
         price:
           product.price,
 
-        quantity:
-          item.quantity,
+        quantity,
       });
 
-      // bulkOperations.push({
-      //   updateOne: {
-      //     filter: {
-      //       _id: product._id,
-      //     },
-
-      //     update: {
-      //       $inc: {
-      //         stock:
-      //           -item.quantity,
-      //       },
-      //     },
-      //   },
-      // });
+      subtotal +=
+        product.price *
+        quantity;
     }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Coupon
+    |--------------------------------------------------------------------------
+    */
 
     if (couponCode) {
       const result =
@@ -146,16 +250,11 @@ export const createOrder = async (payload) => {
       };
     }
 
-    if (
-      bulkOperations.length
-    ) {
-      // await Product.bulkWrite(
-      //   bulkOperations,
-      //   {
-      //     session,
-      //   }
-      // );
-    }
+    /*
+    |--------------------------------------------------------------------------
+    | Calculate total
+    |--------------------------------------------------------------------------
+    */
 
     const total =
       Math.max(
@@ -165,6 +264,27 @@ export const createOrder = async (payload) => {
           tax -
           discount
       );
+
+    /*
+    |--------------------------------------------------------------------------
+    | Reservation expiry
+    |--------------------------------------------------------------------------
+    |
+    | 15 minutes.
+    |
+    */
+
+    const reservationExpiresAt =
+      new Date(
+        Date.now() +
+          15 * 60 * 1000
+      );
+
+    /*
+    |--------------------------------------------------------------------------
+    | Create order
+    |--------------------------------------------------------------------------
+    */
 
     const [order] =
       await Order.create(
@@ -188,6 +308,14 @@ export const createOrder = async (payload) => {
             coupon,
 
             total,
+
+            orderStatus:
+              "Pending",
+
+            inventoryReservationActive:
+              true,
+
+            reservationExpiresAt,
           },
         ],
         {
@@ -505,23 +633,101 @@ export const cancelOrder = async (
       );
     }
 
+    /*
+    |--------------------------------------------------------------------------
+    | Unpaid order
+    |--------------------------------------------------------------------------
+    |
+    | Release reservation only.
+    |
+    */
+
+    if (
+      order.payment.status !==
+      "Paid"
+    ) {
+      if (
+        order.inventoryReservationActive
+      ) {
+        for (const item of order.items) {
+          await Product.findByIdAndUpdate(
+            item.product,
+            {
+              $inc: {
+                reservedStock:
+                  -item.quantity,
+              },
+
+              $push: {
+                stockHistory: {
+                  quantity:
+                    -item.quantity,
+
+                  type: "RETURN",
+
+                  reason:
+                    "Cancelled unpaid order - reservation released",
+
+                  user: userId,
+                },
+              },
+            },
+            {
+              session,
+            }
+          );
+        }
+
+        order.inventoryReservationActive =
+          false;
+
+        order.reservationExpiresAt =
+          null;
+      }
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Paid order
+    |--------------------------------------------------------------------------
+    |
+    | Return sold inventory to stock.
+    |
+    */
+
+    else {
+      for (const item of order.items) {
+        await Product.findByIdAndUpdate(
+          item.product,
+          {
+            $inc: {
+              stock:
+                item.quantity,
+            },
+
+            $push: {
+              stockHistory: {
+                quantity:
+                  item.quantity,
+
+                type: "RETURN",
+
+                reason:
+                  "Cancelled paid order",
+
+                user: userId,
+              },
+            },
+          },
+          {
+            session,
+          }
+        );
+      }
+    }
+
     order.orderStatus =
       "Cancelled";
-
-    for (const item of order.items) {
-      await Product.findByIdAndUpdate(
-        item.product,
-        {
-          $inc: {
-            stock:
-              item.quantity,
-          },
-        },
-        {
-          session,
-        }
-      );
-    }
 
     await order.save({
       session,
